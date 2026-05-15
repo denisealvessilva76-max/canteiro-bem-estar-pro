@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Brain, Phone, MessageCircle } from "lucide-react";
+import { ArrowLeft, Brain, Phone, MessageCircle, Volume2, VolumeX } from "lucide-react";
+import { speak, stopSpeaking, startBackgroundMusic, stopBackgroundMusic, isTtsSupported } from "@/lib/tts";
+import { WHATSAPP_PSICOLOGA, WHATSAPP_ASSISTENTE_SOCIAL, whatsappLink } from "@/lib/contatos";
 
 export const Route = createFileRoute("/app/mental")({
   component: Mental,
 });
 
 const FASES = [
-  { nome: 'Inspire', dur: 4, scale: 1.6 },
-  { nome: 'Segure', dur: 7, scale: 1.6 },
-  { nome: 'Solte', dur: 8, scale: 0.9 },
+  { nome: 'Inspire', dur: 4, scale: 1.6, fala: 'Inspire devagar pelo nariz' },
+  { nome: 'Segure', dur: 7, scale: 1.6, fala: 'Segure o ar' },
+  { nome: 'Solte', dur: 8, scale: 0.9, fala: 'Solte o ar pela boca, devagar' },
 ];
 
 function Mental() {
@@ -18,6 +20,7 @@ function Mental() {
   const [fase, setFase] = useState(0);
   const [tempo, setTempo] = useState(FASES[0].dur);
   const [ciclos, setCiclos] = useState(0);
+  const [comAudio, setComAudio] = useState(true);
 
   useEffect(() => {
     if (!running) return;
@@ -27,13 +30,27 @@ function Mental() {
         const proxima = (fase + 1) % FASES.length;
         if (proxima === 0) setCiclos((c) => c + 1);
         setFase(proxima);
+        if (comAudio) speak(FASES[proxima].fala);
         return FASES[proxima].dur;
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [running, fase]);
+  }, [running, fase, comAudio]);
 
-  function start() { setRunning(true); setFase(0); setTempo(FASES[0].dur); setCiclos(0); }
+  function start() {
+    setRunning(true); setFase(0); setTempo(FASES[0].dur); setCiclos(0);
+    if (comAudio) {
+      startBackgroundMusic();
+      speak('Vamos começar. ' + FASES[0].fala);
+    }
+  }
+  function stop() {
+    setRunning(false);
+    stopSpeaking();
+    stopBackgroundMusic();
+  }
+
+  useEffect(() => () => { stopSpeaking(); stopBackgroundMusic(); }, []);
 
   return (
     <div className="px-5 pb-8 pt-6">
@@ -47,7 +64,7 @@ function Mental() {
         Você não está sozinho. Tudo aqui é confidencial. 🤝
       </p>
 
-      {/* SOS */}
+      {/* SOS / WhatsApp */}
       <div className="mt-6 grid grid-cols-1 gap-3">
         <a
           href="tel:188"
@@ -56,25 +73,38 @@ function Mental() {
           <Phone className="h-5 w-5" /> SOS · CVV 188
         </a>
         <a
-          href="https://wa.me/5594000000000?text=Olá,%20preciso%20conversar"
+          href={whatsappLink(WHATSAPP_PSICOLOGA, 'Olá, sou trabalhador do canteiro e gostaria de conversar com a psicóloga.')}
           target="_blank" rel="noopener"
           className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-success text-base font-bold text-success-foreground shadow-soft"
         >
-          <MessageCircle className="h-5 w-5" /> Falar com Psicóloga
+          <MessageCircle className="h-5 w-5" /> Falar com Psicóloga (WhatsApp)
         </a>
         <a
-          href="https://wa.me/5594000000001?text=Olá,%20preciso%20de%20apoio"
+          href={whatsappLink(WHATSAPP_ASSISTENTE_SOCIAL, 'Olá, sou trabalhador do canteiro e preciso de apoio da assistente social.')}
           target="_blank" rel="noopener"
           className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-success bg-card text-base font-bold text-success"
         >
-          <MessageCircle className="h-5 w-5" /> Assistente Social
+          <MessageCircle className="h-5 w-5" /> Assistente Social (WhatsApp)
         </a>
       </div>
 
       {/* Respiração 4-7-8 */}
       <div className="mt-7 rounded-3xl border border-border bg-card p-6 shadow-soft">
-        <h2 className="text-base font-bold">Respiração 4-7-8</h2>
-        <p className="text-xs text-muted-foreground">Acalma em momentos de estresse ou ansiedade.</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-base font-bold">Respiração guiada 4-7-8</h2>
+            <p className="text-xs text-muted-foreground">Acalma em momentos de estresse ou ansiedade.</p>
+          </div>
+          {isTtsSupported() && (
+            <button
+              onClick={() => { setComAudio((v) => { if (v) { stopSpeaking(); stopBackgroundMusic(); } return !v; }); }}
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground"
+              aria-label="Alternar narração"
+            >
+              {comAudio ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+            </button>
+          )}
+        </div>
 
         <div className="mt-6 flex flex-col items-center">
           <motion.div
@@ -89,10 +119,10 @@ function Mental() {
           </motion.div>
           <p className="mt-4 text-xs text-muted-foreground">{ciclos} ciclos completos</p>
           <button
-            onClick={() => running ? setRunning(false) : start()}
+            onClick={() => running ? stop() : start()}
             className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-primary font-bold text-primary-foreground"
           >
-            {running ? 'Parar' : 'Começar'}
+            {running ? 'Parar' : 'Começar com narração'}
           </button>
         </div>
       </div>
