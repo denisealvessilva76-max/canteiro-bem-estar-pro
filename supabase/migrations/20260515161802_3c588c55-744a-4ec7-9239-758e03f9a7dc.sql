@@ -1,0 +1,2 @@
+ALTER TABLE public.profiles ALTER COLUMN altura TYPE NUMERIC(6,2);
+ALTER TABLE public.profiles ALTER COLUMN peso TYPE NUMERIC(6,2);
