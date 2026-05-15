@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppSaudeRouteImport } from './routes/app.saude'
 import { Route as AppRecompensasRouteImport } from './routes/app.recompensas'
@@ -24,6 +25,12 @@ import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppErgonomiaRouteImport } from './routes/app.ergonomia'
 import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
 import { Route as AppAvisosRouteImport } from './routes/app.avisos'
+import { Route as AdminRecompensasRouteImport } from './routes/admin.recompensas'
+import { Route as AdminFuncionariosRouteImport } from './routes/admin.funcionarios'
+import { Route as AdminDesafiosRouteImport } from './routes/admin.desafios'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminAvisosRouteImport } from './routes/admin.avisos'
+import { Route as AdminAlertasRouteImport } from './routes/admin.alertas'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -43,6 +50,11 @@ const AppRoute = AppRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin-login',
   path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -100,13 +112,50 @@ const AppAvisosRoute = AppAvisosRouteImport.update({
   path: '/avisos',
   getParentRoute: () => AppRoute,
 } as any)
+const AdminRecompensasRoute = AdminRecompensasRouteImport.update({
+  id: '/recompensas',
+  path: '/recompensas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFuncionariosRoute = AdminFuncionariosRouteImport.update({
+  id: '/funcionarios',
+  path: '/funcionarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDesafiosRoute = AdminDesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAvisosRoute = AdminAvisosRouteImport.update({
+  id: '/avisos',
+  path: '/avisos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAlertasRoute = AdminAlertasRouteImport.update({
+  id: '/alertas',
+  path: '/alertas',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
   '/app': typeof AppRouteWithChildren
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/admin/alertas': typeof AdminAlertasRoute
+  '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/desafios': typeof AdminDesafiosRoute
+  '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/recompensas': typeof AdminRecompensasRoute
   '/app/avisos': typeof AppAvisosRoute
   '/app/desafios': typeof AppDesafiosRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
@@ -120,10 +169,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
   '/app': typeof AppRouteWithChildren
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/admin/alertas': typeof AdminAlertasRoute
+  '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/desafios': typeof AdminDesafiosRoute
+  '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/recompensas': typeof AdminRecompensasRoute
   '/app/avisos': typeof AppAvisosRoute
   '/app/desafios': typeof AppDesafiosRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
@@ -138,10 +194,17 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admin-login': typeof AdminLoginRoute
   '/app': typeof AppRouteWithChildren
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/admin/alertas': typeof AdminAlertasRoute
+  '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/desafios': typeof AdminDesafiosRoute
+  '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/recompensas': typeof AdminRecompensasRoute
   '/app/avisos': typeof AppAvisosRoute
   '/app/desafios': typeof AppDesafiosRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
@@ -157,10 +220,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/admin-login'
     | '/app'
     | '/cadastro'
     | '/login'
+    | '/admin/alertas'
+    | '/admin/avisos'
+    | '/admin/dashboard'
+    | '/admin/desafios'
+    | '/admin/funcionarios'
+    | '/admin/recompensas'
     | '/app/avisos'
     | '/app/desafios'
     | '/app/ergonomia'
@@ -174,10 +244,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/admin-login'
     | '/app'
     | '/cadastro'
     | '/login'
+    | '/admin/alertas'
+    | '/admin/avisos'
+    | '/admin/dashboard'
+    | '/admin/desafios'
+    | '/admin/funcionarios'
+    | '/admin/recompensas'
     | '/app/avisos'
     | '/app/desafios'
     | '/app/ergonomia'
@@ -191,10 +268,17 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/admin-login'
     | '/app'
     | '/cadastro'
     | '/login'
+    | '/admin/alertas'
+    | '/admin/avisos'
+    | '/admin/dashboard'
+    | '/admin/desafios'
+    | '/admin/funcionarios'
+    | '/admin/recompensas'
     | '/app/avisos'
     | '/app/desafios'
     | '/app/ergonomia'
@@ -209,6 +293,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
   AppRoute: typeof AppRouteWithChildren
   CadastroRoute: typeof CadastroRoute
@@ -243,6 +328,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-login'
       fullPath: '/admin-login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -322,8 +414,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAvisosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/admin/recompensas': {
+      id: '/admin/recompensas'
+      path: '/recompensas'
+      fullPath: '/admin/recompensas'
+      preLoaderRoute: typeof AdminRecompensasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/funcionarios': {
+      id: '/admin/funcionarios'
+      path: '/funcionarios'
+      fullPath: '/admin/funcionarios'
+      preLoaderRoute: typeof AdminFuncionariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/desafios': {
+      id: '/admin/desafios'
+      path: '/desafios'
+      fullPath: '/admin/desafios'
+      preLoaderRoute: typeof AdminDesafiosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/avisos': {
+      id: '/admin/avisos'
+      path: '/avisos'
+      fullPath: '/admin/avisos'
+      preLoaderRoute: typeof AdminAvisosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/alertas': {
+      id: '/admin/alertas'
+      path: '/alertas'
+      fullPath: '/admin/alertas'
+      preLoaderRoute: typeof AdminAlertasRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminAlertasRoute: typeof AdminAlertasRoute
+  AdminAvisosRoute: typeof AdminAvisosRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminDesafiosRoute: typeof AdminDesafiosRoute
+  AdminFuncionariosRoute: typeof AdminFuncionariosRoute
+  AdminRecompensasRoute: typeof AdminRecompensasRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAlertasRoute: AdminAlertasRoute,
+  AdminAvisosRoute: AdminAvisosRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminDesafiosRoute: AdminDesafiosRoute,
+  AdminFuncionariosRoute: AdminFuncionariosRoute,
+  AdminRecompensasRoute: AdminRecompensasRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AppRouteChildren {
   AppAvisosRoute: typeof AppAvisosRoute
@@ -355,6 +509,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
   AppRoute: AppRouteWithChildren,
   CadastroRoute: CadastroRoute,
