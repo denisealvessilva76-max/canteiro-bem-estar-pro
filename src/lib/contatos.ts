@@ -1,7 +1,8 @@
 // Contatos centrais do Canteiro Saudável
 
-export const WHATSAPP_PSICOLOGA = '5531995892351';
-export const WHATSAPP_ASSISTENTE_SOCIAL = '5531995892351';
+export const WHATSAPP_SAUDE_OCUPACIONAL = '5521998225493';
+export const WHATSAPP_PSICOLOGA = WHATSAPP_SAUDE_OCUPACIONAL;
+export const WHATSAPP_ASSISTENTE_SOCIAL = WHATSAPP_SAUDE_OCUPACIONAL;
 
 export function whatsappLink(numero: string, mensagem: string) {
   return `https://wa.me/${numero}?text=${encodeURIComponent(mensagem)}`;
