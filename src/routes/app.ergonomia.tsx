@@ -57,7 +57,9 @@ function Ergonomia() {
     await supabase.from('alongamento_logs').insert({
       user_id: user.id, data: todayISO(), duracao_segundos: ALONGAMENTOS.reduce((s, a) => s + a.tempo, 0),
     });
-    await supabase.rpc('handle_hidratacao_points').catch(() => null);
+    // bonifica +15 pontos via update direto
+    const { data: prof } = await supabase.from('profiles').select('pontos_acumulados').eq('id', user.id).maybeSingle();
+    if (prof) await supabase.from('profiles').update({ pontos_acumulados: prof.pontos_acumulados + 15 }).eq('id', user.id);
     toast.success('Ginástica concluída! +15 pontos');
     setTimeout(() => void refreshProfile(), 600);
   }
