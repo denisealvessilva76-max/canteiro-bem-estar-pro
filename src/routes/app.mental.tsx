@@ -1,0 +1,106 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, Brain, Phone, MessageCircle } from "lucide-react";
+
+export const Route = createFileRoute("/app/mental")({
+  component: Mental,
+});
+
+const FASES = [
+  { nome: 'Inspire', dur: 4, scale: 1.6 },
+  { nome: 'Segure', dur: 7, scale: 1.6 },
+  { nome: 'Solte', dur: 8, scale: 0.9 },
+];
+
+function Mental() {
+  const [running, setRunning] = useState(false);
+  const [fase, setFase] = useState(0);
+  const [tempo, setTempo] = useState(FASES[0].dur);
+  const [ciclos, setCiclos] = useState(0);
+
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => {
+      setTempo((t) => {
+        if (t > 1) return t - 1;
+        const proxima = (fase + 1) % FASES.length;
+        if (proxima === 0) setCiclos((c) => c + 1);
+        setFase(proxima);
+        return FASES[proxima].dur;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [running, fase]);
+
+  function start() { setRunning(true); setFase(0); setTempo(FASES[0].dur); setCiclos(0); }
+
+  return (
+    <div className="px-5 pb-8 pt-6">
+      <Link to="/app/home" className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+        <ArrowLeft className="h-4 w-4" /> Início
+      </Link>
+      <h1 className="mt-3 flex items-center gap-2 text-2xl font-extrabold">
+        <Brain className="h-7 w-7 text-info" /> Saúde Mental
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Você não está sozinho. Tudo aqui é confidencial. 🤝
+      </p>
+
+      {/* SOS */}
+      <div className="mt-6 grid grid-cols-1 gap-3">
+        <a
+          href="tel:188"
+          className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-destructive text-base font-bold text-destructive-foreground shadow-elevated"
+        >
+          <Phone className="h-5 w-5" /> SOS · CVV 188
+        </a>
+        <a
+          href="https://wa.me/5594000000000?text=Olá,%20preciso%20conversar"
+          target="_blank" rel="noopener"
+          className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-success text-base font-bold text-success-foreground shadow-soft"
+        >
+          <MessageCircle className="h-5 w-5" /> Falar com Psicóloga
+        </a>
+        <a
+          href="https://wa.me/5594000000001?text=Olá,%20preciso%20de%20apoio"
+          target="_blank" rel="noopener"
+          className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-success bg-card text-base font-bold text-success"
+        >
+          <MessageCircle className="h-5 w-5" /> Assistente Social
+        </a>
+      </div>
+
+      {/* Respiração 4-7-8 */}
+      <div className="mt-7 rounded-3xl border border-border bg-card p-6 shadow-soft">
+        <h2 className="text-base font-bold">Respiração 4-7-8</h2>
+        <p className="text-xs text-muted-foreground">Acalma em momentos de estresse ou ansiedade.</p>
+
+        <div className="mt-6 flex flex-col items-center">
+          <motion.div
+            animate={{ scale: running ? FASES[fase].scale : 1 }}
+            transition={{ duration: tempo, ease: 'easeInOut' }}
+            className="flex h-44 w-44 items-center justify-center rounded-full bg-gradient-water text-card shadow-elevated"
+          >
+            <div className="text-center">
+              <div className="text-sm font-medium opacity-90">{running ? FASES[fase].nome : 'Pronto?'}</div>
+              <div className="text-5xl font-extrabold tabular-nums">{running ? tempo : '4·7·8'}</div>
+            </div>
+          </motion.div>
+          <p className="mt-4 text-xs text-muted-foreground">{ciclos} ciclos completos</p>
+          <button
+            onClick={() => running ? setRunning(false) : start()}
+            className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-primary font-bold text-primary-foreground"
+          >
+            {running ? 'Parar' : 'Começar'}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl bg-info/10 p-4 text-xs text-info-foreground">
+        Procure ajuda se: tristeza por mais de 2 semanas, perda de interesse, pensamentos de se machucar.
+        Você não precisa enfrentar isso sozinho.
+      </div>
+    </div>
+  );
+}

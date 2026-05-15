@@ -11,8 +11,19 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSaudeRouteImport } from './routes/app.saude'
+import { Route as AppRecompensasRouteImport } from './routes/app.recompensas'
+import { Route as AppRankingRouteImport } from './routes/app.ranking'
+import { Route as AppPerfilRouteImport } from './routes/app.perfil'
+import { Route as AppMentalRouteImport } from './routes/app.mental'
+import { Route as AppHomeRouteImport } from './routes/app.home'
+import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
+import { Route as AppErgonomiaRouteImport } from './routes/app.ergonomia'
+import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
+import { Route as AppAvisosRouteImport } from './routes/app.avisos'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -22,6 +33,11 @@ const LoginRoute = LoginRouteImport.update({
 const CadastroRoute = CadastroRouteImport.update({
   id: '/cadastro',
   path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -34,37 +50,167 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSaudeRoute = AppSaudeRouteImport.update({
+  id: '/saude',
+  path: '/saude',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRecompensasRoute = AppRecompensasRouteImport.update({
+  id: '/recompensas',
+  path: '/recompensas',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRankingRoute = AppRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPerfilRoute = AppPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMentalRoute = AppMentalRouteImport.update({
+  id: '/mental',
+  path: '/mental',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHidratacaoRoute = AppHidratacaoRouteImport.update({
+  id: '/hidratacao',
+  path: '/hidratacao',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppErgonomiaRoute = AppErgonomiaRouteImport.update({
+  id: '/ergonomia',
+  path: '/ergonomia',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDesafiosRoute = AppDesafiosRouteImport.update({
+  id: '/desafios',
+  path: '/desafios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAvisosRoute = AppAvisosRouteImport.update({
+  id: '/avisos',
+  path: '/avisos',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
+  '/app': typeof AppRouteWithChildren
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/app/avisos': typeof AppAvisosRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/ergonomia': typeof AppErgonomiaRoute
+  '/app/hidratacao': typeof AppHidratacaoRoute
+  '/app/home': typeof AppHomeRoute
+  '/app/mental': typeof AppMentalRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/ranking': typeof AppRankingRoute
+  '/app/recompensas': typeof AppRecompensasRoute
+  '/app/saude': typeof AppSaudeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
+  '/app': typeof AppRouteWithChildren
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/app/avisos': typeof AppAvisosRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/ergonomia': typeof AppErgonomiaRoute
+  '/app/hidratacao': typeof AppHidratacaoRoute
+  '/app/home': typeof AppHomeRoute
+  '/app/mental': typeof AppMentalRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/ranking': typeof AppRankingRoute
+  '/app/recompensas': typeof AppRecompensasRoute
+  '/app/saude': typeof AppSaudeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin-login': typeof AdminLoginRoute
+  '/app': typeof AppRouteWithChildren
   '/cadastro': typeof CadastroRoute
   '/login': typeof LoginRoute
+  '/app/avisos': typeof AppAvisosRoute
+  '/app/desafios': typeof AppDesafiosRoute
+  '/app/ergonomia': typeof AppErgonomiaRoute
+  '/app/hidratacao': typeof AppHidratacaoRoute
+  '/app/home': typeof AppHomeRoute
+  '/app/mental': typeof AppMentalRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/ranking': typeof AppRankingRoute
+  '/app/recompensas': typeof AppRecompensasRoute
+  '/app/saude': typeof AppSaudeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin-login' | '/cadastro' | '/login'
+  fullPaths:
+    | '/'
+    | '/admin-login'
+    | '/app'
+    | '/cadastro'
+    | '/login'
+    | '/app/avisos'
+    | '/app/desafios'
+    | '/app/ergonomia'
+    | '/app/hidratacao'
+    | '/app/home'
+    | '/app/mental'
+    | '/app/perfil'
+    | '/app/ranking'
+    | '/app/recompensas'
+    | '/app/saude'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin-login' | '/cadastro' | '/login'
-  id: '__root__' | '/' | '/admin-login' | '/cadastro' | '/login'
+  to:
+    | '/'
+    | '/admin-login'
+    | '/app'
+    | '/cadastro'
+    | '/login'
+    | '/app/avisos'
+    | '/app/desafios'
+    | '/app/ergonomia'
+    | '/app/hidratacao'
+    | '/app/home'
+    | '/app/mental'
+    | '/app/perfil'
+    | '/app/ranking'
+    | '/app/recompensas'
+    | '/app/saude'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin-login'
+    | '/app'
+    | '/cadastro'
+    | '/login'
+    | '/app/avisos'
+    | '/app/desafios'
+    | '/app/ergonomia'
+    | '/app/hidratacao'
+    | '/app/home'
+    | '/app/mental'
+    | '/app/perfil'
+    | '/app/ranking'
+    | '/app/recompensas'
+    | '/app/saude'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AppRoute: typeof AppRouteWithChildren
   CadastroRoute: typeof CadastroRoute
   LoginRoute: typeof LoginRoute
 }
@@ -85,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CadastroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin-login': {
       id: '/admin-login'
       path: '/admin-login'
@@ -99,12 +252,111 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/saude': {
+      id: '/app/saude'
+      path: '/saude'
+      fullPath: '/app/saude'
+      preLoaderRoute: typeof AppSaudeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/recompensas': {
+      id: '/app/recompensas'
+      path: '/recompensas'
+      fullPath: '/app/recompensas'
+      preLoaderRoute: typeof AppRecompensasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/ranking': {
+      id: '/app/ranking'
+      path: '/ranking'
+      fullPath: '/app/ranking'
+      preLoaderRoute: typeof AppRankingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/perfil': {
+      id: '/app/perfil'
+      path: '/perfil'
+      fullPath: '/app/perfil'
+      preLoaderRoute: typeof AppPerfilRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/mental': {
+      id: '/app/mental'
+      path: '/mental'
+      fullPath: '/app/mental'
+      preLoaderRoute: typeof AppMentalRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/home': {
+      id: '/app/home'
+      path: '/home'
+      fullPath: '/app/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/hidratacao': {
+      id: '/app/hidratacao'
+      path: '/hidratacao'
+      fullPath: '/app/hidratacao'
+      preLoaderRoute: typeof AppHidratacaoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/ergonomia': {
+      id: '/app/ergonomia'
+      path: '/ergonomia'
+      fullPath: '/app/ergonomia'
+      preLoaderRoute: typeof AppErgonomiaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/desafios': {
+      id: '/app/desafios'
+      path: '/desafios'
+      fullPath: '/app/desafios'
+      preLoaderRoute: typeof AppDesafiosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/avisos': {
+      id: '/app/avisos'
+      path: '/avisos'
+      fullPath: '/app/avisos'
+      preLoaderRoute: typeof AppAvisosRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
+
+interface AppRouteChildren {
+  AppAvisosRoute: typeof AppAvisosRoute
+  AppDesafiosRoute: typeof AppDesafiosRoute
+  AppErgonomiaRoute: typeof AppErgonomiaRoute
+  AppHidratacaoRoute: typeof AppHidratacaoRoute
+  AppHomeRoute: typeof AppHomeRoute
+  AppMentalRoute: typeof AppMentalRoute
+  AppPerfilRoute: typeof AppPerfilRoute
+  AppRankingRoute: typeof AppRankingRoute
+  AppRecompensasRoute: typeof AppRecompensasRoute
+  AppSaudeRoute: typeof AppSaudeRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAvisosRoute: AppAvisosRoute,
+  AppDesafiosRoute: AppDesafiosRoute,
+  AppErgonomiaRoute: AppErgonomiaRoute,
+  AppHidratacaoRoute: AppHidratacaoRoute,
+  AppHomeRoute: AppHomeRoute,
+  AppMentalRoute: AppMentalRoute,
+  AppPerfilRoute: AppPerfilRoute,
+  AppRankingRoute: AppRankingRoute,
+  AppRecompensasRoute: AppRecompensasRoute,
+  AppSaudeRoute: AppSaudeRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AppRoute: AppRouteWithChildren,
   CadastroRoute: CadastroRoute,
   LoginRoute: LoginRoute,
 }
