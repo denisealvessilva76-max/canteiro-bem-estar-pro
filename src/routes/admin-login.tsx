@@ -12,38 +12,16 @@ function AdminLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    if (mode === 'signup') {
-      const { data, error } = await supabase.auth.signUp({
-        email, password: senha,
-        options: {
-          emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
-          data: {
-            matricula: 'ADM-' + email.split('@')[0],
-            nome: 'Admin ' + email.split('@')[0],
-            role: 'admin',
-          },
-        },
-      });
-      if (error) { setLoading(false); toast.error(error.message); return; }
-      // garante role admin
-      if (data.user) {
-        await supabase.from('user_roles').upsert({ user_id: data.user.id, role: 'admin' });
-      }
-      toast.success('Conta admin criada');
-      void navigate({ to: "/admin/dashboard" });
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
-      if (error) { setLoading(false); toast.error('Credenciais inválidas'); return; }
-      toast.success('Bem-vindo, equipe Saúde');
-      void navigate({ to: "/admin/dashboard" });
-    }
+    const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
     setLoading(false);
+    if (error) { toast.error('Credenciais inválidas'); return; }
+    toast.success('Bem-vindo, equipe Saúde');
+    void navigate({ to: "/admin/dashboard" });
   }
 
   return (
@@ -84,15 +62,11 @@ function AdminLogin() {
             disabled={loading}
             className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary text-base font-bold text-primary-foreground shadow-soft disabled:opacity-60"
           >
-            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (mode === 'login' ? 'Entrar no painel' : 'Criar conta admin')}
+            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Entrar no painel'}
           </button>
-          <button
-            type="button"
-            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-            className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
-          >
-            {mode === 'login' ? 'Primeira vez? Criar conta admin' : 'Já tenho conta'}
-          </button>
+          <p className="text-center text-xs text-muted-foreground">
+            Novas contas administrativas são criadas por gestores já cadastrados, dentro do painel.
+          </p>
         </form>
       </div>
     </div>
