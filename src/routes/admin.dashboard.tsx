@@ -5,6 +5,7 @@ import { Users, Activity, Droplets, AlertTriangle, X, Phone, Trophy } from "luci
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
+import { WeatherObras } from "@/components/WeatherObras";
 
 export const Route = createFileRoute("/admin/dashboard")({
   component: Dashboard,
@@ -122,6 +123,10 @@ function Dashboard() {
         <KCard onClick={() => setDrill('checkins')} icon={Activity} label="Check-ins hoje" value={stats?.cks.length ?? '—'} tone="info" />
         <KCard onClick={() => setDrill('hidratacao')} icon={Droplets} label="Hidratação média" value={stats ? `${(stats.mediaMl / 1000).toFixed(1)}L` : '—'} tone="water" />
         <KCard onClick={() => setDrill('alertas')} icon={AlertTriangle} label="Alertas abertos" value={stats?.alertas.length ?? '—'} tone="danger" />
+      </div>
+
+      <div className="mt-6">
+        <WeatherObras />
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
