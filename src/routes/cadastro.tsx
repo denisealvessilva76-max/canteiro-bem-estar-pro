@@ -13,7 +13,7 @@ function Cadastro() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     matricula: "", nome: "", senha: "", turno: "diurno" as 'diurno' | 'noturno',
-    cargo: "", peso: "", altura: "",
+    cargo: "", peso: "", altura: "", telefone: "",
   });
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,6 @@ function Cadastro() {
     }
     setLoading(true);
 
-    // Verifica matrícula duplicada
     const { data: existe } = await supabase
       .from('profiles').select('id').eq('matricula', form.matricula.trim()).maybeSingle();
     if (existe) {
@@ -38,7 +37,7 @@ function Cadastro() {
       return;
     }
 
-    const { error } = await supabase.auth.signUp({
+    const { data: signup, error } = await supabase.auth.signUp({
       email: matriculaToEmail(form.matricula),
       password: form.senha,
       options: {
@@ -53,11 +52,16 @@ function Cadastro() {
         },
       },
     });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       toast.error(error.message || "Erro ao cadastrar");
       return;
     }
+    // grava telefone (após o trigger criar o profile)
+    if (signup.user && form.telefone) {
+      await supabase.from('profiles').update({ telefone: form.telefone.trim() }).eq('id', signup.user.id);
+    }
+    setLoading(false);
     toast.success("Cadastro realizado! Bem-vindo!");
     void navigate({ to: "/app/home" });
   }
@@ -74,6 +78,7 @@ function Cadastro() {
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <Field label="Matrícula *" value={form.matricula} onChange={(v) => set('matricula', v)} placeholder="Ex: 123456" inputMode="numeric" />
           <Field label="Nome completo *" value={form.nome} onChange={(v) => set('nome', v)} placeholder="Seu nome" />
+          <Field label="WhatsApp" value={form.telefone} onChange={(v) => set('telefone', v)} placeholder="(31) 9XXXX-XXXX" inputMode="numeric" />
           <Field label="Senha (mín. 6) *" type="password" value={form.senha} onChange={(v) => set('senha', v)} placeholder="••••••" />
           <div>
             <span className="mb-1.5 block text-sm font-semibold text-foreground">Turno</span>
@@ -100,7 +105,7 @@ function Cadastro() {
           <Field label="Cargo" value={form.cargo} onChange={(v) => set('cargo', v)} placeholder="Ex: Pintor" />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Peso (kg)" value={form.peso} onChange={(v) => set('peso', v)} placeholder="70" inputMode="decimal" />
-            <Field label="Altura (m)" value={form.altura} onChange={(v) => set('altura', v)} placeholder="1.75" inputMode="decimal" />
+            <Field label="Altura (cm)" value={form.altura} onChange={(v) => set('altura', v)} placeholder="175" inputMode="decimal" />
           </div>
           <button
             type="submit"

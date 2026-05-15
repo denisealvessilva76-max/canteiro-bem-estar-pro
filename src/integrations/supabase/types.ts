@@ -221,6 +221,48 @@ export type Database = {
         }
         Relationships: []
       }
+      desafio_checkins: {
+        Row: {
+          created_at: string
+          data: string
+          desafio_id: string
+          dificuldade: string | null
+          foto_url: string | null
+          id: string
+          progresso_id: string
+          user_id: string
+          validado: boolean | null
+          validado_em: string | null
+          validado_por: string | null
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          desafio_id: string
+          dificuldade?: string | null
+          foto_url?: string | null
+          id?: string
+          progresso_id: string
+          user_id: string
+          validado?: boolean | null
+          validado_em?: string | null
+          validado_por?: string | null
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          desafio_id?: string
+          dificuldade?: string | null
+          foto_url?: string | null
+          id?: string
+          progresso_id?: string
+          user_id?: string
+          validado?: boolean | null
+          validado_em?: string | null
+          validado_por?: string | null
+        }
+        Relationships: []
+      }
       desafios: {
         Row: {
           ativo: boolean
@@ -328,6 +370,7 @@ export type Database = {
           peso: number | null
           pontos_acumulados: number
           primeiro_acesso: boolean
+          telefone: string | null
           turno: Database["public"]["Enums"]["turno"]
           ultimo_checkin: string | null
           updated_at: string
@@ -348,6 +391,7 @@ export type Database = {
           peso?: number | null
           pontos_acumulados?: number
           primeiro_acesso?: boolean
+          telefone?: string | null
           turno?: Database["public"]["Enums"]["turno"]
           ultimo_checkin?: string | null
           updated_at?: string
@@ -368,6 +412,7 @@ export type Database = {
           peso?: number | null
           pontos_acumulados?: number
           primeiro_acesso?: boolean
+          telefone?: string | null
           turno?: Database["public"]["Enums"]["turno"]
           ultimo_checkin?: string | null
           updated_at?: string

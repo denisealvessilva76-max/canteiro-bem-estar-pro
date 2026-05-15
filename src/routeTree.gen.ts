@@ -29,6 +29,7 @@ import { Route as AdminRecompensasRouteImport } from './routes/admin.recompensas
 import { Route as AdminFuncionariosRouteImport } from './routes/admin.funcionarios'
 import { Route as AdminDesafiosRouteImport } from './routes/admin.desafios'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminContasRouteImport } from './routes/admin.contas'
 import { Route as AdminAvisosRouteImport } from './routes/admin.avisos'
 import { Route as AdminAlertasRouteImport } from './routes/admin.alertas'
 
@@ -132,6 +133,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminContasRoute = AdminContasRouteImport.update({
+  id: '/contas',
+  path: '/contas',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAvisosRoute = AdminAvisosRouteImport.update({
   id: '/avisos',
   path: '/avisos',
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/contas'
     | '/admin/dashboard'
     | '/admin/desafios'
     | '/admin/funcionarios'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/contas'
     | '/admin/dashboard'
     | '/admin/desafios'
     | '/admin/funcionarios'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/contas'
     | '/admin/dashboard'
     | '/admin/desafios'
     | '/admin/funcionarios'
@@ -442,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/contas': {
+      id: '/admin/contas'
+      path: '/contas'
+      fullPath: '/admin/contas'
+      preLoaderRoute: typeof AdminContasRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/avisos': {
       id: '/admin/avisos'
       path: '/avisos'
@@ -462,6 +481,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAlertasRoute: typeof AdminAlertasRoute
   AdminAvisosRoute: typeof AdminAvisosRoute
+  AdminContasRoute: typeof AdminContasRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDesafiosRoute: typeof AdminDesafiosRoute
   AdminFuncionariosRoute: typeof AdminFuncionariosRoute
@@ -471,6 +491,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertasRoute: AdminAlertasRoute,
   AdminAvisosRoute: AdminAvisosRoute,
+  AdminContasRoute: AdminContasRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDesafiosRoute: AdminDesafiosRoute,
   AdminFuncionariosRoute: AdminFuncionariosRoute,
