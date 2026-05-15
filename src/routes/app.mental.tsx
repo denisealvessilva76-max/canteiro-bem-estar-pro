@@ -1,18 +1,27 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Brain, Phone, MessageCircle, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Brain, Phone, MessageCircle, Volume2, VolumeX, HeartPulse, ExternalLink } from "lucide-react";
 import { speak, stopSpeaking, startBackgroundMusic, stopBackgroundMusic, isTtsSupported } from "@/lib/tts";
-import { WHATSAPP_PSICOLOGA, WHATSAPP_ASSISTENTE_SOCIAL, whatsappLink } from "@/lib/contatos";
+import {
+  WHATSAPP_PSICOLOGA,
+  WHATSAPP_ASSISTENTE_SOCIAL,
+  WHATSAPP_SAUDE_OCUPACIONAL,
+  SOS_TELEFONE,
+  SOS_CHAT_URL,
+  whatsappLink,
+} from "@/lib/contatos";
 
 export const Route = createFileRoute("/app/mental")({
   component: Mental,
 });
 
+// Respiração 4-7-8 com ritmo realmente calmo: cada fase tem o tempo correto
+// e a fala acontece UMA vez no início, sem atropelar a contagem.
 const FASES = [
-  { nome: 'Inspire', dur: 4, scale: 1.6, fala: 'Inspire devagar pelo nariz' },
-  { nome: 'Segure', dur: 7, scale: 1.6, fala: 'Segure o ar' },
-  { nome: 'Solte', dur: 8, scale: 0.9, fala: 'Solte o ar pela boca, devagar' },
+  { nome: 'Inspire', dur: 4, scale: 1.55, fala: 'Inspire devagar pelo nariz' },
+  { nome: 'Segure',  dur: 7, scale: 1.55, fala: 'Segure o ar com calma' },
+  { nome: 'Solte',   dur: 8, scale: 0.9,  fala: 'Solte o ar bem devagar pela boca' },
 ];
 
 function Mental() {
@@ -30,7 +39,7 @@ function Mental() {
         const proxima = (fase + 1) % FASES.length;
         if (proxima === 0) setCiclos((c) => c + 1);
         setFase(proxima);
-        if (comAudio) speak(FASES[proxima].fala);
+        if (comAudio) speak(FASES[proxima].fala, { calmo: true });
         return FASES[proxima].dur;
       });
     }, 1000);
@@ -41,7 +50,8 @@ function Mental() {
     setRunning(true); setFase(0); setTempo(FASES[0].dur); setCiclos(0);
     if (comAudio) {
       startBackgroundMusic();
-      speak('Vamos começar. ' + FASES[0].fala);
+      // pausa breve antes de começar para a voz não atropelar a animação
+      setTimeout(() => speak('Vamos respirar juntos. ' + FASES[0].fala, { calmo: true }), 250);
     }
   }
   function stop() {
@@ -64,20 +74,30 @@ function Mental() {
         Você não está sozinho. Tudo aqui é confidencial. 🤝
       </p>
 
-      {/* SOS / WhatsApp */}
+      {/* SOS oficial — CVV */}
       <div className="mt-6 grid grid-cols-1 gap-3">
         <a
-          href="tel:188"
+          href={`tel:${SOS_TELEFONE}`}
           className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-destructive text-base font-bold text-destructive-foreground shadow-elevated"
         >
-          <Phone className="h-5 w-5" /> SOS · CVV 188
+          <Phone className="h-5 w-5" /> SOS · Ligar 188 (CVV)
         </a>
+        <a
+          href={SOS_CHAT_URL}
+          target="_blank" rel="noopener"
+          className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-destructive bg-card text-base font-bold text-destructive"
+        >
+          <MessageCircle className="h-5 w-5" /> Chat anônimo CVV <ExternalLink className="h-4 w-4" />
+        </a>
+
+        <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Equipe da obra</div>
+
         <a
           href={whatsappLink(WHATSAPP_PSICOLOGA, 'Olá, sou trabalhador do canteiro e gostaria de conversar com a psicóloga.')}
           target="_blank" rel="noopener"
           className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-success text-base font-bold text-success-foreground shadow-soft"
         >
-          <MessageCircle className="h-5 w-5" /> Falar com Psicóloga (WhatsApp)
+          <MessageCircle className="h-5 w-5" /> Psicóloga (WhatsApp)
         </a>
         <a
           href={whatsappLink(WHATSAPP_ASSISTENTE_SOCIAL, 'Olá, sou trabalhador do canteiro e preciso de apoio da assistente social.')}
@@ -85,6 +105,13 @@ function Mental() {
           className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-success bg-card text-base font-bold text-success"
         >
           <MessageCircle className="h-5 w-5" /> Assistente Social (WhatsApp)
+        </a>
+        <a
+          href={whatsappLink(WHATSAPP_SAUDE_OCUPACIONAL, 'Olá, sou trabalhador do canteiro e preciso falar com a Saúde Ocupacional.')}
+          target="_blank" rel="noopener"
+          className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-info text-base font-bold text-info-foreground shadow-soft"
+        >
+          <HeartPulse className="h-5 w-5" /> Saúde Ocupacional (WhatsApp)
         </a>
       </div>
 
