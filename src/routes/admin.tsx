@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutDashboard, Users, AlertTriangle, Trophy, Bell, Gift, LogOut, HardHat, Loader2 } from "lucide-react";
+import { LayoutDashboard, Users, AlertTriangle, Trophy, Bell, Gift, LogOut, HardHat, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/admin")({
@@ -14,6 +14,7 @@ const NAV = [
   { to: '/admin/desafios', icon: Trophy, label: 'Desafios' },
   { to: '/admin/avisos', icon: Bell, label: 'Avisos' },
   { to: '/admin/recompensas', icon: Gift, label: 'Recompensas' },
+  { to: '/admin/contas', icon: ShieldCheck, label: 'Contas' },
 ];
 
 function AdminLayout() {
