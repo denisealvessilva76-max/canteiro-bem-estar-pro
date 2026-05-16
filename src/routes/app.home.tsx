@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { WeatherObras } from "@/components/WeatherObras";
+import { LembretesCenter } from "@/components/LembretesCenter";
 import { HUMORES, todayISO } from "@/lib/canteiro";
 import { insertOrQueue } from "@/lib/offline";
 
