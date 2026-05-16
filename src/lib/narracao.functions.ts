@@ -14,6 +14,26 @@ const Input = z.object({
   cacheKey: z.string().min(1).max(128).optional(),
 });
 
+function sanitizeElevenLabsKey(rawKey: string) {
+  const ascii = rawKey
+    .normalize("NFKC")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .replace(/[^\x20-\x7E]/g, " ")
+    .trim();
+
+  const withoutPrefix = ascii
+    .replace(/^(?:export\s+)?(?:ELEVENLABS_API_KEY|xi-api-key)\s*[:=]\s*/i, "")
+    .trim();
+
+  const candidates = withoutPrefix
+    .split(/\s+/)
+    .map((token) => token.replace(/^["'`]+|["'`,;]+$/g, ""))
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+
+  return candidates[0] ?? "";
+}
+
 function bucketPath(text: string, voiceId: string, cacheKey?: string) {
   // Sempre derivar um nome ASCII-safe (cacheKey pode conter acentos/emoji/→ etc.)
   const base = cacheKey ? `${cacheKey}|${voiceId}` : `${voiceId}|${text}`;
@@ -36,9 +56,7 @@ export const obterNarracao = createServerFn({ method: "POST" })
     } catch { /* segue para gerar */ }
 
     const rawKey = process.env.ELEVENLABS_API_KEY ?? "";
-    // Remove espaços, quebras de linha e qualquer caractere fora do ASCII imprimível
-    // (a chave às vezes é colada com setas/aspas tipográficas que quebram o header HTTP)
-    const key = rawKey.replace(/[^\x21-\x7E]/g, "");
+    const key = sanitizeElevenLabsKey(rawKey);
     if (!key) {
       return { url: null, cached: false, error: "ELEVENLABS_API_KEY não configurada" };
     }
@@ -71,6 +89,9 @@ export const obterNarracao = createServerFn({ method: "POST" })
     if (!res.ok) {
       const body = await res.text();
       console.error("ElevenLabs TTS falhou", res.status, body);
+      if (res.status === 401) {
+        return { url: null, cached: false, error: "Credencial de áudio inválida" };
+      }
       return { url: null, cached: false, error: `ElevenLabs ${res.status}` };
     }
 
