@@ -15,7 +15,9 @@ const Input = z.object({
 });
 
 function bucketPath(text: string, voiceId: string, cacheKey?: string) {
-  const k = cacheKey ?? createHash("sha1").update(`${voiceId}|${text}`).digest("hex");
+  // Sempre derivar um nome ASCII-safe (cacheKey pode conter acentos/emoji/→ etc.)
+  const base = cacheKey ? `${cacheKey}|${voiceId}` : `${voiceId}|${text}`;
+  const k = createHash("sha1").update(base).digest("hex");
   return `${voiceId}/${k}.mp3`;
 }
 
