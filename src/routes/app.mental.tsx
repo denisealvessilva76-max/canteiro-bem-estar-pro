@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Brain, Phone, MessageCircle, Volume2, VolumeX, HeartPulse, ExternalLink } from "lucide-react";
-import { speak, stopSpeaking, startBackgroundMusic, stopBackgroundMusic, isTtsSupported } from "@/lib/tts";
+import { ArrowLeft, Brain, Phone, MessageCircle, HeartPulse, ExternalLink } from "lucide-react";
+import { AudioNarracao, pararTodosAudios } from "@/components/AudioNarracao";
 import {
   WHATSAPP_PSICOLOGA,
   WHATSAPP_ASSISTENTE_SOCIAL,
@@ -29,7 +29,6 @@ function Mental() {
   const [fase, setFase] = useState(0);
   const [tempo, setTempo] = useState(FASES[0].dur);
   const [ciclos, setCiclos] = useState(0);
-  const [comAudio, setComAudio] = useState(true);
 
   useEffect(() => {
     if (!running) return;
@@ -39,28 +38,28 @@ function Mental() {
         const proxima = (fase + 1) % FASES.length;
         if (proxima === 0) setCiclos((c) => c + 1);
         setFase(proxima);
-        if (comAudio) speak(FASES[proxima].fala, { calmo: true });
         return FASES[proxima].dur;
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [running, fase, comAudio]);
+  }, [running, fase]);
 
   function start() {
     setRunning(true); setFase(0); setTempo(FASES[0].dur); setCiclos(0);
-    if (comAudio) {
-      startBackgroundMusic();
-      // pausa breve antes de começar para a voz não atropelar a animação
-      setTimeout(() => speak('Vamos respirar juntos. ' + FASES[0].fala, { calmo: true }), 250);
-    }
   }
   function stop() {
     setRunning(false);
-    stopSpeaking();
-    stopBackgroundMusic();
+    pararTodosAudios();
   }
 
-  useEffect(() => () => { stopSpeaking(); stopBackgroundMusic(); }, []);
+  useEffect(() => () => { pararTodosAudios(); }, []);
+
+  // Texto único da narração — gerado uma vez e reproduzido em loop suave.
+  const textoNarracao =
+    'Vamos respirar juntos. Inspire devagar pelo nariz, contando até quatro. ' +
+    'Agora segure o ar com calma, contando até sete. ' +
+    'Solte o ar bem devagar pela boca, contando até oito. ' +
+    'Muito bem. Respire no seu ritmo.';
 
   return (
     <div className="px-5 pb-8 pt-6">
@@ -117,21 +116,8 @@ function Mental() {
 
       {/* Respiração 4-7-8 */}
       <div className="mt-7 rounded-3xl border border-border bg-card p-6 shadow-soft">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-base font-bold">Respiração guiada 4-7-8</h2>
-            <p className="text-xs text-muted-foreground">Acalma em momentos de estresse ou ansiedade.</p>
-          </div>
-          {isTtsSupported() && (
-            <button
-              onClick={() => { setComAudio((v) => { if (v) { stopSpeaking(); stopBackgroundMusic(); } return !v; }); }}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground"
-              aria-label="Alternar narração"
-            >
-              {comAudio ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-            </button>
-          )}
-        </div>
+        <h2 className="text-base font-bold">Respiração guiada 4-7-8</h2>
+        <p className="text-xs text-muted-foreground">Acalma em momentos de estresse ou ansiedade.</p>
 
         <div className="mt-6 flex flex-col items-center">
           <motion.div
@@ -149,8 +135,12 @@ function Mental() {
             onClick={() => running ? stop() : start()}
             className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-primary font-bold text-primary-foreground"
           >
-            {running ? 'Parar' : 'Começar com narração'}
+            {running ? 'Parar' : 'Começar respiração'}
           </button>
+
+          <div className="mt-4 w-full rounded-2xl bg-gradient-primary p-1 text-primary-foreground">
+            <AudioNarracao texto={textoNarracao} cacheKey="mental-respiracao-478" />
+          </div>
         </div>
       </div>
 
