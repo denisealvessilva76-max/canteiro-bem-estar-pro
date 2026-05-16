@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Users, Activity, Droplets, AlertTriangle, X, Phone, Trophy } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend, ComposedChart, Line } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
 
@@ -111,7 +111,15 @@ function Dashboard() {
     return () => { void supabase.removeChannel(ch); };
   }, []);
 
-  const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--info))', 'hsl(var(--warning))', 'hsl(var(--destructive))'];
+  const COLORS = ['oklch(0.65 0.18 145)', 'oklch(0.72 0.19 55)', 'oklch(0.65 0.13 230)', 'oklch(0.78 0.16 80)', 'oklch(0.60 0.22 25)'];
+
+  const tooltipStyle = {
+    backgroundColor: 'hsl(var(--card))',
+    border: '1px solid hsl(var(--border))',
+    borderRadius: '12px',
+    fontSize: 12,
+    boxShadow: '0 8px 24px -12px rgba(0,0,0,0.2)',
+  } as const;
 
   return (
     <div>
@@ -127,56 +135,94 @@ function Dashboard() {
 
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-3xl border border-border bg-card p-5">
-          <h2 className="text-base font-bold">Atividade (7 dias)</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={serie ?? []}>
+        <div className="rounded-3xl border border-border bg-card p-5 shadow-soft transition hover:shadow-elevated">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold">Atividade (7 dias)</h2>
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">CHECK-INS × ALERTAS</span>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            <ComposedChart data={serie ?? []} margin={{ top: 12, right: 8, left: -16, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gCheckins" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="oklch(0.65 0.18 145)" stopOpacity={0.45} />
+                  <stop offset="100%" stopColor="oklch(0.65 0.18 145)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-              <XAxis dataKey="dia" fontSize={11} />
-              <YAxis fontSize={11} />
-              <Tooltip />
+              <XAxis dataKey="dia" fontSize={11} stroke="hsl(var(--muted-foreground))" />
+              <YAxis fontSize={11} stroke="hsl(var(--muted-foreground))" />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'oklch(0.65 0.18 145 / 0.08)' }} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="checkins" stroke="hsl(var(--primary))" strokeWidth={2} name="Check-ins" />
-              <Line type="monotone" dataKey="alertas" stroke="hsl(var(--destructive))" strokeWidth={2} name="Alertas" />
-            </LineChart>
+              <Area type="monotone" dataKey="checkins" stroke="oklch(0.65 0.18 145)" strokeWidth={2.5} fill="url(#gCheckins)" name="Check-ins" />
+              <Bar dataKey="alertas" fill="oklch(0.60 0.22 25)" radius={[6, 6, 0, 0]} barSize={18} name="Alertas" />
+            </ComposedChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="rounded-3xl border border-border bg-card p-5">
-          <h2 className="text-base font-bold">Hidratação total/dia (litros)</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={serie ?? []}>
+        <div className="rounded-3xl border border-border bg-card p-5 shadow-soft transition hover:shadow-elevated">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold">Hidratação total/dia</h2>
+            <span className="rounded-full bg-info/10 px-2 py-0.5 text-[10px] font-bold text-info">LITROS</span>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={serie ?? []} margin={{ top: 12, right: 8, left: -16, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gWater" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="oklch(0.75 0.15 230)" stopOpacity={1} />
+                  <stop offset="100%" stopColor="oklch(0.55 0.18 240)" stopOpacity={1} />
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-              <XAxis dataKey="dia" fontSize={11} />
-              <YAxis fontSize={11} />
-              <Tooltip />
-              <Bar dataKey="hidratacao" fill="hsl(var(--info))" radius={[6, 6, 0, 0]} />
+              <XAxis dataKey="dia" fontSize={11} stroke="hsl(var(--muted-foreground))" />
+              <YAxis fontSize={11} stroke="hsl(var(--muted-foreground))" />
+              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'oklch(0.65 0.13 230 / 0.08)' }} />
+              <Bar dataKey="hidratacao" fill="url(#gWater)" radius={[10, 10, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="rounded-3xl border border-border bg-card p-5">
-          <h2 className="text-base font-bold">Humor médio (7 dias)</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={serie ?? []}>
+        <div className="rounded-3xl border border-border bg-card p-5 shadow-soft transition hover:shadow-elevated">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold">Humor médio (7 dias)</h2>
+            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent">0 — 5</span>
+          </div>
+          <ResponsiveContainer width="100%" height={240}>
+            <AreaChart data={serie ?? []} margin={{ top: 12, right: 8, left: -16, bottom: 0 }}>
+              <defs>
+                <linearGradient id="gHumor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="oklch(0.72 0.19 55)" stopOpacity={0.55} />
+                  <stop offset="100%" stopColor="oklch(0.72 0.19 55)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-              <XAxis dataKey="dia" fontSize={11} />
-              <YAxis domain={[0, 5]} fontSize={11} />
-              <Tooltip />
-              <Line type="monotone" dataKey="humor" stroke="hsl(var(--accent))" strokeWidth={2} />
-            </LineChart>
+              <XAxis dataKey="dia" fontSize={11} stroke="hsl(var(--muted-foreground))" />
+              <YAxis domain={[0, 5]} fontSize={11} stroke="hsl(var(--muted-foreground))" />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Area type="monotone" dataKey="humor" stroke="oklch(0.72 0.19 55)" strokeWidth={2.5} fill="url(#gHumor)" />
+            </AreaChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="rounded-3xl border border-border bg-card p-5">
-          <h2 className="text-base font-bold">Distribuição de humor hoje</h2>
+        <div className="rounded-3xl border border-border bg-card p-5 shadow-soft transition hover:shadow-elevated">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold">Distribuição de humor hoje</h2>
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">{stats?.cks.length ?? 0} check-ins</span>
+          </div>
           {distHumor.length > 0 ? (
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={240}>
               <PieChart>
-                <Pie data={distHumor} dataKey="qtd" nameKey="icone" outerRadius={80} label={(e) => e.icone}>
-                  {distHumor.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                <Pie
+                  data={distHumor}
+                  dataKey="qtd"
+                  nameKey="icone"
+                  innerRadius={48}
+                  outerRadius={88}
+                  paddingAngle={4}
+                  label={(e) => e.icone}
+                >
+                  {distHumor.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="hsl(var(--card))" strokeWidth={2} />)}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyle} />
               </PieChart>
             </ResponsiveContainer>
           ) : <p className="py-12 text-center text-sm text-muted-foreground">Nenhum check-in hoje ainda</p>}
@@ -193,13 +239,13 @@ function Dashboard() {
         </div>
       )}
 
-      <div className="mt-6 rounded-3xl border border-border bg-card p-5">
+      <div className="mt-6 rounded-3xl border border-border bg-card p-5 shadow-soft">
         <h2 className="text-base font-bold">Feed em tempo real</h2>
         <p className="text-xs text-muted-foreground">Movimentações dos trabalhadores aparecem aqui automaticamente</p>
         <ul className="mt-3 max-h-96 space-y-2 overflow-y-auto">
           {feed.length === 0 && <li className="py-8 text-center text-sm text-muted-foreground">Aguardando atividade do canteiro...</li>}
           {feed.map((f, i) => (
-            <li key={i} className="flex items-center justify-between rounded-xl bg-muted/40 p-3 text-sm">
+            <li key={i} className="flex items-center justify-between rounded-xl bg-gradient-to-r from-muted/40 to-transparent p-3 text-sm transition hover:from-primary/10">
               <div><span className="mr-2">{f.icone}</span><span className="font-bold">{f.tipo}</span> · {f.texto}</div>
               <span className="text-xs text-muted-foreground">{new Date(f.ts).toLocaleTimeString('pt-BR')}</span>
             </li>
@@ -312,19 +358,24 @@ const titulosDrill: Record<NonNullable<Drill>, string> = {
 };
 
 function KCard({ icon: Icon, label, value, tone, onClick }: { icon: React.ElementType; label: string; value: string | number; tone: string; onClick?: () => void }) {
-  const tones: Record<string, string> = {
-    primary: 'bg-primary/10 text-primary',
-    info: 'bg-info/10 text-info',
-    water: 'bg-water/10 text-water',
-    danger: 'bg-destructive/10 text-destructive',
+  const tones: Record<string, { bg: string; ring: string; text: string; chip: string }> = {
+    primary: { bg: 'from-primary/15 via-primary/5 to-transparent', ring: 'hover:ring-primary/40', text: 'text-primary', chip: 'bg-primary text-primary-foreground' },
+    info: { bg: 'from-info/15 via-info/5 to-transparent', ring: 'hover:ring-info/40', text: 'text-info', chip: 'bg-info text-info-foreground' },
+    water: { bg: 'from-water/15 via-water/5 to-transparent', ring: 'hover:ring-water/40', text: 'text-water', chip: 'bg-water text-white' },
+    danger: { bg: 'from-destructive/15 via-destructive/5 to-transparent', ring: 'hover:ring-destructive/40', text: 'text-destructive', chip: 'bg-destructive text-destructive-foreground' },
   };
+  const t = tones[tone];
   return (
-    <button onClick={onClick} className="rounded-2xl border border-border bg-card p-5 text-left shadow-soft transition hover:border-primary">
-      <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${tones[tone]}`}>
+    <button
+      onClick={onClick}
+      className={`group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br ${t.bg} p-5 text-left shadow-soft ring-1 ring-transparent transition-all hover:-translate-y-0.5 hover:shadow-elevated ${t.ring}`}
+    >
+      <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${t.chip} shadow-md transition-transform group-hover:scale-110`}>
         <Icon className="h-5 w-5" />
       </div>
-      <p className="mt-3 text-3xl font-extrabold">{value}</p>
-      <p className="text-xs text-muted-foreground">{label} <span className="text-primary">›</span></p>
+      <p className="mt-3 text-3xl font-extrabold tabular-nums">{value}</p>
+      <p className="text-xs text-muted-foreground">{label} <span className={`${t.text} transition-transform group-hover:translate-x-0.5 inline-block`}>›</span></p>
+      <div className={`absolute -right-6 -top-6 h-20 w-20 rounded-full ${t.chip} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`} />
     </button>
   );
 }
