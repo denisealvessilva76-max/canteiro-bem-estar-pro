@@ -2,83 +2,112 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Activity, Play, Pause, RotateCcw, Volume2, VolumeX, ExternalLink } from "lucide-react";
+import { ArrowLeft, Activity, Play, Pause, RotateCcw, ExternalLink } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
-import { speak, stopSpeaking, startBackgroundMusic, stopBackgroundMusic, isTtsSupported } from "@/lib/tts";
 import { VIDEO_GINASTICA_LABORAL } from "@/lib/contatos";
+import { AudioNarracao, pararTodosAudios } from "@/components/AudioNarracao";
+import imgCompleta from "@/assets/ergo-completa.jpg";
+import imgPescoco from "@/assets/ergo-pescoco.jpg";
+import imgOmbros from "@/assets/ergo-ombros.jpg";
+import imgLombar from "@/assets/ergo-lombar.jpg";
+import imgBracos from "@/assets/ergo-bracos.jpg";
+import imgPernas from "@/assets/ergo-pernas.jpg";
+import imgPunhos from "@/assets/ergo-punhos.jpg";
 
 export const Route = createFileRoute("/app/ergonomia")({
   component: Ergonomia,
 });
 
-type Exercicio = { nome: string; tempo: number; instrucao: string; emoji: string };
-type Categoria = { id: string; titulo: string; descricao: string; emoji: string; exercicios: Exercicio[] };
+type Exercicio = { nome: string; tempo: number; instrucao: string; imagem: string; cacheKey: string };
+type Categoria = { id: string; titulo: string; descricao: string; imagem: string; exercicios: Exercicio[] };
 
 const CATEGORIAS: Categoria[] = [
   {
     id: 'completa',
     titulo: 'Ginástica laboral completa',
     descricao: 'Sequência de corpo inteiro — 4 a 6 minutos.',
-    emoji: '🤸',
+    imagem: imgCompleta,
     exercicios: [
-      { nome: 'Pescoço', tempo: 30, instrucao: 'Incline a cabeça suavemente para o lado direito, segure. Depois para o esquerdo.', emoji: '🙆' },
-      { nome: 'Ombros', tempo: 30, instrucao: 'Gire os ombros lentamente para trás. Respire fundo.', emoji: '💪' },
-      { nome: 'Coluna', tempo: 45, instrucao: 'Em pé, gire o tronco devagar para os lados. Mantenha o quadril fixo.', emoji: '🧍' },
-      { nome: 'Braços', tempo: 30, instrucao: 'Estenda um braço sobre o peito, segure com a outra mão. Troque o lado.', emoji: '🤸' },
-      { nome: 'Pernas', tempo: 45, instrucao: 'Apoie a perna em uma plataforma e alongue a parte de trás da coxa.', emoji: '🦵' },
-      { nome: 'Punhos', tempo: 20, instrucao: 'Gire os punhos lentamente para um lado e depois para o outro.', emoji: '✋' },
+      { nome: 'Pescoço', tempo: 30, imagem: imgPescoco, cacheKey: 'pescoco-incl',
+        instrucao: 'Incline a cabeça suavemente para o lado direito e segure. Depois, para o lado esquerdo. Respire fundo.' },
+      { nome: 'Ombros', tempo: 30, imagem: imgOmbros, cacheKey: 'ombros-rot',
+        instrucao: 'Gire os ombros lentamente para trás, fazendo círculos amplos. Mantenha os braços relaxados.' },
+      { nome: 'Coluna', tempo: 45, imagem: imgLombar, cacheKey: 'coluna-rot',
+        instrucao: 'Em pé, gire o tronco devagar para os lados. Mantenha o quadril fixo e os pés firmes no chão.' },
+      { nome: 'Braços', tempo: 30, imagem: imgBracos, cacheKey: 'bracos-peito',
+        instrucao: 'Estenda um braço sobre o peito e segure com a outra mão. Sinta o alongamento. Troque o lado.' },
+      { nome: 'Pernas', tempo: 45, imagem: imgPernas, cacheKey: 'pernas-post',
+        instrucao: 'Apoie a perna esticada em uma plataforma baixa. Incline o tronco lentamente para frente.' },
+      { nome: 'Punhos', tempo: 20, imagem: imgPunhos, cacheKey: 'punhos-rot',
+        instrucao: 'Gire os punhos lentamente para um lado e depois para o outro. Solte as mãos.' },
     ],
   },
   {
     id: 'lombar',
     titulo: 'Dor lombar / costas',
     descricao: 'Alívio para a região lombar após carregar peso ou ficar muito tempo curvado.',
-    emoji: '🦴',
+    imagem: imgLombar,
     exercicios: [
-      { nome: 'Inclinação', tempo: 30, instrucao: 'Em pé, mãos na cintura. Incline o tronco para trás devagar, sem forçar.', emoji: '🧍' },
-      { nome: 'Joelho ao peito', tempo: 40, instrucao: 'Sentado ou em pé, traga um joelho ao peito por 20s. Troque a perna.', emoji: '🦵' },
-      { nome: 'Rotação de tronco', tempo: 40, instrucao: 'Sentado, cruze um pé sobre o joelho oposto, gire o tronco para o lado.', emoji: '🌀' },
-      { nome: 'Gato e camelo', tempo: 45, instrucao: 'Apoie nos joelhos e mãos. Arqueie e curve a coluna alternando.', emoji: '🐈' },
-      { nome: 'Alongamento lateral', tempo: 30, instrucao: 'Em pé, eleve um braço e incline o tronco para o lado oposto.', emoji: '🙆' },
+      { nome: 'Inclinação para trás', tempo: 30, imagem: imgLombar, cacheKey: 'lombar-incl-tras',
+        instrucao: 'Em pé, com as mãos na cintura, incline o tronco para trás devagar, sem forçar.' },
+      { nome: 'Joelho ao peito', tempo: 40, imagem: imgPernas, cacheKey: 'lombar-joelho',
+        instrucao: 'Sentado ou em pé, traga um joelho ao peito e segure por vinte segundos. Troque a perna.' },
+      { nome: 'Rotação de tronco', tempo: 40, imagem: imgLombar, cacheKey: 'lombar-rot-tronco',
+        instrucao: 'Sentado, cruze um pé sobre o joelho oposto e gire o tronco lentamente para o lado.' },
+      { nome: 'Alongamento lateral', tempo: 30, imagem: imgBracos, cacheKey: 'lombar-lateral',
+        instrucao: 'Em pé, eleve um braço e incline o tronco para o lado oposto. Respire profundamente.' },
     ],
   },
   {
     id: 'pescoco',
     titulo: 'Pescoço e ombros',
     descricao: 'Para tensão cervical e dor nos trapézios.',
-    emoji: '🙆',
+    imagem: imgPescoco,
     exercicios: [
-      { nome: 'Inclinação lateral', tempo: 30, instrucao: 'Incline a cabeça para o ombro direito. Segure. Depois esquerdo.', emoji: '🙆' },
-      { nome: 'Rotação cervical', tempo: 30, instrucao: 'Olhe lentamente para o ombro direito. Volte ao centro. Vá para o esquerdo.', emoji: '🔁' },
-      { nome: 'Flexão suave', tempo: 30, instrucao: 'Leve o queixo ao peito devagar. Depois eleve o olhar.', emoji: '⬇️' },
-      { nome: 'Elevação de ombros', tempo: 30, instrucao: 'Leve os ombros até as orelhas, segure 5 segundos e relaxe.', emoji: '💪' },
-      { nome: 'Círculos de ombro', tempo: 40, instrucao: 'Faça círculos amplos para trás. Em seguida, para frente.', emoji: '🔄' },
+      { nome: 'Inclinação lateral', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-incl-lat',
+        instrucao: 'Incline a cabeça para o ombro direito e segure. Depois para o lado esquerdo.' },
+      { nome: 'Rotação cervical', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-rot-cerv',
+        instrucao: 'Olhe lentamente para o ombro direito, volte ao centro e olhe para o esquerdo.' },
+      { nome: 'Flexão suave', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-flex',
+        instrucao: 'Leve o queixo ao peito devagar. Em seguida, eleve o olhar para o teto.' },
+      { nome: 'Elevação de ombros', tempo: 30, imagem: imgOmbros, cacheKey: 'omb-elev',
+        instrucao: 'Leve os ombros até as orelhas, segure por cinco segundos e relaxe completamente.' },
+      { nome: 'Círculos de ombro', tempo: 40, imagem: imgOmbros, cacheKey: 'omb-circ',
+        instrucao: 'Faça círculos amplos com os ombros para trás. Em seguida, para frente.' },
     ],
   },
   {
     id: 'pernas',
     titulo: 'Pernas e joelhos',
     descricao: 'Para quem fica muito tempo em pé ou agachado.',
-    emoji: '🦵',
+    imagem: imgPernas,
     exercicios: [
-      { nome: 'Panturrilha', tempo: 40, instrucao: 'Apoie as mãos na parede, perna esticada atrás, calcanhar no chão.', emoji: '🦵' },
-      { nome: 'Quadríceps', tempo: 40, instrucao: 'Em pé, segure o pé atrás aproximando o calcanhar do glúteo.', emoji: '🧍' },
-      { nome: 'Posterior de coxa', tempo: 40, instrucao: 'Apoie um pé em altura baixa, incline o tronco para frente.', emoji: '⬇️' },
-      { nome: 'Agachamento leve', tempo: 30, instrucao: '5 agachamentos parciais, costas retas, joelhos alinhados aos pés.', emoji: '🏋️' },
+      { nome: 'Panturrilha', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-pantu',
+        instrucao: 'Apoie as mãos na parede. Estique uma perna atrás com o calcanhar firme no chão.' },
+      { nome: 'Quadríceps', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-quad',
+        instrucao: 'Em pé, segure o pé atrás aproximando o calcanhar do glúteo. Mantenha o equilíbrio.' },
+      { nome: 'Posterior de coxa', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-poster',
+        instrucao: 'Apoie um pé em altura baixa e incline o tronco para frente, mantendo a coluna reta.' },
+      { nome: 'Agachamento leve', tempo: 30, imagem: imgPernas, cacheKey: 'pernas-agach',
+        instrucao: 'Faça cinco agachamentos parciais. Mantenha as costas retas e os joelhos alinhados aos pés.' },
     ],
   },
   {
     id: 'braco',
     titulo: 'Braços, punhos e mãos',
     descricao: 'Para quem usa ferramentas, faz movimentos repetitivos.',
-    emoji: '✋',
+    imagem: imgPunhos,
     exercicios: [
-      { nome: 'Punho para cima', tempo: 30, instrucao: 'Braço esticado, dedos apontando para cima. Puxe os dedos com a outra mão.', emoji: '✋' },
-      { nome: 'Punho para baixo', tempo: 30, instrucao: 'Braço esticado, dedos apontando para baixo. Puxe a mão na sua direção.', emoji: '🤚' },
-      { nome: 'Abrir e fechar', tempo: 20, instrucao: 'Abra bem os dedos e feche em punho, repita 10 vezes.', emoji: '👋' },
-      { nome: 'Tríceps', tempo: 30, instrucao: 'Mão sobre o ombro, cotovelo apontando para cima. Empurre o cotovelo levemente.', emoji: '💪' },
+      { nome: 'Punho para cima', tempo: 30, imagem: imgPunhos, cacheKey: 'punho-cima',
+        instrucao: 'Braço esticado com os dedos apontando para cima. Puxe os dedos suavemente com a outra mão.' },
+      { nome: 'Punho para baixo', tempo: 30, imagem: imgPunhos, cacheKey: 'punho-baixo',
+        instrucao: 'Braço esticado com os dedos apontando para baixo. Puxe a mão delicadamente na sua direção.' },
+      { nome: 'Abrir e fechar', tempo: 20, imagem: imgPunhos, cacheKey: 'punho-abrir',
+        instrucao: 'Abra bem os dedos e feche em punho. Repita dez vezes, com calma.' },
+      { nome: 'Tríceps', tempo: 30, imagem: imgBracos, cacheKey: 'bracos-triceps',
+        instrucao: 'Coloque a mão sobre o ombro com o cotovelo apontando para cima. Empurre o cotovelo levemente.' },
     ],
   },
 ];
@@ -96,11 +125,9 @@ function Ergonomia() {
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState(0);
   const [seconds, setSeconds] = useState(0);
-  const [comAudio, setComAudio] = useState(true);
 
   const categoria = useMemo(() => CATEGORIAS.find((c) => c.id === catId) ?? null, [catId]);
 
-  // inicializa segundos quando troca categoria/step
   useEffect(() => {
     if (categoria) setSeconds(categoria.exercicios[0].tempo);
   }, [categoria]);
@@ -109,26 +136,20 @@ function Ergonomia() {
     if (!running || !categoria) return;
     const id = setInterval(() => {
       setSeconds((s) => {
-        if (s > 1) {
-          // narra metade do tempo (apenas no início de cada exercício é falado por outro effect)
-          return s - 1;
-        }
+        if (s > 1) return s - 1;
         if (step < categoria.exercicios.length - 1) {
-          const proximo = step + 1;
-          setStep(proximo);
-          if (comAudio) speak(categoria.exercicios[proximo].nome + '. ' + categoria.exercicios[proximo].instrucao);
-          return categoria.exercicios[proximo].tempo;
+          setStep(step + 1);
+          return categoria.exercicios[step + 1].tempo;
         }
         setRunning(false);
-        if (comAudio) speak('Parabéns, você concluiu a sequência. Hidrate-se.');
         void finalizar();
         return 0;
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [running, step, categoria, comAudio]);
+  }, [running, step, categoria]);
 
-  useEffect(() => () => { stopSpeaking(); stopBackgroundMusic(); }, []);
+  useEffect(() => () => { pararTodosAudios(); }, []);
 
   async function finalizar() {
     if (!user || !categoria) return;
@@ -145,19 +166,10 @@ function Ergonomia() {
   function iniciar() {
     if (!categoria) return;
     setRunning(true); setStep(0); setSeconds(categoria.exercicios[0].tempo);
-    if (comAudio) {
-      startBackgroundMusic();
-      speak('Vamos começar. ' + categoria.exercicios[0].nome + '. ' + categoria.exercicios[0].instrucao);
-    }
   }
-  function pausar() {
-    setRunning(false);
-    stopSpeaking();
-    stopBackgroundMusic();
-  }
+  function pausar() { setRunning(false); pararTodosAudios(); }
   function reset() { pausar(); setStep(0); if (categoria) setSeconds(categoria.exercicios[0].tempo); }
 
-  // Lista de categorias
   if (!categoria) {
     return (
       <div className="px-5 pb-8 pt-6">
@@ -189,9 +201,10 @@ function Ergonomia() {
             <button
               key={c.id}
               onClick={() => { setCatId(c.id); setRunning(false); setStep(0); }}
-              className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-4 text-left transition hover:border-primary"
+              className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-3 text-left transition hover:border-primary"
             >
-              <span className="text-3xl">{c.emoji}</span>
+              <img src={c.imagem} alt={c.titulo} loading="lazy" width={64} height={64}
+                className="h-16 w-16 shrink-0 rounded-xl object-cover" />
               <div className="flex-1">
                 <p className="text-sm font-bold">{c.titulo}</p>
                 <p className="text-xs text-muted-foreground">{c.descricao}</p>
@@ -221,7 +234,6 @@ function Ergonomia() {
     );
   }
 
-  // Sessão em andamento
   const atual = categoria.exercicios[step];
 
   return (
@@ -229,55 +241,57 @@ function Ergonomia() {
       <button onClick={() => { pausar(); setCatId(null); }} className="inline-flex items-center gap-2 text-sm text-muted-foreground">
         <ArrowLeft className="h-4 w-4" /> Voltar para categorias
       </button>
-      <div className="mt-3 flex items-center justify-between">
-        <h1 className="flex items-center gap-2 text-2xl font-extrabold">
-          <span className="text-3xl">{categoria.emoji}</span> {categoria.titulo}
-        </h1>
-        {isTtsSupported() && (
-          <button
-            onClick={() => { setComAudio((v) => { if (v) { stopSpeaking(); stopBackgroundMusic(); } return !v; }); }}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-foreground"
-            aria-label="Alternar narração"
-          >
-            {comAudio ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          </button>
-        )}
-      </div>
+      <h1 className="mt-3 text-2xl font-extrabold">{categoria.titulo}</h1>
 
-      <div className="mt-5 rounded-3xl bg-gradient-primary p-6 text-center text-primary-foreground shadow-elevated">
-        <p className="text-xs uppercase tracking-wider opacity-80">
-          Exercício {step + 1} de {categoria.exercicios.length}
-        </p>
-        <h2 className="mt-1 text-xl font-bold">{atual.nome}</h2>
-        <motion.div
-          key={step + (running ? 'r' : 's')}
-          animate={{ scale: running ? [1, 1.08, 1] : 1 }}
-          transition={{ duration: 1.5, repeat: running ? Infinity : 0 }}
-          className="mt-4 text-7xl"
-        >
-          {atual.emoji}
-        </motion.div>
-        <div className="mt-3 text-5xl font-extrabold tabular-nums">{seconds}s</div>
-        <p className="mt-2 text-sm opacity-90">{atual.instrucao}</p>
-        <div className="mt-5 flex justify-center gap-3">
-          <button
-            onClick={() => running ? pausar() : iniciar()}
-            className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent font-bold text-accent-foreground shadow-warm"
-          >
-            {running ? <><Pause className="h-5 w-5" /> Pausar</> : <><Play className="h-5 w-5" /> {step === 0 && seconds === categoria.exercicios[0].tempo ? 'Iniciar com narração' : 'Continuar'}</>}
-          </button>
-          <button onClick={reset} className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20">
-            <RotateCcw className="h-5 w-5" />
-          </button>
+      <div className="mt-5 overflow-hidden rounded-3xl bg-gradient-primary text-primary-foreground shadow-elevated">
+        <div className="relative bg-white">
+          <motion.img
+            key={atual.cacheKey}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, scale: running ? [1, 1.03, 1] : 1 }}
+            transition={{ opacity: { duration: 0.3 }, scale: { duration: 2, repeat: running ? Infinity : 0 } }}
+            src={atual.imagem}
+            alt={`Posição: ${atual.nome}`}
+            width={768}
+            height={768}
+            loading="lazy"
+            className="mx-auto h-64 w-full object-contain"
+          />
+          <div className="absolute left-3 top-3 rounded-full bg-primary/90 px-3 py-1 text-xs font-bold text-primary-foreground">
+            {step + 1} / {categoria.exercicios.length}
+          </div>
         </div>
-        <div className="mt-3 flex justify-center gap-1">
-          {categoria.exercicios.map((_, i) => (
-            <div key={i} className={`h-1 w-6 rounded-full ${i <= step ? 'bg-accent' : 'bg-white/30'}`} />
-          ))}
+
+        <div className="p-5 text-center">
+          <h2 className="text-xl font-bold">{atual.nome}</h2>
+          <div className="mt-1 text-5xl font-extrabold tabular-nums">{seconds}s</div>
+          <p className="mt-2 text-sm opacity-95">{atual.instrucao}</p>
+
+          <div className="mt-4">
+            <AudioNarracao
+              texto={`${atual.nome}. ${atual.instrucao}`}
+              cacheKey={`ergo-${categoria.id}-${atual.cacheKey}`}
+              autoPlay={running}
+            />
+          </div>
+
+          <div className="mt-4 flex justify-center gap-3">
+            <button
+              onClick={() => running ? pausar() : iniciar()}
+              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-accent font-bold text-accent-foreground shadow-warm"
+            >
+              {running ? <><Pause className="h-5 w-5" /> Pausar</> : <><Play className="h-5 w-5" /> Iniciar sequência</>}
+            </button>
+            <button onClick={reset} className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20" aria-label="Reiniciar">
+              <RotateCcw className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="mt-3 flex justify-center gap-1">
+            {categoria.exercicios.map((_, i) => (
+              <div key={i} className={`h-1 w-6 rounded-full ${i <= step ? 'bg-accent' : 'bg-white/30'}`} />
+            ))}
+          </div>
         </div>
-        <p className="mt-3 text-xs opacity-80">
-          🔊 A voz orienta cada passo — você não precisa olhar a tela.
-        </p>
       </div>
 
       <p className="mt-6 rounded-2xl bg-warning/10 p-3 text-xs text-warning-foreground">
