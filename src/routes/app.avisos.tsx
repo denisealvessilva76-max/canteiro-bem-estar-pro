@@ -57,7 +57,15 @@ function Avisos() {
               {!a.lido && <span className="h-2 w-2 rounded-full bg-current" />}
             </div>
             <h3 className="mt-2 text-base font-bold text-foreground">{a.titulo}</h3>
-            <p className="mt-1 text-sm text-foreground/80">{a.conteudo}</p>
+            {(a as { imagem_url: string | null }).imagem_url && (
+              <img
+                src={(a as { imagem_url: string }).imagem_url}
+                alt={a.titulo}
+                loading="lazy"
+                className="mt-3 max-h-72 w-full rounded-xl object-cover"
+              />
+            )}
+            <p className="mt-2 text-sm text-foreground/80 whitespace-pre-line">{a.conteudo}</p>
             <p className="mt-2 text-[11px] text-muted-foreground">{new Date(a.created_at).toLocaleString('pt-BR')}</p>
           </button>
         ))}

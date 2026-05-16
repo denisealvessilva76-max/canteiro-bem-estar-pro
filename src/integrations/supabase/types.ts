@@ -97,6 +97,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          imagem_url: string | null
           publicado: boolean
           titulo: string
         }
@@ -106,6 +107,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          imagem_url?: string | null
           publicado?: boolean
           titulo: string
         }
@@ -115,6 +117,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          imagem_url?: string | null
           publicado?: boolean
           titulo?: string
         }

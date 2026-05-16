@@ -269,8 +269,15 @@ function Ergonomia() {
 
           <div className="mt-4">
             <AudioNarracao
-              texto={`${atual.nome}. ${atual.instrucao}`}
-              cacheKey={`ergo-${categoria.id}-${atual.cacheKey}`}
+              texto={
+                `Exercício ${step + 1} de ${categoria.exercicios.length}: ${atual.nome}. ` +
+                `${atual.instrucao} ` +
+                `Mantenha a posição por ${atual.tempo} segundos, respirando fundo e devagar. ` +
+                (step === categoria.exercicios.length - 1
+                  ? 'Este é o último. Muito bem, você está quase lá.'
+                  : 'Quando o tempo acabar, vamos para o próximo.')
+              }
+              cacheKey={`ergo-v2-${categoria.id}-${atual.cacheKey}`}
               autoPlay={running}
             />
           </div>
