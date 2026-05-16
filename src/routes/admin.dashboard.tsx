@@ -358,19 +358,24 @@ const titulosDrill: Record<NonNullable<Drill>, string> = {
 };
 
 function KCard({ icon: Icon, label, value, tone, onClick }: { icon: React.ElementType; label: string; value: string | number; tone: string; onClick?: () => void }) {
-  const tones: Record<string, string> = {
-    primary: 'bg-primary/10 text-primary',
-    info: 'bg-info/10 text-info',
-    water: 'bg-water/10 text-water',
-    danger: 'bg-destructive/10 text-destructive',
+  const tones: Record<string, { bg: string; ring: string; text: string; chip: string }> = {
+    primary: { bg: 'from-primary/15 via-primary/5 to-transparent', ring: 'hover:ring-primary/40', text: 'text-primary', chip: 'bg-primary text-primary-foreground' },
+    info: { bg: 'from-info/15 via-info/5 to-transparent', ring: 'hover:ring-info/40', text: 'text-info', chip: 'bg-info text-info-foreground' },
+    water: { bg: 'from-water/15 via-water/5 to-transparent', ring: 'hover:ring-water/40', text: 'text-water', chip: 'bg-water text-white' },
+    danger: { bg: 'from-destructive/15 via-destructive/5 to-transparent', ring: 'hover:ring-destructive/40', text: 'text-destructive', chip: 'bg-destructive text-destructive-foreground' },
   };
+  const t = tones[tone];
   return (
-    <button onClick={onClick} className="rounded-2xl border border-border bg-card p-5 text-left shadow-soft transition hover:border-primary">
-      <div className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${tones[tone]}`}>
+    <button
+      onClick={onClick}
+      className={`group relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br ${t.bg} p-5 text-left shadow-soft ring-1 ring-transparent transition-all hover:-translate-y-0.5 hover:shadow-elevated ${t.ring}`}
+    >
+      <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${t.chip} shadow-md transition-transform group-hover:scale-110`}>
         <Icon className="h-5 w-5" />
       </div>
-      <p className="mt-3 text-3xl font-extrabold">{value}</p>
-      <p className="text-xs text-muted-foreground">{label} <span className="text-primary">›</span></p>
+      <p className="mt-3 text-3xl font-extrabold tabular-nums">{value}</p>
+      <p className="text-xs text-muted-foreground">{label} <span className={`${t.text} transition-transform group-hover:translate-x-0.5 inline-block`}>›</span></p>
+      <div className={`absolute -right-6 -top-6 h-20 w-20 rounded-full ${t.chip} opacity-10 blur-2xl transition-opacity group-hover:opacity-20`} />
     </button>
   );
 }
