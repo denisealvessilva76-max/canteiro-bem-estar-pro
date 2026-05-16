@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Brain, Phone, MessageCircle, Volume2, VolumeX, HeartPulse, ExternalLink } from "lucide-react";
-import { speak, stopSpeaking, startBackgroundMusic, stopBackgroundMusic, isTtsSupported } from "@/lib/tts";
+import { ArrowLeft, Brain, Phone, MessageCircle, HeartPulse, ExternalLink } from "lucide-react";
+import { AudioNarracao, pararTodosAudios } from "@/components/AudioNarracao";
 import {
   WHATSAPP_PSICOLOGA,
   WHATSAPP_ASSISTENTE_SOCIAL,
