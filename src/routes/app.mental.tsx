@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Brain, Phone, MessageCircle, HeartPulse, ExternalLink } from "lucide-react";
-import { AudioNarracao, pararTodosAudios } from "@/components/AudioNarracao";
+import { ArrowLeft, Brain, Phone, MessageCircle, HeartPulse, ExternalLink, Volume2 } from "lucide-react";
+import { useNarracaoSequencial, type Trecho } from "@/components/NarracaoSequencial";
+import { pararTodosAudios } from "@/components/AudioNarracao";
 import {
   WHATSAPP_PSICOLOGA,
   WHATSAPP_ASSISTENTE_SOCIAL,
@@ -16,12 +17,25 @@ export const Route = createFileRoute("/app/mental")({
   component: Mental,
 });
 
-// Respiração 4-7-8 com ritmo realmente calmo: cada fase tem o tempo correto
-// e a fala acontece UMA vez no início, sem atropelar a contagem.
 const FASES = [
-  { nome: 'Inspire', dur: 4, scale: 1.55, fala: 'Inspire devagar pelo nariz' },
-  { nome: 'Segure',  dur: 7, scale: 1.55, fala: 'Segure o ar com calma' },
-  { nome: 'Solte',   dur: 8, scale: 0.9,  fala: 'Solte o ar bem devagar pela boca' },
+  { nome: 'Inspire', dur: 4, scale: 1.55 },
+  { nome: 'Segure',  dur: 7, scale: 1.55 },
+  { nome: 'Solte',   dur: 8, scale: 0.9  },
+];
+
+// Trechos narrados — cada fala dura aproximadamente o tempo da fase.
+// Cacheados pelo ElevenLabs no bucket "narracoes" (1ª execução gera; depois é instantâneo).
+const TRECHOS: Trecho[] = [
+  { cacheKey: 'mental-478-intro',
+    texto: 'Vamos iniciar a respiração guiada. Tente ficar o mais relaxado possível. Solte os ombros e feche os olhos se quiser.' },
+  { cacheKey: 'mental-478-inspire',
+    texto: 'Inspire pelo nariz. Um, dois, três, quatro.' },
+  { cacheKey: 'mental-478-segure',
+    texto: 'Segure o ar. Um, dois, três, quatro, cinco, seis, sete.' },
+  { cacheKey: 'mental-478-solte',
+    texto: 'Solte pela boca, devagar. Um, dois, três, quatro, cinco, seis, sete, oito.' },
+  { cacheKey: 'mental-478-final',
+    texto: 'Muito bem. Você conseguiu. Continue respirando no seu ritmo.' },
 ];
 
 function Mental() {
@@ -30,6 +44,10 @@ function Mental() {
   const [tempo, setTempo] = useState(FASES[0].dur);
   const [ciclos, setCiclos] = useState(0);
 
+  const trechos = useMemo(() => TRECHOS, []);
+  const { play, stop, pronto } = useNarracaoSequencial(trechos);
+
+  // Contagem regressiva da fase
   useEffect(() => {
     if (!running) return;
     const id = setInterval(() => {
@@ -44,22 +62,33 @@ function Mental() {
     return () => clearInterval(id);
   }, [running, fase]);
 
+  // Sincroniza a narração com cada nova fase
+  useEffect(() => {
+    if (!running) return;
+    // Índices em TRECHOS: 1 inspire, 2 segure, 3 solte
+    play(fase + 1);
+  }, [running, fase, ciclos, play]);
+
   function start() {
-    setRunning(true); setFase(0); setTempo(FASES[0].dur); setCiclos(0);
+    setFase(0);
+    setTempo(FASES[0].dur);
+    setCiclos(0);
+    play(0); // intro
+    // dá ~3.5s para a intro antes de começar o ciclo
+    setTimeout(() => {
+      setRunning(true);
+      play(1); // inspire
+    }, 3800);
   }
-  function stop() {
+
+  function stopAll() {
     setRunning(false);
+    stop();
     pararTodosAudios();
+    play(4); // mensagem final
   }
 
-  useEffect(() => () => { pararTodosAudios(); }, []);
-
-  // Texto único da narração — gerado uma vez e reproduzido em loop suave.
-  const textoNarracao =
-    'Vamos respirar juntos. Inspire devagar pelo nariz, contando até quatro. ' +
-    'Agora segure o ar com calma, contando até sete. ' +
-    'Solte o ar bem devagar pela boca, contando até oito. ' +
-    'Muito bem. Respire no seu ritmo.';
+  useEffect(() => () => { stop(); pararTodosAudios(); }, [stop]);
 
   return (
     <div className="px-5 pb-8 pt-6">
@@ -73,51 +102,32 @@ function Mental() {
         Você não está sozinho. Tudo aqui é confidencial. 🤝
       </p>
 
-      {/* SOS oficial — CVV */}
       <div className="mt-6 grid grid-cols-1 gap-3">
-        <a
-          href={`tel:${SOS_TELEFONE}`}
-          className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-destructive text-base font-bold text-destructive-foreground shadow-elevated"
-        >
+        <a href={`tel:${SOS_TELEFONE}`} className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-destructive text-base font-bold text-destructive-foreground shadow-elevated">
           <Phone className="h-5 w-5" /> SOS · Ligar 188 (CVV)
         </a>
-        <a
-          href={SOS_CHAT_URL}
-          target="_blank" rel="noopener"
-          className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-destructive bg-card text-base font-bold text-destructive"
-        >
+        <a href={SOS_CHAT_URL} target="_blank" rel="noopener" className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-destructive bg-card text-base font-bold text-destructive">
           <MessageCircle className="h-5 w-5" /> Chat anônimo CVV <ExternalLink className="h-4 w-4" />
         </a>
 
         <div className="mt-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Equipe da obra</div>
 
-        <a
-          href={whatsappLink(WHATSAPP_PSICOLOGA, 'Olá, sou trabalhador do canteiro e gostaria de conversar com a psicóloga.')}
-          target="_blank" rel="noopener"
-          className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-success text-base font-bold text-success-foreground shadow-soft"
-        >
+        <a href={whatsappLink(WHATSAPP_PSICOLOGA, 'Olá, sou trabalhador do canteiro e gostaria de conversar com a psicóloga.')} target="_blank" rel="noopener" className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-success text-base font-bold text-success-foreground shadow-soft">
           <MessageCircle className="h-5 w-5" /> Psicóloga (WhatsApp)
         </a>
-        <a
-          href={whatsappLink(WHATSAPP_ASSISTENTE_SOCIAL, 'Olá, sou trabalhador do canteiro e preciso de apoio da assistente social.')}
-          target="_blank" rel="noopener"
-          className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-success bg-card text-base font-bold text-success"
-        >
+        <a href={whatsappLink(WHATSAPP_ASSISTENTE_SOCIAL, 'Olá, sou trabalhador do canteiro e preciso de apoio da assistente social.')} target="_blank" rel="noopener" className="flex h-14 items-center justify-center gap-2 rounded-2xl border-2 border-success bg-card text-base font-bold text-success">
           <MessageCircle className="h-5 w-5" /> Assistente Social (WhatsApp)
         </a>
-        <a
-          href={whatsappLink(WHATSAPP_SAUDE_OCUPACIONAL, 'Olá, sou trabalhador do canteiro e preciso falar com a Saúde Ocupacional.')}
-          target="_blank" rel="noopener"
-          className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-info text-base font-bold text-info-foreground shadow-soft"
-        >
+        <a href={whatsappLink(WHATSAPP_SAUDE_OCUPACIONAL, 'Olá, sou trabalhador do canteiro e preciso falar com a Saúde Ocupacional.')} target="_blank" rel="noopener" className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-info text-base font-bold text-info-foreground shadow-soft">
           <HeartPulse className="h-5 w-5" /> Saúde Ocupacional (WhatsApp)
         </a>
       </div>
 
-      {/* Respiração 4-7-8 */}
       <div className="mt-7 rounded-3xl border border-border bg-card p-6 shadow-soft">
         <h2 className="text-base font-bold">Respiração guiada 4-7-8</h2>
-        <p className="text-xs text-muted-foreground">Acalma em momentos de estresse ou ansiedade.</p>
+        <p className="text-xs text-muted-foreground">
+          A voz vai te acompanhar a cada etapa. Sincronizada com a bolinha.
+        </p>
 
         <div className="mt-6 flex flex-col items-center">
           <motion.div
@@ -132,15 +142,18 @@ function Mental() {
           </motion.div>
           <p className="mt-4 text-xs text-muted-foreground">{ciclos} ciclos completos</p>
           <button
-            onClick={() => running ? stop() : start()}
-            className="mt-5 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-primary font-bold text-primary-foreground"
+            onClick={() => running ? stopAll() : start()}
+            disabled={!pronto && !running}
+            className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary font-bold text-primary-foreground disabled:opacity-60"
           >
-            {running ? 'Parar' : 'Começar respiração'}
+            <Volume2 className="h-4 w-4" />
+            {!pronto && !running ? 'Preparando voz...' : running ? 'Parar' : 'Começar respiração guiada'}
           </button>
-
-          <div className="mt-4 w-full rounded-2xl bg-gradient-primary p-1 text-primary-foreground">
-            <AudioNarracao texto={textoNarracao} cacheKey="mental-respiracao-478" />
-          </div>
+          {pronto && !running && (
+            <p className="mt-2 text-[11px] text-muted-foreground text-center">
+              Áudio carregado. Coloque o volume em um nível confortável.
+            </p>
+          )}
         </div>
       </div>
 
