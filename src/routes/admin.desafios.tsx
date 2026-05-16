@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Check, X } from "lucide-react";
+import { Plus, Check, X, ImageOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/desafios")({
@@ -63,22 +63,17 @@ function AdminDesafios() {
 
         <div className="rounded-3xl border border-border bg-card p-6">
           <h2 className="text-lg font-bold">Validar fotos ({pendentes?.length ?? 0})</h2>
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 space-y-4">
             {(pendentes ?? []).map((p) => (
-              <div key={p.id} className="rounded-xl border border-border p-3">
-                <p className="text-sm font-bold">{(p as { profiles: { nome: string } | null }).profiles?.nome}</p>
-                <p className="text-xs text-muted-foreground">
-                  {(p as { desafios: { titulo: string } | null }).desafios?.titulo} · 📸 enviada
-                </p>
-                <div className="mt-2 flex gap-2">
-                  <button onClick={() => validar(p.id, true)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-success text-xs font-bold text-success-foreground">
-                    <Check className="h-3 w-3" /> Validar
-                  </button>
-                  <button onClick={() => validar(p.id, false)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-destructive text-xs font-bold text-destructive-foreground">
-                    <X className="h-3 w-3" /> Recusar
-                  </button>
-                </div>
-              </div>
+              <PendingPhoto
+                key={p.id}
+                id={p.id}
+                fotoPath={(p as { foto_url: string | null }).foto_url ?? ''}
+                nome={(p as { profiles: { nome: string } | null }).profiles?.nome ?? '—'}
+                matricula={(p as { profiles: { matricula: string } | null }).profiles?.matricula ?? ''}
+                desafio={(p as { desafios: { titulo: string } | null }).desafios?.titulo ?? ''}
+                onValidar={validar}
+              />
             ))}
             {pendentes?.length === 0 && <p className="py-4 text-center text-sm text-muted-foreground">Nenhuma foto pendente</p>}
           </div>
@@ -97,6 +92,57 @@ function AdminDesafios() {
             >{d.ativo ? 'Desativar' : 'Ativar'}</button>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function PendingPhoto({ id, fotoPath, nome, matricula, desafio, onValidar }: {
+  id: string; fotoPath: string; nome: string; matricula: string; desafio: string;
+  onValidar: (id: string, ok: boolean) => void;
+}) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [erro, setErro] = useState(false);
+
+  useEffect(() => {
+    let cancel = false;
+    if (!fotoPath) { setErro(true); return; }
+    // Se já é URL completa, usa direto
+    if (/^https?:\/\//.test(fotoPath)) { setUrl(fotoPath); return; }
+    supabase.storage.from('desafios-fotos').createSignedUrl(fotoPath, 60 * 60).then(({ data, error }) => {
+      if (cancel) return;
+      if (error || !data?.signedUrl) setErro(true);
+      else setUrl(data.signedUrl);
+    });
+    return () => { cancel = true; };
+  }, [fotoPath]);
+
+  return (
+    <div className="rounded-xl border border-border p-3">
+      <p className="text-sm font-bold">{nome} <span className="text-xs font-normal text-muted-foreground">· mat. {matricula}</span></p>
+      <p className="text-xs text-muted-foreground">{desafio}</p>
+
+      <div className="mt-2 overflow-hidden rounded-lg border border-border bg-muted/30">
+        {url ? (
+          <a href={url} target="_blank" rel="noreferrer" className="block">
+            <img src={url} alt={`Foto de ${nome}`} className="max-h-72 w-full object-contain" loading="lazy" />
+          </a>
+        ) : erro ? (
+          <div className="flex h-32 flex-col items-center justify-center gap-1 text-xs text-muted-foreground">
+            <ImageOff className="h-5 w-5" /> Imagem indisponível
+          </div>
+        ) : (
+          <div className="flex h-32 items-center justify-center text-xs text-muted-foreground">Carregando foto…</div>
+        )}
+      </div>
+
+      <div className="mt-3 flex gap-2">
+        <button onClick={() => onValidar(id, true)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-success text-xs font-bold text-success-foreground">
+          <Check className="h-3 w-3" /> Validar
+        </button>
+        <button onClick={() => onValidar(id, false)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-destructive text-xs font-bold text-destructive-foreground">
+          <X className="h-3 w-3" /> Recusar
+        </button>
       </div>
     </div>
   );
