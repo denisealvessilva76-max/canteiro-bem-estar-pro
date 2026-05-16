@@ -5,7 +5,7 @@ import { Users, Activity, Droplets, AlertTriangle, X, Phone, Trophy } from "luci
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
-import { WeatherObras } from "@/components/WeatherObras";
+
 
 export const Route = createFileRoute("/admin/dashboard")({
   component: Dashboard,
