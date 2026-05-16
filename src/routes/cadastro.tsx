@@ -54,7 +54,12 @@ function Cadastro() {
     });
     if (error) {
       setLoading(false);
-      toast.error(error.message || "Erro ao cadastrar");
+      const msg = (error.message || "").toLowerCase();
+      if (msg.includes("matricula") || msg.includes("unique") || msg.includes("duplicate")) {
+        toast.error("Essa matrícula já está cadastrada");
+      } else {
+        toast.error(error.message || "Erro ao cadastrar");
+      }
       return;
     }
     // grava telefone (após o trigger criar o profile)
