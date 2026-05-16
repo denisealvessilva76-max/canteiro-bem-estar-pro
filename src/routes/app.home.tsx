@@ -7,6 +7,7 @@ import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X } from "lucide
 import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { supabase } from "@/integrations/supabase/client";
+import { WeatherObras } from "@/components/WeatherObras";
 import { HUMORES, todayISO } from "@/lib/canteiro";
 import { insertOrQueue } from "@/lib/offline";
 
@@ -112,6 +113,10 @@ function Home() {
           <ActionCard to="/app/mental" icon={Brain} title="Saúde Mental" subtitle="Apoio e respiração" tone="accent" />
           <ActionCard to="/app/avisos" icon={Bell} title="Avisos" subtitle="Comunicados" tone="info" />
           <ActionCard to="/app/recompensas" icon={Sparkles} title="Recompensas" subtitle="Loja de prêmios" tone="primary" />
+        </div>
+
+        <div className="mt-6">
+          <WeatherObras />
         </div>
 
         <h2 className="mt-7 text-base font-bold text-foreground">Sua semana</h2>
