@@ -18,8 +18,7 @@ function sanitizeElevenLabsKey(rawKey: string) {
   const ascii = rawKey
     .normalize("NFKC")
     .replace(/[\u200B-\u200D\uFEFF]/g, "")
-    .replace(/[^
-\x20-\x7E]/g, " ")
+    .replace(/[^\x20-\x7E]/g, " ")
     .trim();
 
   const withoutPrefix = ascii
