@@ -35,9 +35,15 @@ export const obterNarracao = createServerFn({ method: "POST" })
       if (head.ok) return { url: publicUrl, cached: true };
     } catch { /* segue para gerar */ }
 
-    const key = process.env.ELEVENLABS_API_KEY;
+    const rawKey = process.env.ELEVENLABS_API_KEY ?? "";
+    // Remove espaços, quebras de linha e qualquer caractere fora do ASCII imprimível
+    // (a chave às vezes é colada com setas/aspas tipográficas que quebram o header HTTP)
+    const key = rawKey.replace(/[^\x21-\x7E]/g, "");
     if (!key) {
       return { url: null, cached: false, error: "ELEVENLABS_API_KEY não configurada" };
+    }
+    if (key.length < 20) {
+      return { url: null, cached: false, error: "ELEVENLABS_API_KEY parece inválida" };
     }
 
     const res = await fetch(
