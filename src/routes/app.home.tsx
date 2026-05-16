@@ -84,6 +84,8 @@ function Home() {
       <AppHeader />
 
       <div className="-mt-6 px-4">
+        <LembretesCenter />
+
         <motion.div
           initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
           className="rounded-3xl border border-border bg-card p-5 shadow-elevated"
