@@ -125,9 +125,6 @@ function Dashboard() {
         <KCard onClick={() => setDrill('alertas')} icon={AlertTriangle} label="Alertas abertos" value={stats?.alertas.length ?? '—'} tone="danger" />
       </div>
 
-      <div className="mt-6">
-        <WeatherObras />
-      </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <div className="rounded-3xl border border-border bg-card p-5">
