@@ -377,8 +377,6 @@ export type Database = {
           turno: Database["public"]["Enums"]["turno"]
           ultimo_checkin: string | null
           updated_at: string
-          whatsapp_assistente: string | null
-          whatsapp_psicologa: string | null
         }
         Insert: {
           altura?: number | null
@@ -398,8 +396,6 @@ export type Database = {
           turno?: Database["public"]["Enums"]["turno"]
           ultimo_checkin?: string | null
           updated_at?: string
-          whatsapp_assistente?: string | null
-          whatsapp_psicologa?: string | null
         }
         Update: {
           altura?: number | null
@@ -419,8 +415,6 @@ export type Database = {
           turno?: Database["public"]["Enums"]["turno"]
           ultimo_checkin?: string | null
           updated_at?: string
-          whatsapp_assistente?: string | null
-          whatsapp_psicologa?: string | null
         }
         Relationships: []
       }
