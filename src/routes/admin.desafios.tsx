@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Check, X, ImageOff } from "lucide-react";
+import { Plus, Check, X, ImageOff, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/desafios")({
@@ -17,11 +17,30 @@ function AdminDesafios() {
     queryKey: ['admin-desafios'],
     queryFn: async () => (await supabase.from('desafios').select('*').order('created_at', { ascending: false })).data ?? [],
   });
+
+  // Fotos pendentes: check-ins diários COM foto e SEM validação ainda
   const { data: pendentes } = useQuery({
     queryKey: ['admin-fotos-pendentes'],
-    queryFn: async () => (await supabase.from('progresso_desafios')
-      .select('*, profiles(nome, matricula), desafios(titulo)')
-      .not('foto_url', 'is', null).is('foto_validada', null)).data ?? [],
+    queryFn: async () => {
+      const { data: checks } = await supabase.from('desafio_checkins')
+        .select('*')
+        .not('foto_url', 'is', null).is('validado', null)
+        .order('created_at', { ascending: false });
+      if (!checks || checks.length === 0) return [];
+      const userIds = [...new Set(checks.map((c) => c.user_id))];
+      const desafioIds = [...new Set(checks.map((c) => c.desafio_id))];
+      const [{ data: profs }, { data: desafs }] = await Promise.all([
+        supabase.from('profiles').select('id, nome, matricula').in('id', userIds),
+        supabase.from('desafios').select('id, titulo').in('id', desafioIds),
+      ]);
+      const pm = new Map((profs ?? []).map((p) => [p.id, p]));
+      const dm = new Map((desafs ?? []).map((d) => [d.id, d]));
+      return checks.map((c) => ({
+        ...c,
+        profile: pm.get(c.user_id) ?? null,
+        desafio: dm.get(c.desafio_id) ?? null,
+      }));
+    },
   });
 
   async function criar() {
@@ -33,8 +52,11 @@ function AdminDesafios() {
   }
 
   async function validar(id: string, ok: boolean) {
-    await supabase.from('progresso_desafios').update({
-      foto_validada: ok, status: ok ? 'concluido' : 'em_andamento', concluido_em: ok ? new Date().toISOString() : null,
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from('desafio_checkins').update({
+      validado: ok,
+      validado_em: new Date().toISOString(),
+      validado_por: user?.id ?? null,
     }).eq('id', id);
     toast.success(ok ? 'Foto validada' : 'Foto recusada');
     void qc.invalidateQueries({ queryKey: ['admin-fotos-pendentes'] });
@@ -62,16 +84,21 @@ function AdminDesafios() {
         </div>
 
         <div className="rounded-3xl border border-border bg-card p-6">
-          <h2 className="text-lg font-bold">Validar fotos ({pendentes?.length ?? 0})</h2>
+          <h2 className="text-lg font-bold">Validar fotos diárias ({pendentes?.length ?? 0})</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Cada check-in diário aparece aqui até ser aprovado ou rejeitado.</p>
           <div className="mt-4 space-y-4">
             {(pendentes ?? []).map((p) => (
               <PendingPhoto
                 key={p.id}
                 id={p.id}
-                fotoPath={(p as { foto_url: string | null }).foto_url ?? ''}
-                nome={(p as { profiles: { nome: string } | null }).profiles?.nome ?? '—'}
-                matricula={(p as { profiles: { matricula: string } | null }).profiles?.matricula ?? ''}
-                desafio={(p as { desafios: { titulo: string } | null }).desafios?.titulo ?? ''}
+                fotoPath={p.foto_url ?? ''}
+                nome={p.profile?.nome ?? '—'}
+                matricula={p.profile?.matricula ?? ''}
+                desafio={p.desafio?.titulo ?? ''}
+                data={p.data}
+                gpsLat={p.gps_lat}
+                gpsLng={p.gps_lng}
+                dificuldade={p.dificuldade}
                 onValidar={validar}
               />
             ))}
@@ -97,8 +124,9 @@ function AdminDesafios() {
   );
 }
 
-function PendingPhoto({ id, fotoPath, nome, matricula, desafio, onValidar }: {
+function PendingPhoto({ id, fotoPath, nome, matricula, desafio, data, gpsLat, gpsLng, dificuldade, onValidar }: {
   id: string; fotoPath: string; nome: string; matricula: string; desafio: string;
+  data: string; gpsLat: number | null; gpsLng: number | null; dificuldade: string | null;
   onValidar: (id: string, ok: boolean) => void;
 }) {
   const [url, setUrl] = useState<string | null>(null);
@@ -107,7 +135,6 @@ function PendingPhoto({ id, fotoPath, nome, matricula, desafio, onValidar }: {
   useEffect(() => {
     let cancel = false;
     if (!fotoPath) { setErro(true); return; }
-    // Se já é URL completa, usa direto
     if (/^https?:\/\//.test(fotoPath)) { setUrl(fotoPath); return; }
     supabase.storage.from('desafios-fotos').createSignedUrl(fotoPath, 60 * 60).then(({ data, error }) => {
       if (cancel) return;
@@ -120,7 +147,8 @@ function PendingPhoto({ id, fotoPath, nome, matricula, desafio, onValidar }: {
   return (
     <div className="rounded-xl border border-border p-3">
       <p className="text-sm font-bold">{nome} <span className="text-xs font-normal text-muted-foreground">· mat. {matricula}</span></p>
-      <p className="text-xs text-muted-foreground">{desafio}</p>
+      <p className="text-xs text-muted-foreground">{desafio} · {new Date(data).toLocaleDateString('pt-BR')}</p>
+      {dificuldade && <p className="mt-1 text-[11px] italic text-muted-foreground">"{dificuldade}"</p>}
 
       <div className="mt-2 overflow-hidden rounded-lg border border-border bg-muted/30">
         {url ? (
@@ -135,6 +163,12 @@ function PendingPhoto({ id, fotoPath, nome, matricula, desafio, onValidar }: {
           <div className="flex h-32 items-center justify-center text-xs text-muted-foreground">Carregando foto…</div>
         )}
       </div>
+
+      {gpsLat && gpsLng && (
+        <p className="mt-2 flex items-center gap-1 text-[10px] text-muted-foreground">
+          <MapPin className="h-3 w-3" /> {gpsLat.toFixed(4)}, {gpsLng.toFixed(4)}
+        </p>
+      )}
 
       <div className="mt-3 flex gap-2">
         <button onClick={() => onValidar(id, true)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-success text-xs font-bold text-success-foreground">

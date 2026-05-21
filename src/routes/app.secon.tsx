@@ -1,25 +1,27 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Phone, Camera, AlertTriangle, MapPin, Check } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Camera, AlertTriangle, MapPin, Check, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { capturarMeta } from '@/lib/camera';
+import { WHATSAPP_SAUDE_OCUPACIONAL, whatsappLink } from '@/lib/contatos';
 
 export const Route = createFileRoute('/app/secon')({
-  component: Secon,
+  component: Cecom,
 });
 
-const TEL = '08002850193';
+const TEL_CECOM = '08002850193';
+const MSG = 'Olá, estou no CECOM ou fui encaminhado para o CECOM. Preciso de orientação da Saúde Ocupacional.';
 
-function Secon() {
+function Cecom() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [enviando, setEnviando] = useState<string | null>(null);
 
   const { data: chamados } = useQuery({
-    queryKey: ['secon', user?.id],
+    queryKey: ['cecom', user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
       const { data } = await supabase.from('secon_chamados').select('*').eq('user_id', user!.id).order('created_at', { ascending: false });
@@ -29,18 +31,18 @@ function Secon() {
 
   const pendentes = (chamados ?? []).filter((c) => c.status === 'pendente');
 
-  async function acionar() {
+  async function acionarWhats() {
     if (!user) return;
     const meta = await capturarMeta();
     const { error } = await supabase.from('secon_chamados').insert({
       user_id: user.id,
-      telefone_discado: TEL,
+      telefone_discado: TEL_CECOM,
       ...meta,
     });
     if (error) { toast.error(error.message); return; }
-    void qc.invalidateQueries({ queryKey: ['secon'] });
-    // Abre o discador
-    window.location.href = `tel:${TEL}`;
+    void qc.invalidateQueries({ queryKey: ['cecom'] });
+    // Abre WhatsApp da Saúde Ocupacional com mensagem pré-pronta
+    window.open(whatsappLink(WHATSAPP_SAUDE_OCUPACIONAL, MSG), '_blank');
   }
 
   async function enviarComprovante(id: string, file: File) {
@@ -61,7 +63,7 @@ function Secon() {
     setEnviando(null);
     if (error) { toast.error(error.message); return; }
     toast.success('Comprovante enviado!');
-    void qc.invalidateQueries({ queryKey: ['secon'] });
+    void qc.invalidateQueries({ queryKey: ['cecom'] });
   }
 
   return (
@@ -71,19 +73,29 @@ function Secon() {
       </Link>
 
       <div className="mt-3 rounded-3xl bg-gradient-to-br from-red-600 to-rose-500 p-5 text-white shadow-elevated">
-        <h1 className="flex items-center gap-2 text-2xl font-extrabold"><AlertTriangle className="h-7 w-7" /> Estou no Secon</h1>
+        <h1 className="flex items-center gap-2 text-2xl font-extrabold"><AlertTriangle className="h-7 w-7" /> Estou no Cecom</h1>
         <p className="mt-1 text-sm opacity-90">Acionamento médico fora do canteiro (alojamento/urgência).</p>
       </div>
 
       <button
-        onClick={() => void acionar()}
-        className="mt-5 flex h-20 w-full items-center justify-center gap-3 rounded-3xl bg-red-600 text-lg font-extrabold text-white shadow-elevated active:scale-[0.98]"
+        onClick={() => void acionarWhats()}
+        className="mt-5 flex h-20 w-full items-center justify-center gap-3 rounded-3xl bg-success text-lg font-extrabold text-success-foreground shadow-elevated active:scale-[0.98]"
       >
-        <Phone className="h-7 w-7" /> Ligar 0800 285 0193
+        <MessageCircle className="h-7 w-7" /> Falar com Saúde Ocupacional
       </button>
       <p className="mt-2 text-center text-[11px] text-muted-foreground">
-        Ao ligar, gravamos sua localização e geramos um pedido de comprovação obrigatória abaixo.
+        Abrirá o WhatsApp corporativo com a mensagem pronta. Sua localização é registrada.
       </p>
+
+      <div className="mt-4 rounded-2xl border border-border bg-card p-4">
+        <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Telefone direto do Cecom</p>
+        <a href={`tel:${TEL_CECOM}`} className="mt-1 flex items-center gap-2 text-2xl font-extrabold text-primary">
+          <Phone className="h-6 w-6" /> 0800 285 0193
+        </a>
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Caso não tenha ninguém próximo que possa realizar a ligação ou um posto de bombeiro por perto, você mesmo pode ligar e solicitar atendimento.
+        </p>
+      </div>
 
       {pendentes.length > 0 && (
         <div className="mt-6 rounded-2xl border-2 border-warning bg-warning/5 p-4">
@@ -102,9 +114,7 @@ function Secon() {
             <div className="flex items-start justify-between gap-2">
               <div>
                 <p className="text-xs text-muted-foreground">{new Date(c.created_at).toLocaleString('pt-BR')}</p>
-                <p className="mt-1 text-sm font-bold">
-                  Acionamento Secon
-                </p>
+                <p className="mt-1 text-sm font-bold">Acionamento Cecom</p>
                 {c.gps_lat && c.gps_lng && (
                   <p className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
                     <MapPin className="h-3 w-3" /> {c.gps_lat.toFixed(4)}, {c.gps_lng.toFixed(4)}
