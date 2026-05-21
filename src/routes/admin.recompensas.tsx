@@ -11,7 +11,10 @@ export const Route = createFileRoute("/admin/recompensas")({
 
 function AdminRecompensas() {
   const qc = useQueryClient();
-  const [form, setForm] = useState({ titulo: '', descricao: '', custo_pontos: 100 });
+  const [form, setForm] = useState<{ titulo: string; descricao: string; custo_pontos: number; imagem_url: string | null }>({
+    titulo: '', descricao: '', custo_pontos: 100, imagem_url: null,
+  });
+  const [uploading, setUploading] = useState(false);
 
   const { data: items } = useQuery({
     queryKey: ['admin-recompensas'],
@@ -24,10 +27,23 @@ function AdminRecompensas() {
       .order('created_at', { ascending: false }).limit(50)).data ?? [],
   });
 
+  async function uploadImagem(file: File) {
+    if (file.size > 5_000_000) { toast.error('Imagem > 5MB'); return; }
+    setUploading(true);
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { error } = await supabase.storage.from('recompensas-imagens').upload(path, file);
+    if (error) { toast.error(error.message); setUploading(false); return; }
+    const { data: pub } = supabase.storage.from('recompensas-imagens').getPublicUrl(path);
+    setForm((f) => ({ ...f, imagem_url: pub.publicUrl }));
+    setUploading(false);
+    toast.success('Imagem enviada');
+  }
+
   async function criar() {
     if (!form.titulo) return;
     await supabase.from('recompensas').insert(form);
-    setForm({ titulo: '', descricao: '', custo_pontos: 100 });
+    setForm({ titulo: '', descricao: '', custo_pontos: 100, imagem_url: null });
     toast.success('Recompensa adicionada');
     void qc.invalidateQueries({ queryKey: ['admin-recompensas'] });
   }
@@ -52,6 +68,16 @@ function AdminRecompensas() {
             <input type="number" placeholder="Custo em pontos" value={form.custo_pontos}
               onChange={(e) => setForm({ ...form, custo_pontos: +e.target.value })}
               className="h-11 w-full rounded-xl border border-input bg-background px-3 outline-none focus:border-primary" />
+            <div className="rounded-xl border border-dashed border-input p-3 text-center">
+              {form.imagem_url ? (
+                <img src={form.imagem_url} alt="" className="mx-auto h-24 rounded-lg object-cover" />
+              ) : <p className="text-xs text-muted-foreground">Imagem do brinde (opcional)</p>}
+              <label className="mt-2 inline-block cursor-pointer text-xs font-bold text-primary">
+                {uploading ? 'Enviando…' : (form.imagem_url ? 'Trocar imagem' : 'Anexar imagem')}
+                <input type="file" accept="image/*" className="hidden" disabled={uploading}
+                  onChange={(e) => e.target.files?.[0] && uploadImagem(e.target.files[0])} />
+              </label>
+            </div>
             <button onClick={criar} className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary font-bold text-primary-foreground">
               <Plus className="h-4 w-4" /> Adicionar
             </button>

@@ -63,24 +63,30 @@ function Recompensas() {
         {(items ?? []).map((r) => {
           const podeResgatar = pontos >= r.custo_pontos;
           const falta = r.custo_pontos - pontos;
+          const img = (r as { imagem_url: string | null }).imagem_url;
           return (
-            <div key={r.id} className="rounded-3xl border border-border bg-card p-5 shadow-soft">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-base font-bold">{r.titulo}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">{r.descricao}</p>
+            <div key={r.id} className="overflow-hidden rounded-3xl border border-border bg-card shadow-soft">
+              {img && (
+                <img src={img} alt={r.titulo} className="h-40 w-full object-cover" />
+              )}
+              <div className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-base font-bold">{r.titulo}</h3>
+                    <p className="mt-1 text-xs text-muted-foreground">{r.descricao}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-accent/15 px-3 py-1 text-sm font-bold text-accent">
+                    {r.custo_pontos} pts
+                  </span>
                 </div>
-                <span className="shrink-0 rounded-full bg-accent/15 px-3 py-1 text-sm font-bold text-accent">
-                  {r.custo_pontos} pts
-                </span>
+                <button
+                  disabled={!podeResgatar}
+                  onClick={() => resgatar(r)}
+                  className="mt-4 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-primary font-bold text-primary-foreground disabled:bg-none disabled:bg-muted disabled:text-muted-foreground"
+                >
+                  {podeResgatar ? 'Resgatar' : `Falta ${falta} pts`}
+                </button>
               </div>
-              <button
-                disabled={!podeResgatar}
-                onClick={() => resgatar(r)}
-                className="mt-4 flex h-12 w-full items-center justify-center rounded-2xl bg-gradient-primary font-bold text-primary-foreground disabled:bg-none disabled:bg-muted disabled:text-muted-foreground"
-              >
-                {podeResgatar ? 'Resgatar' : `Falta ${falta} pts`}
-              </button>
             </div>
           );
         })}

@@ -16,8 +16,20 @@ function Perfil() {
   const { profile, refreshProfile, signOut } = useAuth();
   const navigate = useNavigate();
   const [savingAvatar, setSavingAvatar] = useState(false);
+  const [uploadingFoto, setUploadingFoto] = useState(false);
   const [telefone, setTelefone] = useState((profile as { telefone?: string } | null)?.telefone ?? '');
   const [savingTel, setSavingTel] = useState(false);
+
+  const { data: medalhas } = useQuery({
+    queryKey: ['medalhas', profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from('user_conquistas')
+        .select('id, conquistado_em, conquistas(codigo, titulo, descricao, icone, pontos)')
+        .eq('user_id', profile!.id);
+      return data ?? [];
+    },
+  });
 
   if (!profile) return null;
 
@@ -29,10 +41,26 @@ function Perfil() {
   async function escolherAvatar(idx: number) {
     if (!profile) return;
     setSavingAvatar(true);
-    await supabase.from('profiles').update({ avatar_id: idx + 1 }).eq('id', profile.id);
+    await supabase.from('profiles').update({ avatar_id: idx + 1, avatar_url: null }).eq('id', profile.id);
     await refreshProfile();
     setSavingAvatar(false);
     toast.success('Avatar atualizado');
+  }
+
+  async function enviarFoto(file: File) {
+    if (!profile) return;
+    if (file.size > 5_000_000) { toast.error('Foto muito grande (máx 5MB)'); return; }
+    setUploadingFoto(true);
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${profile.id}/avatar.${ext}`;
+    const { error: upErr } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
+    if (upErr) { toast.error('Erro no upload: ' + upErr.message); setUploadingFoto(false); return; }
+    const { data: pub } = supabase.storage.from('avatars').getPublicUrl(path);
+    const url = `${pub.publicUrl}?v=${Date.now()}`;
+    await supabase.from('profiles').update({ avatar_url: url }).eq('id', profile.id);
+    await refreshProfile();
+    setUploadingFoto(false);
+    toast.success('Foto de perfil atualizada!');
   }
 
   async function salvarTelefone() {
@@ -45,6 +73,7 @@ function Perfil() {
   }
 
   const atualIdx = (profile.avatar_id ?? 1) - 1;
+  const fotoUrl = (profile as { avatar_url?: string | null }).avatar_url;
 
   return (
     <div className="px-5 pb-8 pt-6">
@@ -53,14 +82,41 @@ function Perfil() {
       </Link>
 
       <div className="mt-6 rounded-3xl bg-gradient-primary p-6 text-center text-primary-foreground shadow-elevated">
-        <div className="text-7xl">{AVATARS[atualIdx] ?? '👷'}</div>
+        {fotoUrl ? (
+          <img src={fotoUrl} alt="Foto de perfil" className="mx-auto h-24 w-24 rounded-full object-cover ring-4 ring-white/40" />
+        ) : (
+          <div className="text-7xl">{AVATARS[atualIdx] ?? '👷'}</div>
+        )}
         <h1 className="mt-3 text-xl font-extrabold">{profile.nome}</h1>
         <p className="text-sm opacity-85">{profile.cargo ?? 'Trabalhador'}</p>
         <div className="mt-4 flex justify-center gap-3 text-xs">
           <div className="flex items-center gap-1"><IdCard className="h-3.5 w-3.5" /> {profile.matricula}</div>
           <div className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {profile.turno}</div>
         </div>
+        <label className="mt-4 inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded-full bg-white/20 px-4 text-xs font-bold backdrop-blur">
+          <Camera className="h-4 w-4" /> {uploadingFoto ? 'Enviando…' : (fotoUrl ? 'Trocar foto' : 'Enviar foto real')}
+          <input type="file" accept="image/*" capture="user" className="hidden" disabled={uploadingFoto}
+            onChange={(e) => e.target.files?.[0] && enviarFoto(e.target.files[0])} />
+        </label>
       </div>
+
+      {medalhas && medalhas.length > 0 && (
+        <>
+          <h2 className="mt-7 text-base font-bold">🏅 Minhas medalhas</h2>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {medalhas.map((m) => {
+              const c = (m as { conquistas: { titulo: string; icone: string | null; descricao: string | null } | null }).conquistas;
+              if (!c) return null;
+              return (
+                <div key={m.id} className="rounded-2xl border border-accent/30 bg-accent/5 p-3 text-center" title={c.descricao ?? ''}>
+                  <div className="text-3xl">{c.icone ?? '🏅'}</div>
+                  <p className="mt-1 text-[10px] font-bold leading-tight">{c.titulo}</p>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <h2 className="mt-7 text-base font-bold">Escolha seu avatar</h2>
       <div className="mt-3 grid grid-cols-5 gap-2">
