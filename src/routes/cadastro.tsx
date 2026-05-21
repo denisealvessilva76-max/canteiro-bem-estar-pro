@@ -12,6 +12,7 @@ export const Route = createFileRoute("/cadastro")({
 function Cadastro() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
+    codigo: "",
     matricula: "", nome: "", senha: "", turno: "diurno" as 'diurno' | 'noturno',
     cargo: "", peso: "", altura: "", telefone: "",
   });
@@ -23,6 +24,10 @@ function Cadastro() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (form.codigo.trim() !== "00345") {
+      toast.error("Código da empresa inválido. Solicite ao RH.");
+      return;
+    }
     if (!form.matricula || !form.nome || form.senha.length < 6) {
       toast.error("Preencha matrícula, nome e senha (mínimo 6 caracteres).");
       return;
@@ -81,6 +86,7 @@ function Cadastro() {
         <p className="mt-2 text-sm text-muted-foreground">Cadastre seus dados para começar.</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+          <Field label="Código da empresa *" value={form.codigo} onChange={(v) => set('codigo', v)} placeholder="Fornecido pelo RH" type="password" />
           <Field label="Matrícula *" value={form.matricula} onChange={(v) => set('matricula', v)} placeholder="Ex: 123456" inputMode="numeric" />
           <Field label="Nome completo *" value={form.nome} onChange={(v) => set('nome', v)} placeholder="Seu nome" />
           <Field label="WhatsApp" value={form.telefone} onChange={(v) => set('telefone', v)} placeholder="(31) 9XXXX-XXXX" inputMode="numeric" />

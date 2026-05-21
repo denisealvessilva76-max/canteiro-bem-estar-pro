@@ -143,17 +143,14 @@ function Mental() {
           <p className="mt-4 text-xs text-muted-foreground">{ciclos} ciclos completos</p>
           <button
             onClick={() => running ? stopAll() : start()}
-            disabled={!pronto && !running}
-            className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary font-bold text-primary-foreground disabled:opacity-60"
+            className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary font-bold text-primary-foreground"
           >
             <Volume2 className="h-4 w-4" />
-            {!pronto && !running ? 'Preparando voz...' : running ? 'Parar' : 'Começar respiração guiada'}
+            {running ? 'Parar' : 'Começar respiração guiada'}
           </button>
-          {pronto && !running && (
-            <p className="mt-2 text-[11px] text-muted-foreground text-center">
-              Áudio carregado. Coloque o volume em um nível confortável.
-            </p>
-          )}
+          <p className="mt-2 text-[11px] text-muted-foreground text-center">
+            {pronto ? 'Áudio carregado. Coloque o volume em um nível confortável.' : 'A voz pode levar alguns segundos. Você pode começar sem áudio.'}
+          </p>
         </div>
       </div>
 
