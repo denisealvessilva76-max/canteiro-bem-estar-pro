@@ -110,7 +110,7 @@ function Home() {
           )}
         </motion.div>
 
-        {/* SOS Secon (alojamento/urgência) */}
+        {/* SOS Cecom (alojamento/urgência) */}
         <Link
           to="/app/secon"
           className="mt-5 flex items-center justify-between gap-3 rounded-3xl bg-gradient-to-r from-red-600 to-rose-500 p-4 text-white shadow-elevated active:scale-[0.98]"
@@ -120,11 +120,11 @@ function Home() {
               <AlertTriangle className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-extrabold">Estou no Secon</p>
+              <p className="text-sm font-extrabold">Estou no Cecom</p>
               <p className="text-[11px] opacity-90">Acionamento médico fora do canteiro</p>
             </div>
           </div>
-          <span className="text-xs font-bold">0800 →</span>
+          <span className="text-xs font-bold">WhatsApp →</span>
         </Link>
 
         <h2 className="mt-7 text-base font-bold text-foreground">Ações rápidas</h2>
