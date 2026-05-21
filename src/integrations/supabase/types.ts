@@ -197,6 +197,39 @@ export type Database = {
           },
         ]
       }
+      ciclo_menstrual: {
+        Row: {
+          created_at: string
+          data_fim: string | null
+          data_inicio: string
+          fluxo: string | null
+          id: string
+          observacoes: string | null
+          sintomas: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio: string
+          fluxo?: string | null
+          id?: string
+          observacoes?: string | null
+          sintomas?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_fim?: string | null
+          data_inicio?: string
+          fluxo?: string | null
+          id?: string
+          observacoes?: string | null
+          sintomas?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       conquistas: {
         Row: {
           codigo: string
@@ -337,6 +370,57 @@ export type Database = {
           },
         ]
       }
+      odonto_dicas: {
+        Row: {
+          ativo: boolean
+          conteudo: string
+          created_at: string
+          id: string
+          ordem: number
+          titulo: string
+        }
+        Insert: {
+          ativo?: boolean
+          conteudo: string
+          created_at?: string
+          id?: string
+          ordem?: number
+          titulo: string
+        }
+        Update: {
+          ativo?: boolean
+          conteudo?: string
+          created_at?: string
+          id?: string
+          ordem?: number
+          titulo?: string
+        }
+        Relationships: []
+      }
+      odonto_logs: {
+        Row: {
+          created_at: string
+          data: string
+          id: string
+          periodo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          id?: string
+          periodo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          id?: string
+          periodo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       parametros: {
         Row: {
           chave: string
@@ -472,6 +556,36 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       recompensas: {
         Row: {
           ativo: boolean
@@ -502,6 +616,42 @@ export type Database = {
           id?: string
           imagem_url?: string | null
           titulo?: string
+        }
+        Relationships: []
+      }
+      reportes_bug: {
+        Row: {
+          created_at: string
+          descricao: string
+          id: string
+          resolvido_em: string | null
+          rota: string | null
+          screenshot_url: string | null
+          status: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao: string
+          id?: string
+          resolvido_em?: string | null
+          rota?: string | null
+          screenshot_url?: string | null
+          status?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          resolvido_em?: string | null
+          rota?: string | null
+          screenshot_url?: string | null
+          status?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -596,6 +746,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ubs_clinicas: {
+        Row: {
+          ativo: boolean
+          cidade: string | null
+          created_at: string
+          endereco: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          tipo: string
+        }
+        Insert: {
+          ativo?: boolean
+          cidade?: string | null
+          created_at?: string
+          endereco?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          tipo?: string
+        }
+        Update: {
+          ativo?: boolean
+          cidade?: string | null
+          created_at?: string
+          endereco?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          tipo?: string
+        }
+        Relationships: []
       }
       user_conquistas: {
         Row: {
