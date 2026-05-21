@@ -264,6 +264,9 @@ export type Database = {
           desafio_id: string
           dificuldade: string | null
           foto_url: string | null
+          gps_capturado_em: string | null
+          gps_lat: number | null
+          gps_lng: number | null
           id: string
           progresso_id: string
           user_id: string
@@ -277,6 +280,9 @@ export type Database = {
           desafio_id: string
           dificuldade?: string | null
           foto_url?: string | null
+          gps_capturado_em?: string | null
+          gps_lat?: number | null
+          gps_lng?: number | null
           id?: string
           progresso_id: string
           user_id: string
@@ -290,6 +296,9 @@ export type Database = {
           desafio_id?: string
           dificuldade?: string | null
           foto_url?: string | null
+          gps_capturado_em?: string | null
+          gps_lat?: number | null
+          gps_lng?: number | null
           id?: string
           progresso_id?: string
           user_id?: string
@@ -621,34 +630,40 @@ export type Database = {
       }
       reportes_bug: {
         Row: {
+          componente: string | null
           created_at: string
           descricao: string
           id: string
           resolvido_em: string | null
           rota: string | null
           screenshot_url: string | null
+          severidade: string
           status: string
           user_agent: string | null
           user_id: string
         }
         Insert: {
+          componente?: string | null
           created_at?: string
           descricao: string
           id?: string
           resolvido_em?: string | null
           rota?: string | null
           screenshot_url?: string | null
+          severidade?: string
           status?: string
           user_agent?: string | null
           user_id: string
         }
         Update: {
+          componente?: string | null
           created_at?: string
           descricao?: string
           id?: string
           resolvido_em?: string | null
           rota?: string | null
           screenshot_url?: string | null
+          severidade?: string
           status?: string
           user_agent?: string | null
           user_id?: string
@@ -746,6 +761,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      secon_chamados: {
+        Row: {
+          comprovado_em: string | null
+          comprovante_url: string | null
+          created_at: string
+          gps_capturado_em: string | null
+          gps_lat: number | null
+          gps_lng: number | null
+          id: string
+          observacoes: string | null
+          status: string
+          telefone_discado: string
+          user_id: string
+        }
+        Insert: {
+          comprovado_em?: string | null
+          comprovante_url?: string | null
+          created_at?: string
+          gps_capturado_em?: string | null
+          gps_lat?: number | null
+          gps_lng?: number | null
+          id?: string
+          observacoes?: string | null
+          status?: string
+          telefone_discado?: string
+          user_id: string
+        }
+        Update: {
+          comprovado_em?: string | null
+          comprovante_url?: string | null
+          created_at?: string
+          gps_capturado_em?: string | null
+          gps_lat?: number | null
+          gps_lng?: number | null
+          id?: string
+          observacoes?: string | null
+          status?: string
+          telefone_discado?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       ubs_clinicas: {
         Row: {

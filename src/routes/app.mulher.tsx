@@ -6,6 +6,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { todayISO } from "@/lib/canteiro";
+import { GameBoundary } from "@/components/GameBoundary";
+import { MulherSwipeCards } from "@/components/jogos/MulherSwipeCards";
 
 export const Route = createFileRoute("/app/mulher")({
   component: SaudeMulher,
@@ -16,7 +18,7 @@ const SINTOMAS = ['Cólica', 'Dor de cabeça', 'Cansaço', 'Inchaço', 'Ansiedad
 function SaudeMulher() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [aba, setAba] = useState<'ciclo' | 'educacao' | 'clinicas'>('ciclo');
+  const [aba, setAba] = useState<'ciclo' | 'educacao' | 'clinicas' | 'praticar'>('ciclo');
 
   const { data: ciclos } = useQuery({
     queryKey: ['ciclos', user?.id],
@@ -50,14 +52,22 @@ function SaudeMulher() {
         <p className="text-sm opacity-90">Calendário, educação e atendimento gratuito.</p>
       </div>
 
-      <div className="mt-4 inline-flex w-full rounded-full bg-muted p-1 text-xs font-bold">
-        {(['ciclo', 'educacao', 'clinicas'] as const).map((a) => (
+      <div className="mt-4 grid grid-cols-4 gap-1 rounded-full bg-muted p-1 text-[11px] font-bold">
+        {(['ciclo', 'educacao', 'clinicas', 'praticar'] as const).map((a) => (
           <button key={a} onClick={() => setAba(a)}
-            className={`flex-1 rounded-full px-3 py-1.5 ${aba === a ? 'bg-pink-500 text-white' : 'text-muted-foreground'}`}>
-            {a === 'ciclo' ? 'Calendário' : a === 'educacao' ? 'Educação' : 'Onde ir'}
+            className={`rounded-full px-2 py-1.5 ${aba === a ? 'bg-pink-500 text-white' : 'text-muted-foreground'}`}>
+            {a === 'ciclo' ? 'Calendário' : a === 'educacao' ? 'Educação' : a === 'clinicas' ? 'Onde ir' : 'Praticar'}
           </button>
         ))}
       </div>
+
+      {aba === 'praticar' && (
+        <div className="mt-5">
+          <GameBoundary componente="MulherSwipeCards" userId={user?.id} onAbort={() => setAba('ciclo')}>
+            <MulherSwipeCards onDone={() => setAba('educacao')} />
+          </GameBoundary>
+        </div>
+      )}
 
       {aba === 'ciclo' && (
         <CalendarioCiclo user={user} ciclos={ciclos ?? []} qc={qc} proximoEstimado={proximoEstimado} />

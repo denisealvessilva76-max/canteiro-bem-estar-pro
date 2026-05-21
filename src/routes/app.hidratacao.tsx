@@ -8,6 +8,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { calcMetaHidratacao, todayISO, URINA_NIVEIS } from "@/lib/canteiro";
 import { insertOrQueue } from "@/lib/offline";
+import { podeRegistrar, marcarRegistro, formatFaltam } from "@/lib/rateLimit";
+
+const COOLDOWN_MS = 45 * 60 * 1000;
 
 export const Route = createFileRoute("/app/hidratacao")({
   component: Hidratacao,
@@ -37,10 +40,18 @@ function Hidratacao() {
 
   async function adicionar(ml: number) {
     if (!user) return;
+    const rl = podeRegistrar(`hidr:${user.id}`, COOLDOWN_MS);
+    if (!rl.ok) {
+      toast.error(`Aguarde ${formatFaltam(rl.faltamMs)} antes de registrar novamente.`, {
+        description: 'O sistema bloqueia registros muito próximos para evitar duplicidades.',
+      });
+      return;
+    }
     const res = await insertOrQueue('hidratacao_logs', {
       user_id: user.id, data: todayISO(), ml_consumidos: ml,
     });
     if (res.error) { toast.error(`Erro ao registrar: ${res.error}`); return; }
+    marcarRegistro(`hidr:${user.id}`);
     if (res.online) toast.success(`+${ml}ml registrado`);
     else toast.info('Salvo offline, sincronizará depois');
     void qc.invalidateQueries({ queryKey: ['hidratacao-hoje'] });

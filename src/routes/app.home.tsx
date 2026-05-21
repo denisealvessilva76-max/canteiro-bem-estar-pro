@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X, Heart, Smile } from "lucide-react";
+import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X, Heart, Smile, AlertTriangle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,6 +109,23 @@ function Home() {
             </>
           )}
         </motion.div>
+
+        {/* SOS Secon (alojamento/urgência) */}
+        <Link
+          to="/app/secon"
+          className="mt-5 flex items-center justify-between gap-3 rounded-3xl bg-gradient-to-r from-red-600 to-rose-500 p-4 text-white shadow-elevated active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20">
+              <AlertTriangle className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-sm font-extrabold">Estou no Secon</p>
+              <p className="text-[11px] opacity-90">Acionamento médico fora do canteiro</p>
+            </div>
+          </div>
+          <span className="text-xs font-bold">0800 →</span>
+        </Link>
 
         <h2 className="mt-7 text-base font-bold text-foreground">Ações rápidas</h2>
         <div className="mt-3 grid grid-cols-2 gap-3">

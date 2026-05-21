@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Check, MapPin, Phone, Sunrise, Sun, Moon } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { todayISO } from "@/lib/canteiro";
+import { GameBoundary } from "@/components/GameBoundary";
+import { EscovaDragDrop } from "@/components/jogos/EscovaDragDrop";
 
 export const Route = createFileRoute("/app/odonto")({
   component: Odontologia,
@@ -19,6 +22,7 @@ const PERIODOS = [
 function Odontologia() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const [aba, setAba] = useState<'info' | 'praticar'>('info');
 
   const { data: feitas } = useQuery({
     queryKey: ['odonto-hoje', user?.id],
@@ -72,47 +76,68 @@ function Odontologia() {
         </div>
       </div>
 
-      <h2 className="mt-5 text-sm font-bold">Registrar escovação</h2>
-      <div className="mt-2 grid grid-cols-3 gap-2">
-        {PERIODOS.map((p) => {
-          const Icon = p.icon;
-          const done = feitas?.has(p.id);
-          return (
-            <button key={p.id} onClick={() => void marcar(p.id)} disabled={done}
-              className={`flex flex-col items-center gap-1 rounded-2xl border-2 p-3 text-xs font-bold transition ${
-                done ? 'border-cyan-500 bg-cyan-50 text-cyan-700' : 'border-border bg-card'
-              }`}>
-              <Icon className="h-5 w-5" />
-              {p.label}
-              <span className="text-[10px] opacity-70">{p.hora}</span>
-              {done && <Check className="h-4 w-4" />}
-            </button>
-          );
-        })}
-      </div>
-
-      <h2 className="mt-6 text-sm font-bold">Dicas e cuidados</h2>
-      <div className="mt-2 space-y-2">
-        {(dicas ?? []).map((d) => (
-          <details key={d.id} className="rounded-2xl border border-border bg-card p-4">
-            <summary className="cursor-pointer text-sm font-bold">{d.titulo}</summary>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d.conteudo}</p>
-          </details>
+      <div className="mt-4 inline-flex w-full rounded-full bg-muted p-1 text-xs font-bold">
+        {(['info', 'praticar'] as const).map((a) => (
+          <button key={a} onClick={() => setAba(a)}
+            className={`flex-1 rounded-full px-3 py-1.5 ${aba === a ? 'bg-cyan-500 text-white' : 'text-muted-foreground'}`}>
+            {a === 'info' ? 'Informativos' : 'Praticar'}
+          </button>
         ))}
       </div>
 
-      <h2 className="mt-6 text-sm font-bold">Onde se atender</h2>
-      <div className="mt-2 space-y-2">
-        {(clinicas ?? []).length === 0 && <p className="text-xs text-muted-foreground">A equipe ainda está cadastrando as clínicas odontológicas.</p>}
-        {(clinicas ?? []).map((c) => (
-          <div key={c.id} className="rounded-2xl border border-border bg-card p-4">
-            <p className="text-sm font-bold">{c.nome}</p>
-            {c.endereco && <p className="mt-1 flex items-start gap-1 text-xs text-muted-foreground"><MapPin className="mt-0.5 h-3 w-3" />{c.endereco}{c.cidade ? ` — ${c.cidade}` : ''}</p>}
-            {c.telefone && <a href={`tel:${c.telefone}`} className="mt-1 flex items-center gap-1 text-xs font-bold text-primary"><Phone className="h-3 w-3" />{c.telefone}</a>}
-            {c.observacoes && <p className="mt-2 text-xs text-muted-foreground">{c.observacoes}</p>}
+      {aba === 'info' && (
+        <>
+          <h2 className="mt-5 text-sm font-bold">Registrar escovação</h2>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {PERIODOS.map((p) => {
+              const Icon = p.icon;
+              const done = feitas?.has(p.id);
+              return (
+                <button key={p.id} onClick={() => void marcar(p.id)} disabled={done}
+                  className={`flex flex-col items-center gap-1 rounded-2xl border-2 p-3 text-xs font-bold transition ${
+                    done ? 'border-cyan-500 bg-cyan-50 text-cyan-700' : 'border-border bg-card'
+                  }`}>
+                  <Icon className="h-5 w-5" />
+                  {p.label}
+                  <span className="text-[10px] opacity-70">{p.hora}</span>
+                  {done && <Check className="h-4 w-4" />}
+                </button>
+              );
+            })}
           </div>
-        ))}
-      </div>
+
+          <h2 className="mt-6 text-sm font-bold">Dicas e cuidados</h2>
+          <div className="mt-2 space-y-2">
+            {(dicas ?? []).map((d) => (
+              <details key={d.id} className="rounded-2xl border border-border bg-card p-4">
+                <summary className="cursor-pointer text-sm font-bold">{d.titulo}</summary>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d.conteudo}</p>
+              </details>
+            ))}
+          </div>
+
+          <h2 className="mt-6 text-sm font-bold">Onde se atender</h2>
+          <div className="mt-2 space-y-2">
+            {(clinicas ?? []).length === 0 && <p className="text-xs text-muted-foreground">A equipe ainda está cadastrando as clínicas odontológicas.</p>}
+            {(clinicas ?? []).map((c) => (
+              <div key={c.id} className="rounded-2xl border border-border bg-card p-4">
+                <p className="text-sm font-bold">{c.nome}</p>
+                {c.endereco && <p className="mt-1 flex items-start gap-1 text-xs text-muted-foreground"><MapPin className="mt-0.5 h-3 w-3" />{c.endereco}{c.cidade ? ` — ${c.cidade}` : ''}</p>}
+                {c.telefone && <a href={`tel:${c.telefone}`} className="mt-1 flex items-center gap-1 text-xs font-bold text-primary"><Phone className="h-3 w-3" />{c.telefone}</a>}
+                {c.observacoes && <p className="mt-2 text-xs text-muted-foreground">{c.observacoes}</p>}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {aba === 'praticar' && (
+        <div className="mt-5">
+          <GameBoundary componente="EscovaDragDrop" userId={user?.id} onAbort={() => setAba('info')}>
+            <EscovaDragDrop onDone={() => setAba('info')} />
+          </GameBoundary>
+        </div>
+      )}
     </div>
   );
 }
