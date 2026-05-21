@@ -9,6 +9,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { WeatherObras } from "@/components/WeatherObras";
 import { LembretesCenter } from "@/components/LembretesCenter";
+import { PermissaoNotificacoes } from "@/components/PermissaoNotificacoes";
 import { HUMORES, todayISO } from "@/lib/canteiro";
 import { insertOrQueue } from "@/lib/offline";
 
@@ -85,6 +86,7 @@ function Home() {
 
       <div className="-mt-6 px-4">
         <LembretesCenter />
+        <PermissaoNotificacoes />
 
         <motion.div
           initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
