@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, Brain, Phone, MessageCircle, HeartPulse, ExternalLink, Volume2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Brain, Phone, MessageCircle, HeartPulse, ExternalLink, Volume2, X } from "lucide-react";
 import { useNarracaoSequencial, type Trecho } from "@/components/NarracaoSequencial";
 import { pararTodosAudios } from "@/components/AudioNarracao";
+import { GameBoundary } from "@/components/GameBoundary";
+import { FidgetBubbles } from "@/components/jogos/FidgetBubbles";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   WHATSAPP_PSICOLOGA,
   WHATSAPP_ASSISTENTE_SOCIAL,
@@ -39,10 +42,21 @@ const TRECHOS: Trecho[] = [
 ];
 
 function Mental() {
+  const { user } = useAuth();
   const [running, setRunning] = useState(false);
   const [fase, setFase] = useState(0);
   const [tempo, setTempo] = useState(FASES[0].dur);
   const [ciclos, setCiclos] = useState(0);
+  const [aba, setAba] = useState<'respiracao' | 'fidget'>('respiracao');
+  const [showApoio, setShowApoio] = useState(false);
+  const [apoioShown, setApoioShown] = useState(false);
+
+  // Trigger de 3 minutos na aba: oferece apoio
+  useEffect(() => {
+    if (apoioShown) return;
+    const t = setTimeout(() => { setShowApoio(true); setApoioShown(true); }, 3 * 60 * 1000);
+    return () => clearTimeout(t);
+  }, [apoioShown]);
 
   const trechos = useMemo(() => TRECHOS, []);
   const { play, stop, pronto } = useNarracaoSequencial(trechos);
