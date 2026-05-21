@@ -6,6 +6,7 @@ import { ArrowLeft, Trophy, Camera, Check, Clock, CalendarCheck } from "lucide-r
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
+import { capturarMeta } from "@/lib/camera";
 
 export const Route = createFileRoute("/app/desafios")({
   component: Desafios,
@@ -108,16 +109,21 @@ function DesafioCard({ desafio: d, meu, status, checks, onAceitar, onChange }: {
   async function fazerCheckin(file: File) {
     if (!user || !meu) return;
     setUploading(true);
+    const meta = await capturarMeta();
     const path = `${user.id}/${meu.id}/${today}-${Date.now()}.jpg`;
     const { error: upErr } = await supabase.storage.from('desafios-fotos').upload(path, file);
     if (upErr) { toast.error('Erro no upload'); setUploading(false); return; }
 
     if (checkHoje) {
-      await supabase.from('desafio_checkins').update({ foto_url: path, dificuldade: dificuldade || null }).eq('id', checkHoje.id);
+      await supabase.from('desafio_checkins').update({
+        foto_url: path, dificuldade: dificuldade || null,
+        gps_lat: meta.gps_lat, gps_lng: meta.gps_lng, gps_capturado_em: meta.gps_capturado_em,
+      }).eq('id', checkHoje.id);
     } else {
       await supabase.from('desafio_checkins').insert({
         user_id: user.id, desafio_id: d.id, progresso_id: meu.id, data: today,
         foto_url: path, dificuldade: dificuldade || null,
+        gps_lat: meta.gps_lat, gps_lng: meta.gps_lng, gps_capturado_em: meta.gps_capturado_em,
       });
     }
     // se atingiu duração: marca concluído
