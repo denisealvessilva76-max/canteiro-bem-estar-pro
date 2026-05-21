@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X } from "lucide-react";
+import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X, Heart, Smile } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { supabase } from "@/integrations/supabase/client";
 import { WeatherObras } from "@/components/WeatherObras";
 import { LembretesCenter } from "@/components/LembretesCenter";
+import { PermissaoNotificacoes } from "@/components/PermissaoNotificacoes";
 import { HUMORES, todayISO } from "@/lib/canteiro";
 import { insertOrQueue } from "@/lib/offline";
 
@@ -85,6 +86,7 @@ function Home() {
 
       <div className="-mt-6 px-4">
         <LembretesCenter />
+        <PermissaoNotificacoes />
 
         <motion.div
           initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
@@ -114,6 +116,8 @@ function Home() {
           <ActionCard to="/app/saude" icon={HeartPulse} title="Saúde" subtitle="Pressão e sintomas" tone="danger" />
           <ActionCard to="/app/ergonomia" icon={Activity} title="Ergonomia" subtitle="Alongamentos" tone="primary" />
           <ActionCard to="/app/mental" icon={Brain} title="Saúde Mental" subtitle="Apoio e respiração" tone="accent" />
+          <ActionCard to="/app/mulher" icon={Heart} title="Saúde da Mulher" subtitle="Ciclo e cuidados" tone="pink" />
+          <ActionCard to="/app/odonto" icon={Smile} title="Odontologia" subtitle="Escovação e dicas" tone="cyan" />
           <ActionCard to="/app/avisos" icon={Bell} title="Avisos" subtitle="Comunicados" tone="info" />
           <ActionCard to="/app/recompensas" icon={Sparkles} title="Recompensas" subtitle="Loja de prêmios" tone="primary" />
         </div>
@@ -173,7 +177,7 @@ function Home() {
 
 function ActionCard({ to, icon: Icon, title, subtitle, tone }: {
   to: string; icon: React.ElementType; title: string; subtitle: string;
-  tone: 'water' | 'danger' | 'primary' | 'accent' | 'info';
+  tone: 'water' | 'danger' | 'primary' | 'accent' | 'info' | 'pink' | 'cyan';
 }) {
   const tones: Record<string, string> = {
     water: 'bg-water/10 text-water',
@@ -181,6 +185,8 @@ function ActionCard({ to, icon: Icon, title, subtitle, tone }: {
     primary: 'bg-primary/10 text-primary',
     accent: 'bg-accent/15 text-accent',
     info: 'bg-info/10 text-info',
+    pink: 'bg-pink-100 text-pink-600',
+    cyan: 'bg-cyan-100 text-cyan-600',
   };
   return (
     <Link to={to} className="rounded-2xl border border-border bg-card p-4 shadow-soft transition active:scale-[0.97]">

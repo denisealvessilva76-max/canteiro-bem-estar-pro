@@ -19,6 +19,8 @@ import { Route as AppSaudeRouteImport } from './routes/app.saude'
 import { Route as AppRecompensasRouteImport } from './routes/app.recompensas'
 import { Route as AppRankingRouteImport } from './routes/app.ranking'
 import { Route as AppPerfilRouteImport } from './routes/app.perfil'
+import { Route as AppOdontoRouteImport } from './routes/app.odonto'
+import { Route as AppMulherRouteImport } from './routes/app.mulher'
 import { Route as AppMentalRouteImport } from './routes/app.mental'
 import { Route as AppHomeRouteImport } from './routes/app.home'
 import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
@@ -30,6 +32,8 @@ import { Route as AdminFuncionariosRouteImport } from './routes/admin.funcionari
 import { Route as AdminDesafiosRouteImport } from './routes/admin.desafios'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminContasRouteImport } from './routes/admin.contas'
+import { Route as AdminClinicasRouteImport } from './routes/admin.clinicas'
+import { Route as AdminBugsRouteImport } from './routes/admin.bugs'
 import { Route as AdminAvisosRouteImport } from './routes/admin.avisos'
 import { Route as AdminAlertasRouteImport } from './routes/admin.alertas'
 
@@ -81,6 +85,16 @@ const AppRankingRoute = AppRankingRouteImport.update({
 const AppPerfilRoute = AppPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOdontoRoute = AppOdontoRouteImport.update({
+  id: '/odonto',
+  path: '/odonto',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMulherRoute = AppMulherRouteImport.update({
+  id: '/mulher',
+  path: '/mulher',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMentalRoute = AppMentalRouteImport.update({
@@ -138,6 +152,16 @@ const AdminContasRoute = AdminContasRouteImport.update({
   path: '/contas',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminClinicasRoute = AdminClinicasRouteImport.update({
+  id: '/clinicas',
+  path: '/clinicas',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBugsRoute = AdminBugsRouteImport.update({
+  id: '/bugs',
+  path: '/bugs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAvisosRoute = AdminAvisosRouteImport.update({
   id: '/avisos',
   path: '/avisos',
@@ -158,6 +182,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/bugs': typeof AdminBugsRoute
+  '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
@@ -169,6 +195,8 @@ export interface FileRoutesByFullPath {
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/home': typeof AppHomeRoute
   '/app/mental': typeof AppMentalRoute
+  '/app/mulher': typeof AppMulherRoute
+  '/app/odonto': typeof AppOdontoRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/ranking': typeof AppRankingRoute
   '/app/recompensas': typeof AppRecompensasRoute
@@ -183,6 +211,8 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/bugs': typeof AdminBugsRoute
+  '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
@@ -194,6 +224,8 @@ export interface FileRoutesByTo {
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/home': typeof AppHomeRoute
   '/app/mental': typeof AppMentalRoute
+  '/app/mulher': typeof AppMulherRoute
+  '/app/odonto': typeof AppOdontoRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/ranking': typeof AppRankingRoute
   '/app/recompensas': typeof AppRecompensasRoute
@@ -209,6 +241,8 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/bugs': typeof AdminBugsRoute
+  '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
@@ -220,6 +254,8 @@ export interface FileRoutesById {
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/home': typeof AppHomeRoute
   '/app/mental': typeof AppMentalRoute
+  '/app/mulher': typeof AppMulherRoute
+  '/app/odonto': typeof AppOdontoRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/ranking': typeof AppRankingRoute
   '/app/recompensas': typeof AppRecompensasRoute
@@ -236,6 +272,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/bugs'
+    | '/admin/clinicas'
     | '/admin/contas'
     | '/admin/dashboard'
     | '/admin/desafios'
@@ -247,6 +285,8 @@ export interface FileRouteTypes {
     | '/app/hidratacao'
     | '/app/home'
     | '/app/mental'
+    | '/app/mulher'
+    | '/app/odonto'
     | '/app/perfil'
     | '/app/ranking'
     | '/app/recompensas'
@@ -261,6 +301,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/bugs'
+    | '/admin/clinicas'
     | '/admin/contas'
     | '/admin/dashboard'
     | '/admin/desafios'
@@ -272,6 +314,8 @@ export interface FileRouteTypes {
     | '/app/hidratacao'
     | '/app/home'
     | '/app/mental'
+    | '/app/mulher'
+    | '/app/odonto'
     | '/app/perfil'
     | '/app/ranking'
     | '/app/recompensas'
@@ -286,6 +330,8 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/bugs'
+    | '/admin/clinicas'
     | '/admin/contas'
     | '/admin/dashboard'
     | '/admin/desafios'
@@ -297,6 +343,8 @@ export interface FileRouteTypes {
     | '/app/hidratacao'
     | '/app/home'
     | '/app/mental'
+    | '/app/mulher'
+    | '/app/odonto'
     | '/app/perfil'
     | '/app/ranking'
     | '/app/recompensas'
@@ -384,6 +432,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPerfilRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/odonto': {
+      id: '/app/odonto'
+      path: '/odonto'
+      fullPath: '/app/odonto'
+      preLoaderRoute: typeof AppOdontoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/mulher': {
+      id: '/app/mulher'
+      path: '/mulher'
+      fullPath: '/app/mulher'
+      preLoaderRoute: typeof AppMulherRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/mental': {
       id: '/app/mental'
       path: '/mental'
@@ -461,6 +523,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContasRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/clinicas': {
+      id: '/admin/clinicas'
+      path: '/clinicas'
+      fullPath: '/admin/clinicas'
+      preLoaderRoute: typeof AdminClinicasRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/bugs': {
+      id: '/admin/bugs'
+      path: '/bugs'
+      fullPath: '/admin/bugs'
+      preLoaderRoute: typeof AdminBugsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/avisos': {
       id: '/admin/avisos'
       path: '/avisos'
@@ -481,6 +557,8 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAlertasRoute: typeof AdminAlertasRoute
   AdminAvisosRoute: typeof AdminAvisosRoute
+  AdminBugsRoute: typeof AdminBugsRoute
+  AdminClinicasRoute: typeof AdminClinicasRoute
   AdminContasRoute: typeof AdminContasRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDesafiosRoute: typeof AdminDesafiosRoute
@@ -491,6 +569,8 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertasRoute: AdminAlertasRoute,
   AdminAvisosRoute: AdminAvisosRoute,
+  AdminBugsRoute: AdminBugsRoute,
+  AdminClinicasRoute: AdminClinicasRoute,
   AdminContasRoute: AdminContasRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDesafiosRoute: AdminDesafiosRoute,
@@ -507,6 +587,8 @@ interface AppRouteChildren {
   AppHidratacaoRoute: typeof AppHidratacaoRoute
   AppHomeRoute: typeof AppHomeRoute
   AppMentalRoute: typeof AppMentalRoute
+  AppMulherRoute: typeof AppMulherRoute
+  AppOdontoRoute: typeof AppOdontoRoute
   AppPerfilRoute: typeof AppPerfilRoute
   AppRankingRoute: typeof AppRankingRoute
   AppRecompensasRoute: typeof AppRecompensasRoute
@@ -520,6 +602,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppHidratacaoRoute: AppHidratacaoRoute,
   AppHomeRoute: AppHomeRoute,
   AppMentalRoute: AppMentalRoute,
+  AppMulherRoute: AppMulherRoute,
+  AppOdontoRoute: AppOdontoRoute,
   AppPerfilRoute: AppPerfilRoute,
   AppRankingRoute: AppRankingRoute,
   AppRecompensasRoute: AppRecompensasRoute,
