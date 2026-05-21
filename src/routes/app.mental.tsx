@@ -137,41 +137,117 @@ function Mental() {
         </a>
       </div>
 
-      <div className="mt-7 rounded-3xl border border-border bg-card p-6 shadow-soft">
-        <h2 className="text-base font-bold">Respiração guiada 4-7-8</h2>
-        <p className="text-xs text-muted-foreground">
-          A voz vai te acompanhar a cada etapa. Sincronizada com a bolinha.
-        </p>
-
-        <div className="mt-6 flex flex-col items-center">
-          <motion.div
-            animate={{ scale: running ? FASES[fase].scale : 1 }}
-            transition={{ duration: tempo, ease: 'easeInOut' }}
-            className="flex h-44 w-44 items-center justify-center rounded-full bg-gradient-water text-card shadow-elevated"
-          >
-            <div className="text-center">
-              <div className="text-sm font-medium opacity-90">{running ? FASES[fase].nome : 'Pronto?'}</div>
-              <div className="text-5xl font-extrabold tabular-nums">{running ? tempo : '4·7·8'}</div>
-            </div>
-          </motion.div>
-          <p className="mt-4 text-xs text-muted-foreground">{ciclos} ciclos completos</p>
-          <button
-            onClick={() => running ? stopAll() : start()}
-            className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary font-bold text-primary-foreground"
-          >
-            <Volume2 className="h-4 w-4" />
-            {running ? 'Parar' : 'Começar respiração guiada'}
-          </button>
-          <p className="mt-2 text-[11px] text-muted-foreground text-center">
-            {pronto ? 'Áudio carregado. Coloque o volume em um nível confortável.' : 'A voz pode levar alguns segundos. Você pode começar sem áudio.'}
-          </p>
-        </div>
+      <div className="mt-7 flex gap-2 rounded-2xl bg-muted p-1">
+        <button
+          onClick={() => setAba('respiracao')}
+          className={`flex-1 rounded-xl py-2 text-sm font-semibold transition ${aba === 'respiracao' ? 'bg-card shadow-soft' : 'text-muted-foreground'}`}
+        >
+          Respiração 4-7-8
+        </button>
+        <button
+          onClick={() => setAba('fidget')}
+          className={`flex-1 rounded-xl py-2 text-sm font-semibold transition ${aba === 'fidget' ? 'bg-card shadow-soft' : 'text-muted-foreground'}`}
+        >
+          Fidget (calma)
+        </button>
       </div>
+
+      {aba === 'respiracao' ? (
+        <div className="mt-4 rounded-3xl border border-border bg-card p-6 shadow-soft">
+          <h2 className="text-base font-bold">Respiração guiada 4-7-8</h2>
+          <p className="text-xs text-muted-foreground">
+            A voz vai te acompanhar a cada etapa. Sincronizada com a bolinha.
+          </p>
+
+          <div className="mt-6 flex flex-col items-center">
+            <motion.div
+              animate={{ scale: running ? FASES[fase].scale : 1 }}
+              transition={{ duration: tempo, ease: 'easeInOut' }}
+              className="flex h-44 w-44 items-center justify-center rounded-full bg-gradient-water text-card shadow-elevated"
+            >
+              <div className="text-center">
+                <div className="text-sm font-medium opacity-90">{running ? FASES[fase].nome : 'Pronto?'}</div>
+                <div className="text-5xl font-extrabold tabular-nums">{running ? tempo : '4·7·8'}</div>
+              </div>
+            </motion.div>
+            <p className="mt-4 text-xs text-muted-foreground">{ciclos} ciclos completos</p>
+            <button
+              onClick={() => running ? stopAll() : start()}
+              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary font-bold text-primary-foreground"
+            >
+              <Volume2 className="h-4 w-4" />
+              {running ? 'Parar' : 'Começar respiração guiada'}
+            </button>
+            <p className="mt-2 text-[11px] text-muted-foreground text-center">
+              {pronto ? 'Áudio carregado. Coloque o volume em um nível confortável.' : 'A voz pode levar alguns segundos. Você pode começar sem áudio.'}
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 rounded-3xl border border-border bg-card p-6 shadow-soft">
+          <h2 className="text-base font-bold">Estoure as bolhas 🫧</h2>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Toque para liberar a tensão. Movimentos repetitivos ajudam a reduzir a ansiedade.
+          </p>
+          <GameBoundary nome="FidgetBubbles" rota="/app/mental">
+            <FidgetBubbles />
+          </GameBoundary>
+        </div>
+      )}
 
       <div className="mt-6 rounded-2xl bg-info/10 p-4 text-xs text-info-foreground">
         Procure ajuda se: tristeza por mais de 2 semanas, perda de interesse, pensamentos de se machucar.
         Você não precisa enfrentar isso sozinho.
       </div>
+
+      <AnimatePresence>
+        {showApoio && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center"
+            onClick={() => setShowApoio(false)}
+          >
+            <motion.div
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 40, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-3xl bg-card p-6 shadow-elevated"
+            >
+              <div className="flex items-start justify-between">
+                <h3 className="text-lg font-extrabold">Tudo bem por aí? 💙</h3>
+                <button onClick={() => setShowApoio(false)} className="text-muted-foreground"><X className="h-5 w-5" /></button>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Você já está aqui há alguns minutos. Se quiser conversar com alguém agora, é só tocar abaixo. É confidencial.
+              </p>
+              <div className="mt-4 grid gap-2">
+                <a
+                  href={whatsappLink(WHATSAPP_PSICOLOGA, 'Olá, gostaria de conversar com a psicóloga.')}
+                  target="_blank" rel="noopener"
+                  className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-success font-bold text-success-foreground"
+                >
+                  <MessageCircle className="h-4 w-4" /> Falar com psicóloga
+                </a>
+                <a
+                  href={`tel:${SOS_TELEFONE}`}
+                  className="flex h-12 items-center justify-center gap-2 rounded-2xl bg-destructive font-bold text-destructive-foreground"
+                >
+                  <Phone className="h-4 w-4" /> Ligar CVV 188
+                </a>
+                <button
+                  onClick={() => setShowApoio(false)}
+                  className="mt-1 h-10 text-sm font-semibold text-muted-foreground"
+                >
+                  Estou bem, obrigado
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
