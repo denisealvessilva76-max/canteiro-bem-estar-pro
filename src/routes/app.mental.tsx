@@ -189,7 +189,7 @@ function Mental() {
           <p className="mb-4 text-xs text-muted-foreground">
             Toque para liberar a tensão. Movimentos repetitivos ajudam a reduzir a ansiedade.
           </p>
-          <GameBoundary nome="FidgetBubbles" rota="/app/mental">
+          <GameBoundary componente="FidgetBubbles" rota="/app/mental">
             <FidgetBubbles />
           </GameBoundary>
         </div>
