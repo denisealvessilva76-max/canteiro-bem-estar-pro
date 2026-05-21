@@ -40,8 +40,9 @@ function Hidratacao() {
     const res = await insertOrQueue('hidratacao_logs', {
       user_id: user.id, data: todayISO(), ml_consumidos: ml,
     });
+    if (res.error) { toast.error(`Erro ao registrar: ${res.error}`); return; }
     if (res.online) toast.success(`+${ml}ml registrado`);
-    else toast.info('Salvo offline');
+    else toast.info('Salvo offline, sincronizará depois');
     void qc.invalidateQueries({ queryKey: ['hidratacao-hoje'] });
     setTimeout(() => void refreshProfile(), 600);
   }
