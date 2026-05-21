@@ -60,10 +60,13 @@ export async function flushQueue(): Promise<{ ok: number; failed: number }> {
 export async function insertOrQueue(table: string, payload: Record<string, unknown>) {
   if (typeof navigator !== 'undefined' && navigator.onLine) {
     const { error } = await supabase.from(table as never).insert(payload as never);
-    if (!error) return { online: true as const };
+    if (!error) return { online: true as const, duplicate: false as const };
+    if ((error as { code?: string } | null)?.code === '23505') {
+      return { online: true as const, duplicate: true as const };
+    }
   }
   await enqueue(table, payload);
-  return { online: false as const };
+  return { online: false as const, duplicate: false as const };
 }
 
 export function setupOnlineSync() {
