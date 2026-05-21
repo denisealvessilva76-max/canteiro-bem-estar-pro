@@ -12,6 +12,7 @@ export const Route = createFileRoute("/cadastro")({
 function Cadastro() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
+    codigo: "",
     matricula: "", nome: "", senha: "", turno: "diurno" as 'diurno' | 'noturno',
     cargo: "", peso: "", altura: "", telefone: "",
   });
@@ -23,6 +24,10 @@ function Cadastro() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (form.codigo.trim() !== "00345") {
+      toast.error("Código da empresa inválido. Solicite ao RH.");
+      return;
+    }
     if (!form.matricula || !form.nome || form.senha.length < 6) {
       toast.error("Preencha matrícula, nome e senha (mínimo 6 caracteres).");
       return;
