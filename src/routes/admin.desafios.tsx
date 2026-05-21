@@ -21,10 +21,26 @@ function AdminDesafios() {
   // Fotos pendentes: check-ins diários COM foto e SEM validação ainda
   const { data: pendentes } = useQuery({
     queryKey: ['admin-fotos-pendentes'],
-    queryFn: async () => (await supabase.from('desafio_checkins')
-      .select('*, profiles(nome, matricula), desafios(titulo)')
-      .not('foto_url', 'is', null).is('validado', null)
-      .order('created_at', { ascending: false })).data ?? [],
+    queryFn: async () => {
+      const { data: checks } = await supabase.from('desafio_checkins')
+        .select('*')
+        .not('foto_url', 'is', null).is('validado', null)
+        .order('created_at', { ascending: false });
+      if (!checks || checks.length === 0) return [];
+      const userIds = [...new Set(checks.map((c) => c.user_id))];
+      const desafioIds = [...new Set(checks.map((c) => c.desafio_id))];
+      const [{ data: profs }, { data: desafs }] = await Promise.all([
+        supabase.from('profiles').select('id, nome, matricula').in('id', userIds),
+        supabase.from('desafios').select('id, titulo').in('id', desafioIds),
+      ]);
+      const pm = new Map((profs ?? []).map((p) => [p.id, p]));
+      const dm = new Map((desafs ?? []).map((d) => [d.id, d]));
+      return checks.map((c) => ({
+        ...c,
+        profile: pm.get(c.user_id) ?? null,
+        desafio: dm.get(c.desafio_id) ?? null,
+      }));
+    },
   });
 
   async function criar() {
@@ -75,14 +91,14 @@ function AdminDesafios() {
               <PendingPhoto
                 key={p.id}
                 id={p.id}
-                fotoPath={(p as { foto_url: string | null }).foto_url ?? ''}
-                nome={(p as { profiles: { nome: string } | null }).profiles?.nome ?? '—'}
-                matricula={(p as { profiles: { matricula: string } | null }).profiles?.matricula ?? ''}
-                desafio={(p as { desafios: { titulo: string } | null }).desafios?.titulo ?? ''}
-                data={(p as { data: string }).data}
-                gpsLat={(p as { gps_lat: number | null }).gps_lat}
-                gpsLng={(p as { gps_lng: number | null }).gps_lng}
-                dificuldade={(p as { dificuldade: string | null }).dificuldade}
+                fotoPath={p.foto_url ?? ''}
+                nome={p.profile?.nome ?? '—'}
+                matricula={p.profile?.matricula ?? ''}
+                desafio={p.desafio?.titulo ?? ''}
+                data={p.data}
+                gpsLat={p.gps_lat}
+                gpsLng={p.gps_lng}
+                dificuldade={p.dificuldade}
                 onValidar={validar}
               />
             ))}
