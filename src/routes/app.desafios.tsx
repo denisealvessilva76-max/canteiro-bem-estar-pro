@@ -184,8 +184,15 @@ function DesafioCard({ desafio: d, meu, status, checks, onAceitar, onChange }: {
           </div>
 
           {checkHoje?.foto_url ? (
-            <div className="rounded-xl bg-success/10 p-2 text-center text-xs font-bold text-success">
-              <CalendarCheck className="mr-1 inline h-3 w-3" /> Check-in de hoje feito
+            <div className="rounded-xl bg-success/10 p-3 text-center text-xs font-bold text-success">
+              <CalendarCheck className="mr-1 inline h-3 w-3" /> Check-in de hoje feito ({checks.length}/{d.duracao_dias} dias)
+              <div className="mt-1 text-[10px] font-normal text-success/80">
+                {checkHoje.validado === null ? 'Aguardando validação da foto pelo admin.' :
+                 checkHoje.validado ? '✅ Foto validada!' : '❌ Foto rejeitada — refaça amanhã.'}
+              </div>
+              <div className="mt-1 text-[10px] font-normal text-muted-foreground">
+                Volte amanhã para o próximo check-in.
+              </div>
             </div>
           ) : (
             <label className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl border-2 border-accent bg-accent-soft font-bold text-accent">
