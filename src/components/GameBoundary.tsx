@@ -25,8 +25,8 @@ export class GameBoundary extends React.Component<Props, State> {
     // Auto-reporte crítico (silencioso).
     try {
       void supabase.from('reportes_bug').insert({
-        user_id: this.props.userId ?? null,
-        rota: this.props.rota ?? (typeof location !== 'undefined' ? location.pathname : null),
+        user_id: this.props.userId ?? '',
+        rota: this.props.rota ?? (typeof location !== 'undefined' ? location.pathname : ''),
         componente: this.props.componente,
         severidade: 'critico',
         descricao: `[AUTO] ${this.props.componente}: ${this.state.msg}\n${(error instanceof Error && error.stack) || ''}\n${info.componentStack}`,
