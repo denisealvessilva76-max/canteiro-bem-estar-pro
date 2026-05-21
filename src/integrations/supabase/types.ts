@@ -362,6 +362,7 @@ export type Database = {
         Row: {
           altura: number | null
           avatar_id: number | null
+          avatar_url: string | null
           cargo: string | null
           created_at: string
           exposicao_sol: boolean | null
@@ -381,6 +382,7 @@ export type Database = {
         Insert: {
           altura?: number | null
           avatar_id?: number | null
+          avatar_url?: string | null
           cargo?: string | null
           created_at?: string
           exposicao_sol?: boolean | null
@@ -400,6 +402,7 @@ export type Database = {
         Update: {
           altura?: number | null
           avatar_id?: number | null
+          avatar_url?: string | null
           cargo?: string | null
           created_at?: string
           exposicao_sol?: boolean | null
@@ -653,6 +656,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      conceder_medalha: {
+        Args: { _codigo: string; _user_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
