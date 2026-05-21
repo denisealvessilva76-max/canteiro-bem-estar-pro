@@ -33,6 +33,7 @@ import { Route as AdminDesafiosRouteImport } from './routes/admin.desafios'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminContasRouteImport } from './routes/admin.contas'
 import { Route as AdminClinicasRouteImport } from './routes/admin.clinicas'
+import { Route as AdminBugsRouteImport } from './routes/admin.bugs'
 import { Route as AdminAvisosRouteImport } from './routes/admin.avisos'
 import { Route as AdminAlertasRouteImport } from './routes/admin.alertas'
 
@@ -156,6 +157,11 @@ const AdminClinicasRoute = AdminClinicasRouteImport.update({
   path: '/clinicas',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBugsRoute = AdminBugsRouteImport.update({
+  id: '/bugs',
+  path: '/bugs',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAvisosRoute = AdminAvisosRouteImport.update({
   id: '/avisos',
   path: '/avisos',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/bugs': typeof AdminBugsRoute
   '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/bugs': typeof AdminBugsRoute
   '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -233,6 +241,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/admin/alertas': typeof AdminAlertasRoute
   '/admin/avisos': typeof AdminAvisosRoute
+  '/admin/bugs': typeof AdminBugsRoute
   '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -263,6 +272,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/bugs'
     | '/admin/clinicas'
     | '/admin/contas'
     | '/admin/dashboard'
@@ -291,6 +301,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/bugs'
     | '/admin/clinicas'
     | '/admin/contas'
     | '/admin/dashboard'
@@ -319,6 +330,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/alertas'
     | '/admin/avisos'
+    | '/admin/bugs'
     | '/admin/clinicas'
     | '/admin/contas'
     | '/admin/dashboard'
@@ -518,6 +530,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminClinicasRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/bugs': {
+      id: '/admin/bugs'
+      path: '/bugs'
+      fullPath: '/admin/bugs'
+      preLoaderRoute: typeof AdminBugsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/avisos': {
       id: '/admin/avisos'
       path: '/avisos'
@@ -538,6 +557,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAlertasRoute: typeof AdminAlertasRoute
   AdminAvisosRoute: typeof AdminAvisosRoute
+  AdminBugsRoute: typeof AdminBugsRoute
   AdminClinicasRoute: typeof AdminClinicasRoute
   AdminContasRoute: typeof AdminContasRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -549,6 +569,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAlertasRoute: AdminAlertasRoute,
   AdminAvisosRoute: AdminAvisosRoute,
+  AdminBugsRoute: AdminBugsRoute,
   AdminClinicasRoute: AdminClinicasRoute,
   AdminContasRoute: AdminContasRoute,
   AdminDashboardRoute: AdminDashboardRoute,
@@ -602,3 +623,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
