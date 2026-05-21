@@ -10,6 +10,7 @@ export function BugReportButton() {
   const loc = useLocation();
   const [open, setOpen] = useState(false);
   const [texto, setTexto] = useState('');
+  const [severidade, setSeveridade] = useState<'normal' | 'critico'>('normal');
   const [enviando, setEnviando] = useState(false);
 
   async function enviar() {
@@ -19,12 +20,13 @@ export function BugReportButton() {
       user_id: user.id,
       rota: loc.pathname,
       descricao: texto.trim(),
+      severidade,
       user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
     });
     setEnviando(false);
     if (error) { toast.error('Falha ao enviar: ' + error.message); return; }
     toast.success('Obrigado! Reporte enviado para a equipe.');
-    setTexto(''); setOpen(false);
+    setTexto(''); setSeveridade('normal'); setOpen(false);
   }
 
   return (
@@ -48,6 +50,16 @@ export function BugReportButton() {
             <textarea value={texto} onChange={(e) => setTexto(e.target.value)} rows={5}
               placeholder="Ex: o botão de respiração não inicia..."
               className="mt-3 w-full rounded-2xl border-2 border-input bg-background p-3 text-sm outline-none focus:border-primary" />
+            <div className="mt-3 flex gap-2 text-xs">
+              <button onClick={() => setSeveridade('normal')}
+                className={`flex-1 rounded-full border-2 px-3 py-2 font-bold ${severidade === 'normal' ? 'border-primary bg-primary/10 text-primary' : 'border-border'}`}>
+                Normal
+              </button>
+              <button onClick={() => setSeveridade('critico')}
+                className={`flex-1 rounded-full border-2 px-3 py-2 font-bold ${severidade === 'critico' ? 'border-destructive bg-destructive/10 text-destructive' : 'border-border'}`}>
+                🚨 Crítico (não consigo usar)
+              </button>
+            </div>
             <button onClick={() => void enviar()} disabled={enviando || !texto.trim()}
               className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary font-bold text-primary-foreground disabled:opacity-50">
               <Send className="h-4 w-4" /> {enviando ? 'Enviando...' : 'Enviar'}
