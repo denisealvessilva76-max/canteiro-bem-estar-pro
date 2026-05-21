@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSeconRouteImport } from './routes/app.secon'
 import { Route as AppSaudeRouteImport } from './routes/app.saude'
 import { Route as AppRecompensasRouteImport } from './routes/app.recompensas'
 import { Route as AppRankingRouteImport } from './routes/app.ranking'
@@ -66,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppSeconRoute = AppSeconRouteImport.update({
+  id: '/secon',
+  path: '/secon',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppSaudeRoute = AppSaudeRouteImport.update({
   id: '/saude',
@@ -201,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/app/ranking': typeof AppRankingRoute
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
+  '/app/secon': typeof AppSeconRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/app/ranking': typeof AppRankingRoute
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
+  '/app/secon': typeof AppSeconRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/app/ranking': typeof AppRankingRoute
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
+  '/app/secon': typeof AppSeconRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/app/ranking'
     | '/app/recompensas'
     | '/app/saude'
+    | '/app/secon'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -320,6 +330,7 @@ export interface FileRouteTypes {
     | '/app/ranking'
     | '/app/recompensas'
     | '/app/saude'
+    | '/app/secon'
   id:
     | '__root__'
     | '/'
@@ -349,6 +360,7 @@ export interface FileRouteTypes {
     | '/app/ranking'
     | '/app/recompensas'
     | '/app/saude'
+    | '/app/secon'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -403,6 +415,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/secon': {
+      id: '/app/secon'
+      path: '/secon'
+      fullPath: '/app/secon'
+      preLoaderRoute: typeof AppSeconRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/saude': {
       id: '/app/saude'
@@ -593,6 +612,7 @@ interface AppRouteChildren {
   AppRankingRoute: typeof AppRankingRoute
   AppRecompensasRoute: typeof AppRecompensasRoute
   AppSaudeRoute: typeof AppSaudeRoute
+  AppSeconRoute: typeof AppSeconRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -608,6 +628,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppRankingRoute: AppRankingRoute,
   AppRecompensasRoute: AppRecompensasRoute,
   AppSaudeRoute: AppSaudeRoute,
+  AppSeconRoute: AppSeconRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -623,3 +644,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
