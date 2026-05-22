@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { todayISO } from "@/lib/canteiro";
 import { GameBoundary } from "@/components/GameBoundary";
 import { EscovaDragDrop } from "@/components/jogos/EscovaDragDrop";
+import { QuizOdonto } from "@/components/jogos/QuizOdonto";
+import { PlacarPessoal } from "@/components/PlacarPessoal";
 
 export const Route = createFileRoute("/app/odonto")({
   component: Odontologia,
@@ -22,7 +24,7 @@ const PERIODOS = [
 function Odontologia() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [aba, setAba] = useState<'info' | 'praticar'>('info');
+  const [aba, setAba] = useState<'info' | 'praticar' | 'quiz'>('info');
 
   const { data: feitas } = useQuery({
     queryKey: ['odonto-hoje', user?.id],
@@ -77,10 +79,10 @@ function Odontologia() {
       </div>
 
       <div className="mt-4 inline-flex w-full rounded-full bg-muted p-1 text-xs font-bold">
-        {(['info', 'praticar'] as const).map((a) => (
+        {(['info', 'praticar', 'quiz'] as const).map((a) => (
           <button key={a} onClick={() => setAba(a)}
             className={`flex-1 rounded-full px-3 py-1.5 ${aba === a ? 'bg-cyan-500 text-white' : 'text-muted-foreground'}`}>
-            {a === 'info' ? 'Informativos' : 'Praticar'}
+            {a === 'info' ? 'Informativos' : a === 'praticar' ? 'Praticar' : 'Quiz'}
           </button>
         ))}
       </div>
@@ -136,6 +138,17 @@ function Odontologia() {
           <GameBoundary componente="EscovaDragDrop" userId={user?.id} onAbort={() => setAba('info')}>
             <EscovaDragDrop onDone={() => setAba('info')} />
           </GameBoundary>
+        </div>
+      )}
+
+      {aba === 'quiz' && (
+        <div className="mt-5">
+          <PlacarPessoal jogo="odonto_quiz" />
+          <div className="mt-3">
+            <GameBoundary componente="QuizOdonto" userId={user?.id} onAbort={() => setAba('info')}>
+              <QuizOdonto onDone={() => setAba('info')} />
+            </GameBoundary>
+          </div>
         </div>
       )}
     </div>

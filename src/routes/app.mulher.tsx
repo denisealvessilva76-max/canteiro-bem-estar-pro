@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { todayISO } from "@/lib/canteiro";
 import { GameBoundary } from "@/components/GameBoundary";
 import { MulherSwipeCards } from "@/components/jogos/MulherSwipeCards";
+import { QuizMulher } from "@/components/jogos/QuizMulher";
+import { PlacarPessoal } from "@/components/PlacarPessoal";
 
 export const Route = createFileRoute("/app/mulher")({
   component: SaudeMulher,
@@ -18,7 +20,7 @@ const SINTOMAS = ['Cólica', 'Dor de cabeça', 'Cansaço', 'Inchaço', 'Ansiedad
 function SaudeMulher() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  const [aba, setAba] = useState<'ciclo' | 'educacao' | 'clinicas' | 'praticar'>('ciclo');
+  const [aba, setAba] = useState<'ciclo' | 'educacao' | 'clinicas' | 'praticar' | 'quiz'>('ciclo');
 
   const { data: ciclos } = useQuery({
     queryKey: ['ciclos', user?.id],
@@ -52,11 +54,11 @@ function SaudeMulher() {
         <p className="text-sm opacity-90">Calendário, educação e atendimento gratuito.</p>
       </div>
 
-      <div className="mt-4 grid grid-cols-4 gap-1 rounded-full bg-muted p-1 text-[11px] font-bold">
-        {(['ciclo', 'educacao', 'clinicas', 'praticar'] as const).map((a) => (
+      <div className="mt-4 grid grid-cols-5 gap-1 rounded-full bg-muted p-1 text-[10px] font-bold">
+        {(['ciclo', 'educacao', 'clinicas', 'praticar', 'quiz'] as const).map((a) => (
           <button key={a} onClick={() => setAba(a)}
-            className={`rounded-full px-2 py-1.5 ${aba === a ? 'bg-pink-500 text-white' : 'text-muted-foreground'}`}>
-            {a === 'ciclo' ? 'Calendário' : a === 'educacao' ? 'Educação' : a === 'clinicas' ? 'Onde ir' : 'Praticar'}
+            className={`rounded-full px-1.5 py-1.5 ${aba === a ? 'bg-pink-500 text-white' : 'text-muted-foreground'}`}>
+            {a === 'ciclo' ? 'Calendário' : a === 'educacao' ? 'Educação' : a === 'clinicas' ? 'Onde ir' : a === 'praticar' ? 'Praticar' : 'Quiz'}
           </button>
         ))}
       </div>
@@ -66,6 +68,17 @@ function SaudeMulher() {
           <GameBoundary componente="MulherSwipeCards" userId={user?.id} onAbort={() => setAba('ciclo')}>
             <MulherSwipeCards onDone={() => setAba('educacao')} />
           </GameBoundary>
+        </div>
+      )}
+
+      {aba === 'quiz' && (
+        <div className="mt-5">
+          <PlacarPessoal jogo="mulher_quiz" />
+          <div className="mt-3">
+            <GameBoundary componente="QuizMulher" userId={user?.id} onAbort={() => setAba('educacao')}>
+              <QuizMulher onDone={() => setAba('educacao')} />
+            </GameBoundary>
+          </div>
         </div>
       )}
 

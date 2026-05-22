@@ -6,6 +6,8 @@ import { useNarracaoSequencial, type Trecho } from "@/components/NarracaoSequenc
 import { pararTodosAudios } from "@/components/AudioNarracao";
 import { GameBoundary } from "@/components/GameBoundary";
 import { FidgetBubbles } from "@/components/jogos/FidgetBubbles";
+import { CardioMental } from "@/components/jogos/CardioMental";
+import { PlacarPessoal } from "@/components/PlacarPessoal";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   WHATSAPP_PSICOLOGA,
@@ -42,7 +44,7 @@ function Mental() {
   const [fase, setFase] = useState(0);
   const [tempo, setTempo] = useState(FASES[0].dur);
   const [ciclos, setCiclos] = useState(0);
-  const [aba, setAba] = useState<'respiracao' | 'fidget'>('respiracao');
+  const [aba, setAba] = useState<'respiracao' | 'fidget' | 'cardio'>('respiracao');
   const [showApoio, setShowApoio] = useState(false);
   const [apoioShown, setApoioShown] = useState(false);
 
@@ -121,22 +123,19 @@ function Mental() {
         </a>
       </div>
 
-      <div className="mt-7 flex gap-2 rounded-2xl bg-muted p-1">
-        <button
-          onClick={() => setAba('respiracao')}
-          className={`flex-1 rounded-xl py-2 text-sm font-semibold transition ${aba === 'respiracao' ? 'bg-card shadow-soft' : 'text-muted-foreground'}`}
-        >
-          Respiração 4-7-8
-        </button>
-        <button
-          onClick={() => setAba('fidget')}
-          className={`flex-1 rounded-xl py-2 text-sm font-semibold transition ${aba === 'fidget' ? 'bg-card shadow-soft' : 'text-muted-foreground'}`}
-        >
-          Fidget (calma)
-        </button>
+      <div className="mt-7 grid grid-cols-3 gap-1 rounded-2xl bg-muted p-1">
+        {(['respiracao', 'fidget', 'cardio'] as const).map((a) => (
+          <button
+            key={a}
+            onClick={() => setAba(a)}
+            className={`rounded-xl py-2 text-xs font-semibold transition ${aba === a ? 'bg-card shadow-soft' : 'text-muted-foreground'}`}
+          >
+            {a === 'respiracao' ? 'Respiração' : a === 'fidget' ? 'Fidget' : 'Cardio ❤️'}
+          </button>
+        ))}
       </div>
 
-      {aba === 'respiracao' ? (
+      {aba === 'respiracao' && (
         <div className="mt-4 rounded-3xl border border-border bg-card p-6 shadow-soft">
           <h2 className="text-base font-bold">Respiração guiada 4-7-8</h2>
           <p className="text-xs text-muted-foreground">
@@ -167,7 +166,9 @@ function Mental() {
             </p>
           </div>
         </div>
-      ) : (
+      )}
+
+      {aba === 'fidget' && (
         <div className="mt-4 rounded-3xl border border-border bg-card p-6 shadow-soft">
           <h2 className="text-base font-bold">Estoure as bolhas 🫧</h2>
           <p className="mb-4 text-xs text-muted-foreground">
@@ -176,6 +177,21 @@ function Mental() {
           <GameBoundary componente="FidgetBubbles" rota="/app/mental">
             <FidgetBubbles />
           </GameBoundary>
+        </div>
+      )}
+
+      {aba === 'cardio' && (
+        <div className="mt-4 rounded-3xl border border-border bg-card p-6 shadow-soft">
+          <h2 className="text-base font-bold">Coerência cardíaca ❤️</h2>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Acompanhe o ritmo da bolinha por 60 segundos. Ajuda a regular o batimento e diminuir o estresse.
+          </p>
+          <PlacarPessoal jogo="mental_cardio" label="Sua melhor coerência" />
+          <div className="mt-3">
+            <GameBoundary componente="CardioMental" userId={user?.id} rota="/app/mental" onAbort={() => setAba('respiracao')}>
+              <CardioMental onDone={() => setAba('respiracao')} />
+            </GameBoundary>
+          </div>
         </div>
       )}
 
