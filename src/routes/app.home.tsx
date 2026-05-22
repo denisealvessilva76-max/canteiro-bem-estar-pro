@@ -12,6 +12,11 @@ import { LembretesCenter } from "@/components/LembretesCenter";
 import { PermissaoNotificacoes } from "@/components/PermissaoNotificacoes";
 import { HUMORES, todayISO } from "@/lib/canteiro";
 import { insertOrQueue } from "@/lib/offline";
+import { FraseMotivacional } from "@/components/FraseMotivacional";
+import { PilulaDoDia } from "@/components/PilulaDoDia";
+import { TermometroEstresse } from "@/components/TermometroEstresse";
+import { Aniversariantes } from "@/components/Aniversariantes";
+import { AlertaVermelho } from "@/components/AlertaVermelho";
 
 export const Route = createFileRoute("/app/home")({
   component: Home,
@@ -84,9 +89,13 @@ function Home() {
     <>
       <AppHeader />
 
-      <div className="-mt-6 px-4">
+      <div className="-mt-6 px-4 space-y-3">
+        <AlertaVermelho />
         <LembretesCenter />
         <PermissaoNotificacoes />
+        <FraseMotivacional />
+        <PilulaDoDia />
+        <TermometroEstresse />
 
         <motion.div
           initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
