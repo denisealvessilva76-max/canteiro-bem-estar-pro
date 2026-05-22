@@ -26,19 +26,14 @@ const FASES = [
   { nome: 'Solte',   dur: 8, scale: 0.9  },
 ];
 
-// Trechos narrados — cada fala dura aproximadamente o tempo da fase.
-// Cacheados pelo ElevenLabs no bucket "narracoes" (1ª execução gera; depois é instantâneo).
+// Narração curta — só anuncia a fase. A bolinha mostra a contagem.
+// Texto curto cabe em qualquer duração (4s/7s/8s) e sincroniza com a tela.
 const TRECHOS: Trecho[] = [
-  { cacheKey: 'mental-478-intro',
-    texto: 'Vamos iniciar a respiração guiada. Tente ficar o mais relaxado possível. Solte os ombros e feche os olhos se quiser.' },
-  { cacheKey: 'mental-478-inspire',
-    texto: 'Inspire pelo nariz. Um, dois, três, quatro.' },
-  { cacheKey: 'mental-478-segure',
-    texto: 'Segure o ar. Um, dois, três, quatro, cinco, seis, sete.' },
-  { cacheKey: 'mental-478-solte',
-    texto: 'Solte pela boca, devagar. Um, dois, três, quatro, cinco, seis, sete, oito.' },
-  { cacheKey: 'mental-478-final',
-    texto: 'Muito bem. Você conseguiu. Continue respirando no seu ritmo.' },
+  { cacheKey: 'mental-478-intro',   texto: 'Vamos começar. Solte os ombros e relaxe.' },
+  { cacheKey: 'mental-478-inspire', texto: 'Inspire pelo nariz.' },
+  { cacheKey: 'mental-478-segure',  texto: 'Segure o ar.' },
+  { cacheKey: 'mental-478-solte',   texto: 'Solte pela boca, devagar.' },
+  { cacheKey: 'mental-478-final',   texto: 'Muito bem. Continue respirando no seu ritmo.' },
 ];
 
 function Mental() {
@@ -51,7 +46,6 @@ function Mental() {
   const [showApoio, setShowApoio] = useState(false);
   const [apoioShown, setApoioShown] = useState(false);
 
-  // Trigger de 3 minutos na aba: oferece apoio
   useEffect(() => {
     if (apoioShown) return;
     const t = setTimeout(() => { setShowApoio(true); setApoioShown(true); }, 3 * 60 * 1000);
@@ -61,7 +55,7 @@ function Mental() {
   const trechos = useMemo(() => TRECHOS, []);
   const { play, stop, pronto } = useNarracaoSequencial(trechos);
 
-  // Contagem regressiva da fase
+  // Contagem regressiva + narração disparada EXATAMENTE na troca de fase.
   useEffect(() => {
     if (!running) return;
     const id = setInterval(() => {
@@ -70,36 +64,26 @@ function Mental() {
         const proxima = (fase + 1) % FASES.length;
         if (proxima === 0) setCiclos((c) => c + 1);
         setFase(proxima);
+        play(proxima + 1); // 1=inspire, 2=segure, 3=solte
         return FASES[proxima].dur;
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [running, fase]);
-
-  // Sincroniza a narração com cada nova fase
-  useEffect(() => {
-    if (!running) return;
-    // Índices em TRECHOS: 1 inspire, 2 segure, 3 solte
-    play(fase + 1);
-  }, [running, fase, ciclos, play]);
+  }, [running, fase, play]);
 
   function start() {
     setFase(0);
     setTempo(FASES[0].dur);
     setCiclos(0);
-    play(0); // intro
-    // dá ~3.5s para a intro antes de começar o ciclo
-    setTimeout(() => {
-      setRunning(true);
-      play(1); // inspire
-    }, 3800);
+    play(0);
+    setTimeout(() => { setRunning(true); play(1); }, 2500);
   }
 
   function stopAll() {
     setRunning(false);
     stop();
     pararTodosAudios();
-    play(4); // mensagem final
+    play(4);
   }
 
   useEffect(() => () => { stop(); pararTodosAudios(); }, [stop]);
