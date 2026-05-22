@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X, Heart, Smile, AlertTriangle } from "lucide-react";
+import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X, Heart, Smile, AlertTriangle, Ticket } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { supabase } from "@/integrations/supabase/client";
@@ -149,6 +149,7 @@ function Home() {
           <ActionCard to="/app/quiz" icon={Brain} title="Curiosidades" subtitle="Quiz da obra" tone="accent" />
           <ActionCard to="/app/elogios" icon={Heart} title="Elogie um colega" subtitle="Mande um nominado" tone="pink" />
           <ActionCard to="/app/hidratacao-qr" icon={Droplets} title="QR Bebedouro" subtitle="Bater ponto na água" tone="water" />
+          <ActionCard to="/app/cupons" icon={Ticket} title="Meus cupons" subtitle="Marcos de pontos" tone="accent" />
         </div>
 
         <Aniversariantes />

@@ -30,6 +30,7 @@ import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppErgonomiaRouteImport } from './routes/app.ergonomia'
 import { Route as AppElogiosRouteImport } from './routes/app.elogios'
 import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
+import { Route as AppCuponsRouteImport } from './routes/app.cupons'
 import { Route as AppAvisosRouteImport } from './routes/app.avisos'
 import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
 import { Route as AdminRecompensasRouteImport } from './routes/admin.recompensas'
@@ -37,6 +38,7 @@ import { Route as AdminFuncionariosRouteImport } from './routes/admin.funcionari
 import { Route as AdminEngajamentoRouteImport } from './routes/admin.engajamento'
 import { Route as AdminDesafiosRouteImport } from './routes/admin.desafios'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminConteudoRouteImport } from './routes/admin.conteudo'
 import { Route as AdminContasRouteImport } from './routes/admin.contas'
 import { Route as AdminClinicasRouteImport } from './routes/admin.clinicas'
 import { Route as AdminBugsRouteImport } from './routes/admin.bugs'
@@ -148,6 +150,11 @@ const AppDesafiosRoute = AppDesafiosRouteImport.update({
   path: '/desafios',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCuponsRoute = AppCuponsRouteImport.update({
+  id: '/cupons',
+  path: '/cupons',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAvisosRoute = AppAvisosRouteImport.update({
   id: '/avisos',
   path: '/avisos',
@@ -181,6 +188,11 @@ const AdminDesafiosRoute = AdminDesafiosRouteImport.update({
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConteudoRoute = AdminConteudoRouteImport.update({
+  id: '/conteudo',
+  path: '/conteudo',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminContasRoute = AdminContasRouteImport.update({
@@ -221,6 +233,7 @@ export interface FileRoutesByFullPath {
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
+  '/admin/conteudo': typeof AdminConteudoRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
@@ -228,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/app/avisos': typeof AppAvisosRoute
+  '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
   '/app/elogios': typeof AppElogiosRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
@@ -256,6 +270,7 @@ export interface FileRoutesByTo {
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
+  '/admin/conteudo': typeof AdminConteudoRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
@@ -263,6 +278,7 @@ export interface FileRoutesByTo {
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/app/avisos': typeof AppAvisosRoute
+  '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
   '/app/elogios': typeof AppElogiosRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
@@ -292,6 +308,7 @@ export interface FileRoutesById {
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/clinicas': typeof AdminClinicasRoute
   '/admin/contas': typeof AdminContasRoute
+  '/admin/conteudo': typeof AdminConteudoRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
@@ -299,6 +316,7 @@ export interface FileRoutesById {
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/app/avisos': typeof AppAvisosRoute
+  '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
   '/app/elogios': typeof AppElogiosRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
@@ -329,6 +347,7 @@ export interface FileRouteTypes {
     | '/admin/bugs'
     | '/admin/clinicas'
     | '/admin/contas'
+    | '/admin/conteudo'
     | '/admin/dashboard'
     | '/admin/desafios'
     | '/admin/engajamento'
@@ -336,6 +355,7 @@ export interface FileRouteTypes {
     | '/admin/recompensas'
     | '/admin/relatorios'
     | '/app/avisos'
+    | '/app/cupons'
     | '/app/desafios'
     | '/app/elogios'
     | '/app/ergonomia'
@@ -364,6 +384,7 @@ export interface FileRouteTypes {
     | '/admin/bugs'
     | '/admin/clinicas'
     | '/admin/contas'
+    | '/admin/conteudo'
     | '/admin/dashboard'
     | '/admin/desafios'
     | '/admin/engajamento'
@@ -371,6 +392,7 @@ export interface FileRouteTypes {
     | '/admin/recompensas'
     | '/admin/relatorios'
     | '/app/avisos'
+    | '/app/cupons'
     | '/app/desafios'
     | '/app/elogios'
     | '/app/ergonomia'
@@ -399,6 +421,7 @@ export interface FileRouteTypes {
     | '/admin/bugs'
     | '/admin/clinicas'
     | '/admin/contas'
+    | '/admin/conteudo'
     | '/admin/dashboard'
     | '/admin/desafios'
     | '/admin/engajamento'
@@ -406,6 +429,7 @@ export interface FileRouteTypes {
     | '/admin/recompensas'
     | '/admin/relatorios'
     | '/app/avisos'
+    | '/app/cupons'
     | '/app/desafios'
     | '/app/elogios'
     | '/app/ergonomia'
@@ -581,6 +605,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDesafiosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/cupons': {
+      id: '/app/cupons'
+      path: '/cupons'
+      fullPath: '/app/cupons'
+      preLoaderRoute: typeof AppCuponsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/avisos': {
       id: '/app/avisos'
       path: '/avisos'
@@ -630,6 +661,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/conteudo': {
+      id: '/admin/conteudo'
+      path: '/conteudo'
+      fullPath: '/admin/conteudo'
+      preLoaderRoute: typeof AdminConteudoRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/contas': {
       id: '/admin/contas'
       path: '/contas'
@@ -674,6 +712,7 @@ interface AdminRouteChildren {
   AdminBugsRoute: typeof AdminBugsRoute
   AdminClinicasRoute: typeof AdminClinicasRoute
   AdminContasRoute: typeof AdminContasRoute
+  AdminConteudoRoute: typeof AdminConteudoRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminDesafiosRoute: typeof AdminDesafiosRoute
   AdminEngajamentoRoute: typeof AdminEngajamentoRoute
@@ -688,6 +727,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBugsRoute: AdminBugsRoute,
   AdminClinicasRoute: AdminClinicasRoute,
   AdminContasRoute: AdminContasRoute,
+  AdminConteudoRoute: AdminConteudoRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminDesafiosRoute: AdminDesafiosRoute,
   AdminEngajamentoRoute: AdminEngajamentoRoute,
@@ -700,6 +740,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AppRouteChildren {
   AppAvisosRoute: typeof AppAvisosRoute
+  AppCuponsRoute: typeof AppCuponsRoute
   AppDesafiosRoute: typeof AppDesafiosRoute
   AppElogiosRoute: typeof AppElogiosRoute
   AppErgonomiaRoute: typeof AppErgonomiaRoute
@@ -719,6 +760,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAvisosRoute: AppAvisosRoute,
+  AppCuponsRoute: AppCuponsRoute,
   AppDesafiosRoute: AppDesafiosRoute,
   AppElogiosRoute: AppElogiosRoute,
   AppErgonomiaRoute: AppErgonomiaRoute,
