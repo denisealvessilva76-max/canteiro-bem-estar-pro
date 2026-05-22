@@ -51,12 +51,13 @@ function AdminDesafios() {
     void qc.invalidateQueries({ queryKey: ['admin-desafios'] });
   }
 
-  async function validar(id: string, ok: boolean) {
+  async function validar(id: string, ok: boolean, motivo?: string) {
     const { data: { user } } = await supabase.auth.getUser();
     await supabase.from('desafio_checkins').update({
       validado: ok,
       validado_em: new Date().toISOString(),
       validado_por: user?.id ?? null,
+      motivo_recusa: ok ? null : (motivo ?? null),
     }).eq('id', id);
     toast.success(ok ? 'Foto validada' : 'Foto recusada');
     void qc.invalidateQueries({ queryKey: ['admin-fotos-pendentes'] });
