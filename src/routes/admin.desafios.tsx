@@ -128,10 +128,12 @@ function AdminDesafios() {
 function PendingPhoto({ id, fotoPath, nome, matricula, desafio, data, gpsLat, gpsLng, dificuldade, onValidar }: {
   id: string; fotoPath: string; nome: string; matricula: string; desafio: string;
   data: string; gpsLat: number | null; gpsLng: number | null; dificuldade: string | null;
-  onValidar: (id: string, ok: boolean) => void;
+  onValidar: (id: string, ok: boolean, motivo?: string) => void;
 }) {
   const [url, setUrl] = useState<string | null>(null);
   const [erro, setErro] = useState(false);
+  const [recusando, setRecusando] = useState(false);
+  const [motivo, setMotivo] = useState('');
 
   useEffect(() => {
     let cancel = false;
@@ -171,14 +173,41 @@ function PendingPhoto({ id, fotoPath, nome, matricula, desafio, data, gpsLat, gp
         </p>
       )}
 
-      <div className="mt-3 flex gap-2">
-        <button onClick={() => onValidar(id, true)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-success text-xs font-bold text-success-foreground">
-          <Check className="h-3 w-3" /> Validar
-        </button>
-        <button onClick={() => onValidar(id, false)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-destructive text-xs font-bold text-destructive-foreground">
-          <X className="h-3 w-3" /> Recusar
-        </button>
-      </div>
+      {!recusando ? (
+        <div className="mt-3 flex gap-2">
+          <button onClick={() => onValidar(id, true)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-success text-xs font-bold text-success-foreground">
+            <Check className="h-3 w-3" /> Validar
+          </button>
+          <button onClick={() => setRecusando(true)} className="flex h-9 flex-1 items-center justify-center gap-1 rounded-lg bg-destructive text-xs font-bold text-destructive-foreground">
+            <X className="h-3 w-3" /> Recusar
+          </button>
+        </div>
+      ) : (
+        <div className="mt-3 space-y-2 rounded-lg border border-destructive/40 bg-destructive/5 p-2">
+          <p className="text-xs font-bold text-destructive">Por que está recusando?</p>
+          <textarea
+            value={motivo}
+            onChange={(e) => setMotivo(e.target.value)}
+            rows={2}
+            placeholder="Ex: Foto não mostra a atividade, está borrada, fora do local do canteiro…"
+            className="w-full rounded border border-input bg-background p-2 text-xs"
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={() => { onValidar(id, false, motivo.trim() || undefined); setRecusando(false); setMotivo(''); }}
+              className="flex h-8 flex-1 items-center justify-center rounded bg-destructive text-xs font-bold text-destructive-foreground"
+            >
+              Confirmar recusa
+            </button>
+            <button
+              onClick={() => { setRecusando(false); setMotivo(''); }}
+              className="flex h-8 flex-1 items-center justify-center rounded border border-border text-xs font-bold"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
