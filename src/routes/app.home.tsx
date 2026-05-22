@@ -146,7 +146,12 @@ function Home() {
           <ActionCard to="/app/odonto" icon={Smile} title="Odontologia" subtitle="Escovação e dicas" tone="cyan" />
           <ActionCard to="/app/avisos" icon={Bell} title="Avisos" subtitle="Comunicados" tone="info" />
           <ActionCard to="/app/recompensas" icon={Sparkles} title="Recompensas" subtitle="Loja de prêmios" tone="primary" />
+          <ActionCard to="/app/quiz" icon={Brain} title="Curiosidades" subtitle="Quiz da obra" tone="accent" />
+          <ActionCard to="/app/elogios" icon={Heart} title="Elogie um colega" subtitle="Mande um nominado" tone="pink" />
+          <ActionCard to="/app/hidratacao-qr" icon={Droplets} title="QR Bebedouro" subtitle="Bater ponto na água" tone="water" />
         </div>
+
+        <Aniversariantes />
 
         <div className="mt-6">
           <WeatherObras />
