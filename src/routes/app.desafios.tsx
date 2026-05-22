@@ -196,6 +196,11 @@ function DesafioCard({ desafio: d, meu, status, checks, onAceitar, onChange }: {
                 {checkHoje.validado === null ? 'Aguardando validação da foto pelo admin.' :
                  checkHoje.validado ? '✅ Foto validada!' : '❌ Foto rejeitada — refaça amanhã.'}
               </div>
+              {checkHoje.validado === false && checkHoje.motivo_recusa && (
+                <div className="mt-2 rounded-lg bg-destructive/10 p-2 text-left text-[11px] font-normal text-destructive">
+                  <strong>Motivo da recusa:</strong> {checkHoje.motivo_recusa}
+                </div>
+              )}
               <div className="mt-1 text-[10px] font-normal text-muted-foreground">
                 Volte amanhã para o próximo check-in.
               </div>
