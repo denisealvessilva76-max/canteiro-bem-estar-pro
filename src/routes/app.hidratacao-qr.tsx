@@ -55,7 +55,6 @@ function HidratacaoQR() {
         user_id: user.id,
         data: todayISO(),
         ml_consumidos: qr.ml_padrao,
-        fonte: `qr:${qr.codigo}`,
       });
       if (error) throw error;
       toast.success(`+${qr.ml_padrao} ml registrados no ${qr.localizacao}!`);
