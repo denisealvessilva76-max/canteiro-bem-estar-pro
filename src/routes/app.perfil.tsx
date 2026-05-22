@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { ArrowLeft, LogOut, IdCard, Clock, Phone, Check, Camera } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { AvatarCapacete } from "@/components/AvatarCapacete";
+import { nivelPorPontos, NIVEIS, proximoNivel } from "@/lib/gamificacao";
 
 export const Route = createFileRoute("/app/perfil")({
   component: Perfil,
@@ -28,6 +30,19 @@ function Perfil() {
         .select('id, conquistado_em, conquistas(codigo, titulo, descricao, icone, pontos)')
         .eq('user_id', profile!.id);
       return data ?? [];
+    },
+  });
+
+  const { data: estresseHist } = useQuery({
+    queryKey: ['estresse-hist', profile?.id],
+    enabled: !!profile?.id,
+    queryFn: async () => {
+      const { data } = await supabase.from('estresse_logs')
+        .select('nivel, semana')
+        .eq('user_id', profile!.id)
+        .order('semana', { ascending: false })
+        .limit(8);
+      return (data ?? []).reverse();
     },
   });
 
