@@ -157,6 +157,7 @@ function Perfil() {
         </div>
       )}
 
+      {medalhas && medalhas.length > 0 && (
         <>
           <h2 className="mt-7 text-base font-bold">🏅 Minhas medalhas</h2>
           <div className="mt-3 grid grid-cols-3 gap-2">
