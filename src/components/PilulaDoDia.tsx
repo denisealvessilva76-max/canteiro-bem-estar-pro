@@ -44,8 +44,8 @@ export function PilulaDoDia() {
       toast.error('Não foi possível registrar');
       return;
     }
-    // +2 pts
-    await supabase.rpc('add_points' as never, { p_user: user.id, p_pts: 2 } as never).then(() => {}).catch(() => {});
+    // +2 pts (best-effort)
+    try { await (supabase.rpc as unknown as (n: string, p: unknown) => Promise<unknown>)('add_points', { p_user: user.id, p_pts: 2 }); } catch { /* ok */ }
     // fallback: atualiza diretamente caso RPC não exista
     toast.success('+2 pontos! Pílula vista.');
     void qc.invalidateQueries({ queryKey: ['pilula-hoje'] });
