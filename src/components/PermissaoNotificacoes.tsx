@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Bell, X } from 'lucide-react';
-import { pedirPermissao, ativarLembretes, lerCfg, salvarCfg } from '@/lib/notificacoes';
+import { pedirPermissao, ativarLembretes, lerCfg, salvarCfg, registrarSW } from '@/lib/notificacoes';
 
 export function PermissaoNotificacoes() {
   const [estado, setEstado] = useState<NotificationPermission | 'unsupported'>('default');
@@ -10,15 +10,30 @@ export function PermissaoNotificacoes() {
     if (typeof window === 'undefined' || !('Notification' in window)) { setEstado('unsupported'); return; }
     setEstado(Notification.permission);
     setOculto(localStorage.getItem('notif-banner-dismiss') === '1');
+    // Se já tem permissão, garante SW registrado e reagenda lembretes do dia
+    if (Notification.permission === 'granted') {
+      void (async () => {
+        await registrarSW();
+        await ativarLembretes(lerCfg());
+      })();
+    }
   }, []);
 
   async function ativar() {
+    await registrarSW();
     const p = await pedirPermissao();
     setEstado(p);
     if (p === 'granted') {
       const cfg = { ...lerCfg() };
       salvarCfg(cfg);
-      await ativarLembretes(cfg);
+      await ativarLembretes(cfg, { force: true });
+      // Disparar um "ping" agora para o usuário ver que funcionou
+      try {
+        new Notification('Lembretes ativados ✅', {
+          body: 'Você receberá avisos de água, alongamento e check-in.',
+          icon: '/icon-192.png',
+        });
+      } catch { /* noop */ }
     }
   }
 
@@ -36,7 +51,7 @@ export function PermissaoNotificacoes() {
       </div>
       <div className="flex-1">
         <p className="text-xs font-bold">Ative os lembretes</p>
-        <p className="text-[11px] text-muted-foreground">Receba avisos de água, alongamento e escovação no horário certo.</p>
+        <p className="text-[11px] text-muted-foreground">Avisos de água, check-in, alongamento e escovação no horário certo.</p>
       </div>
       <button onClick={() => void ativar()} className="rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground">Ativar</button>
       <button onClick={fechar} aria-label="Fechar"><X className="h-4 w-4 text-muted-foreground" /></button>
