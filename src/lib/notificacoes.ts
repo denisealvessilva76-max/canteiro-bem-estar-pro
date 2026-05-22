@@ -4,6 +4,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 const LEMBRETES_KEY = 'canteiro-lembretes-cfg';
+const ULTIMO_AGENDAMENTO_KEY = 'canteiro-lembretes-ultimo';
 
 export type LembreteCfg = {
   agua: boolean;       // a cada 90 min entre 7h e 17h
@@ -67,16 +68,20 @@ async function agendarLocal(delayMs: number, title: string, body: string, url = 
   }, delayMs);
 }
 
-export async function ativarLembretes(cfg: LembreteCfg) {
+export async function ativarLembretes(cfg: LembreteCfg, opts?: { force?: boolean }) {
   if (typeof window === 'undefined') return;
   if (Notification?.permission !== 'granted') return;
+  // Reagenda no máximo 1x por dia (cada agendamento é via setTimeout no SW)
+  const hoje = new Date().toDateString();
+  if (!opts?.force && localStorage.getItem(ULTIMO_AGENDAMENTO_KEY) === hoje) return;
+  localStorage.setItem(ULTIMO_AGENDAMENTO_KEY, hoje);
+
   if (cfg.checkin) await agendarLocal(proximoHorario(8, 0), 'Check-in diário', 'Como você está hoje?', '/app/home');
   if (cfg.alongar) {
     await agendarLocal(proximoHorario(10, 0), 'Hora do alongamento', '3 minutos pra soltar o corpo.', '/app/ergonomia');
     await agendarLocal(proximoHorario(15, 0), 'Hora do alongamento', 'Mais 3 minutos pra terminar bem o dia.', '/app/ergonomia');
   }
   if (cfg.agua) {
-    // 7h, 9h, 11h, 13h, 15h, 17h
     for (const h of [7, 9, 11, 13, 15, 17]) {
       await agendarLocal(proximoHorario(h, 0), 'Beba água', 'Hora de mais um copo. Sua meta agradece!', '/app/hidratacao');
     }

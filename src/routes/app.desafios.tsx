@@ -90,7 +90,7 @@ function Desafios() {
 
 type DesafioRow = { id: string; titulo: string; descricao: string | null; meta: string; duracao_dias: number; pontos_recompensa: number };
 type ProgressoRow = { id: string; desafio_id: string; status: string; iniciado_em: string };
-type CheckinRow = { id: string; desafio_id: string; progresso_id: string; data: string; foto_url: string | null; dificuldade: string | null; validado: boolean | null };
+type CheckinRow = { id: string; desafio_id: string; progresso_id: string; data: string; foto_url: string | null; dificuldade: string | null; validado: boolean | null; motivo_recusa?: string | null };
 
 function DesafioCard({ desafio: d, meu, status, checks, onAceitar, onChange }: {
   desafio: DesafioRow;
@@ -196,6 +196,11 @@ function DesafioCard({ desafio: d, meu, status, checks, onAceitar, onChange }: {
                 {checkHoje.validado === null ? 'Aguardando validação da foto pelo admin.' :
                  checkHoje.validado ? '✅ Foto validada!' : '❌ Foto rejeitada — refaça amanhã.'}
               </div>
+              {checkHoje.validado === false && checkHoje.motivo_recusa && (
+                <div className="mt-2 rounded-lg bg-destructive/10 p-2 text-left text-[11px] font-normal text-destructive">
+                  <strong>Motivo da recusa:</strong> {checkHoje.motivo_recusa}
+                </div>
+              )}
               <div className="mt-1 text-[10px] font-normal text-muted-foreground">
                 Volte amanhã para o próximo check-in.
               </div>
