@@ -287,6 +287,48 @@ export type Database = {
         }
         Relationships: []
       }
+      cupons: {
+        Row: {
+          codigo: string
+          created_at: string
+          descricao: string
+          expira_em: string | null
+          id: string
+          marco_tipo: string
+          marco_valor: number
+          status: string
+          usado_em: string | null
+          user_id: string
+          valor_desconto: number | null
+        }
+        Insert: {
+          codigo: string
+          created_at?: string
+          descricao: string
+          expira_em?: string | null
+          id?: string
+          marco_tipo: string
+          marco_valor: number
+          status?: string
+          usado_em?: string | null
+          user_id: string
+          valor_desconto?: number | null
+        }
+        Update: {
+          codigo?: string
+          created_at?: string
+          descricao?: string
+          expira_em?: string | null
+          id?: string
+          marco_tipo?: string
+          marco_valor?: number
+          status?: string
+          usado_em?: string | null
+          user_id?: string
+          valor_desconto?: number | null
+        }
+        Relationships: []
+      }
       desafio_checkins: {
         Row: {
           created_at: string
@@ -1229,6 +1271,7 @@ export type Database = {
         Args: { _codigo: string; _user_id: string }
         Returns: undefined
       }
+      gerar_codigo_cupom: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
