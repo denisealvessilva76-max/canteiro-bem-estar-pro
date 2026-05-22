@@ -149,6 +149,7 @@ function Home() {
           <ActionCard to="/app/quiz" icon={Brain} title="Curiosidades" subtitle="Quiz da obra" tone="accent" />
           <ActionCard to="/app/elogios" icon={Heart} title="Elogie um colega" subtitle="Mande um nominado" tone="pink" />
           <ActionCard to="/app/hidratacao-qr" icon={Droplets} title="QR Bebedouro" subtitle="Bater ponto na água" tone="water" />
+          <ActionCard to="/app/cupons" icon={Ticket} title="Meus cupons" subtitle="Marcos de pontos" tone="accent" />
         </div>
 
         <Aniversariantes />
