@@ -268,6 +268,7 @@ export type Database = {
           gps_lat: number | null
           gps_lng: number | null
           id: string
+          motivo_recusa: string | null
           progresso_id: string
           user_id: string
           validado: boolean | null
@@ -284,6 +285,7 @@ export type Database = {
           gps_lat?: number | null
           gps_lng?: number | null
           id?: string
+          motivo_recusa?: string | null
           progresso_id: string
           user_id: string
           validado?: boolean | null
@@ -300,6 +302,7 @@ export type Database = {
           gps_lat?: number | null
           gps_lng?: number | null
           id?: string
+          motivo_recusa?: string | null
           progresso_id?: string
           user_id?: string
           validado?: boolean | null
@@ -378,6 +381,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      jogo_scores: {
+        Row: {
+          acertos: number | null
+          categoria: string
+          created_at: string
+          id: string
+          jogo: string
+          pontos: number
+          total: number | null
+          user_id: string
+        }
+        Insert: {
+          acertos?: number | null
+          categoria: string
+          created_at?: string
+          id?: string
+          jogo: string
+          pontos?: number
+          total?: number | null
+          user_id: string
+        }
+        Update: {
+          acertos?: number | null
+          categoria?: string
+          created_at?: string
+          id?: string
+          jogo?: string
+          pontos?: number
+          total?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       odonto_dicas: {
         Row: {
