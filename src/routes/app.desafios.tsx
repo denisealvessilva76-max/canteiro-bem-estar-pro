@@ -90,7 +90,7 @@ function Desafios() {
 
 type DesafioRow = { id: string; titulo: string; descricao: string | null; meta: string; duracao_dias: number; pontos_recompensa: number };
 type ProgressoRow = { id: string; desafio_id: string; status: string; iniciado_em: string };
-type CheckinRow = { id: string; desafio_id: string; progresso_id: string; data: string; foto_url: string | null; dificuldade: string | null; validado: boolean | null };
+type CheckinRow = { id: string; desafio_id: string; progresso_id: string; data: string; foto_url: string | null; dificuldade: string | null; validado: boolean | null; motivo_recusa?: string | null };
 
 function DesafioCard({ desafio: d, meu, status, checks, onAceitar, onChange }: {
   desafio: DesafioRow;
