@@ -115,7 +115,48 @@ function Perfil() {
         </label>
       </div>
 
-      {medalhas && medalhas.length > 0 && (
+      <div className="mt-5 rounded-3xl border border-border bg-card p-5">
+        <h2 className="text-base font-bold">Seu capacete</h2>
+        <div className="mt-3 flex items-center gap-4">
+          <AvatarCapacete pontos={profile.pontos_acumulados} nome={profile.nome} size="lg" showProgress />
+          <div className="flex-1 text-sm">
+            {(() => {
+              const n = nivelPorPontos(profile.pontos_acumulados);
+              const info = NIVEIS[n];
+              const { proximo, faltam } = proximoNivel(profile.pontos_acumulados);
+              return (
+                <>
+                  <p className="font-bold" style={{ color: info.cor }}>Nível {info.label} {info.emoji}</p>
+                  {proximo ? (
+                    <p className="text-xs text-muted-foreground">Faltam <b>{faltam} pts</b> para o capacete {NIVEIS[proximo].label} {NIVEIS[proximo].emoji}</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Nível máximo atingido. Lenda do canteiro! 💎</p>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      </div>
+
+      {estresseHist && estresseHist.length > 0 && (
+        <div className="mt-5 rounded-3xl border border-border bg-card p-5">
+          <h2 className="text-base font-bold">Termômetro de estresse</h2>
+          <p className="text-xs text-muted-foreground">Últimas {estresseHist.length} semanas</p>
+          <div className="mt-3 flex items-end gap-1.5">
+            {estresseHist.map((e, i) => {
+              const cor = e.nivel >= 4 ? 'bg-red-500' : e.nivel === 3 ? 'bg-yellow-500' : 'bg-emerald-500';
+              return (
+                <div key={i} className="flex-1 text-center">
+                  <div className={`${cor} rounded-md`} style={{ height: `${e.nivel * 14}px` }} />
+                  <p className="mt-1 text-[9px] text-muted-foreground">{(e.semana as string).slice(5)}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
         <>
           <h2 className="mt-7 text-base font-bold">🏅 Minhas medalhas</h2>
           <div className="mt-3 grid grid-cols-3 gap-2">
