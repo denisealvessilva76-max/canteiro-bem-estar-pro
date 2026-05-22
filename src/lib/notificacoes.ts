@@ -4,6 +4,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 const LEMBRETES_KEY = 'canteiro-lembretes-cfg';
+const ULTIMO_AGENDAMENTO_KEY = 'canteiro-lembretes-ultimo';
 
 export type LembreteCfg = {
   agua: boolean;       // a cada 90 min entre 7h e 17h
