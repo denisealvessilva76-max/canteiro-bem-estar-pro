@@ -15,6 +15,7 @@ const NAV = [
   { to: '/admin/avisos', icon: Bell, label: 'Avisos' },
   { to: '/admin/recompensas', icon: Gift, label: 'Recompensas' },
   { to: '/admin/clinicas', icon: MapPin, label: 'Clínicas/UBS' },
+  { to: '/admin/relatorios', icon: FileText, label: 'Relatórios' },
   { to: '/admin/bugs', icon: Bug, label: 'Reportes' },
   { to: '/admin/contas', icon: ShieldCheck, label: 'Contas' },
 ] as const;
