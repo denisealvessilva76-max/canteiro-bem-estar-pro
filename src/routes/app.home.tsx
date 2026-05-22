@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X, Heart, Smile, AlertTriangle } from "lucide-react";
+import { Droplets, HeartPulse, Bell, Sparkles, Brain, Activity, X, Heart, Smile, AlertTriangle, Ticket } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppHeader } from "@/components/AppHeader";
 import { supabase } from "@/integrations/supabase/client";

@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Users, AlertTriangle, Trophy, Bell, Gift, LogOut, HardHat, Loader2, ShieldCheck, Menu, X, ChevronLeft, MapPin, Bug, FileText, Zap } from "lucide-react";
+import { LayoutDashboard, Users, AlertTriangle, Trophy, Bell, Gift, LogOut, HardHat, Loader2, ShieldCheck, Menu, X, ChevronLeft, MapPin, Bug, FileText, Zap, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/admin")({
@@ -14,6 +14,7 @@ const NAV = [
   { to: '/admin/desafios', icon: Trophy, label: 'Desafios' },
   { to: '/admin/avisos', icon: Bell, label: 'Avisos' },
   { to: '/admin/engajamento', icon: Zap, label: 'Engajamento' },
+  { to: '/admin/conteudo', icon: BookOpen, label: 'Conteúdo' },
   { to: '/admin/recompensas', icon: Gift, label: 'Recompensas' },
   { to: '/admin/clinicas', icon: MapPin, label: 'Clínicas/UBS' },
   { to: '/admin/relatorios', icon: FileText, label: 'Relatórios' },
