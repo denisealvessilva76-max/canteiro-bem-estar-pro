@@ -58,6 +58,36 @@ export type Database = {
           },
         ]
       }
+      alertas_vermelhos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          expira_em: string | null
+          id: string
+          mensagem: string
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          expira_em?: string | null
+          id?: string
+          mensagem: string
+          tipo?: string
+          titulo: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          expira_em?: string | null
+          id?: string
+          mensagem?: string
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
       alongamento_logs: {
         Row: {
           created_at: string
@@ -347,6 +377,83 @@ export type Database = {
         }
         Relationships: []
       }
+      elogios: {
+        Row: {
+          anonimo: boolean
+          created_at: string
+          de_user_id: string
+          id: string
+          mensagem: string
+          para_user_id: string
+        }
+        Insert: {
+          anonimo?: boolean
+          created_at?: string
+          de_user_id: string
+          id?: string
+          mensagem: string
+          para_user_id: string
+        }
+        Update: {
+          anonimo?: boolean
+          created_at?: string
+          de_user_id?: string
+          id?: string
+          mensagem?: string
+          para_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "elogios_de_user_id_fkey"
+            columns: ["de_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "elogios_para_user_id_fkey"
+            columns: ["para_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      estresse_logs: {
+        Row: {
+          created_at: string
+          id: string
+          nivel: number
+          observacao: string | null
+          semana: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nivel: number
+          observacao?: string | null
+          semana?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nivel?: number
+          observacao?: string | null
+          semana?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estresse_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hidratacao_logs: {
         Row: {
           cor_urina: number | null
@@ -381,6 +488,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      hidratacao_qr_codes: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          created_at: string
+          id: string
+          localizacao: string
+          ml_padrao: number
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          created_at?: string
+          id?: string
+          localizacao: string
+          ml_padrao?: number
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          created_at?: string
+          id?: string
+          localizacao?: string
+          ml_padrao?: number
+        }
+        Relationships: []
       }
       jogo_scores: {
         Row: {
@@ -487,13 +621,88 @@ export type Database = {
         }
         Relationships: []
       }
+      pilulas_dia: {
+        Row: {
+          ativo: boolean
+          categoria: string | null
+          created_at: string
+          data_publicacao: string
+          descricao: string | null
+          id: string
+          media_url: string | null
+          tipo: string
+          titulo: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          data_publicacao?: string
+          descricao?: string | null
+          id?: string
+          media_url?: string | null
+          tipo?: string
+          titulo: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string | null
+          created_at?: string
+          data_publicacao?: string
+          descricao?: string | null
+          id?: string
+          media_url?: string | null
+          tipo?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      pilulas_views: {
+        Row: {
+          id: string
+          pilula_id: string
+          user_id: string
+          visto_em: string
+        }
+        Insert: {
+          id?: string
+          pilula_id: string
+          user_id: string
+          visto_em?: string
+        }
+        Update: {
+          id?: string
+          pilula_id?: string
+          user_id?: string
+          visto_em?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pilulas_views_pilula_id_fkey"
+            columns: ["pilula_id"]
+            isOneToOne: false
+            referencedRelation: "pilulas_dia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pilulas_views_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           altura: number | null
           avatar_id: number | null
           avatar_url: string | null
           cargo: string | null
+          contrato: string | null
           created_at: string
+          data_nascimento: string | null
+          empreiteira: string | null
           exposicao_sol: boolean | null
           grupo_risco: string | null
           id: string
@@ -513,7 +722,10 @@ export type Database = {
           avatar_id?: number | null
           avatar_url?: string | null
           cargo?: string | null
+          contrato?: string | null
           created_at?: string
+          data_nascimento?: string | null
+          empreiteira?: string | null
           exposicao_sol?: boolean | null
           grupo_risco?: string | null
           id: string
@@ -533,7 +745,10 @@ export type Database = {
           avatar_id?: number | null
           avatar_url?: string | null
           cargo?: string | null
+          contrato?: string | null
           created_at?: string
+          data_nascimento?: string | null
+          empreiteira?: string | null
           exposicao_sol?: boolean | null
           grupo_risco?: string | null
           id?: string
@@ -630,6 +845,81 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      quiz_obra_perguntas: {
+        Row: {
+          ativo: boolean
+          categoria: string
+          correta: number
+          created_at: string
+          id: string
+          opcoes: Json
+          pergunta: string
+          semana: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string
+          correta: number
+          created_at?: string
+          id?: string
+          opcoes: Json
+          pergunta: string
+          semana?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string
+          correta?: number
+          created_at?: string
+          id?: string
+          opcoes?: Json
+          pergunta?: string
+          semana?: string
+        }
+        Relationships: []
+      }
+      quiz_obra_respostas: {
+        Row: {
+          acertou: boolean
+          id: string
+          pergunta_id: string
+          respondido_em: string
+          resposta: number
+          user_id: string
+        }
+        Insert: {
+          acertou: boolean
+          id?: string
+          pergunta_id: string
+          respondido_em?: string
+          resposta: number
+          user_id: string
+        }
+        Update: {
+          acertou?: boolean
+          id?: string
+          pergunta_id?: string
+          respondido_em?: string
+          resposta?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_obra_respostas_pergunta_id_fkey"
+            columns: ["pergunta_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_obra_perguntas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_obra_respostas_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recompensas: {
         Row: {
