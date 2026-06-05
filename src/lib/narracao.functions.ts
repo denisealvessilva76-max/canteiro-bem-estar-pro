@@ -44,7 +44,9 @@ function bucketPath(text: string, voiceId: string, cacheKey?: string) {
 }
 
 export const obterNarracao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) => Input.parse(input))
+
   .handler(async ({ data }) => {
     const voiceId = data.voiceId ?? VOZ_PADRAO;
     const path = bucketPath(data.texto, voiceId, data.cacheKey);
