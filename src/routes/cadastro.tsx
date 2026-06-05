@@ -14,6 +14,7 @@ export const Route = createFileRoute("/cadastro")({
 
 function Cadastro() {
   const navigate = useNavigate();
+  const validarCodigo = useServerFn(validarCodigoEmpresa);
   const [form, setForm] = useState({
     codigo: "",
     matricula: "", nome: "", senha: "", turno: "diurno" as 'diurno' | 'noturno',
@@ -27,15 +28,26 @@ function Cadastro() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (form.codigo.trim() !== "00345") {
-      toast.error("Código da empresa inválido. Solicite ao RH.");
-      return;
-    }
     if (!form.matricula || !form.nome || form.senha.length < 6) {
       toast.error("Preencha matrícula, nome e senha (mínimo 6 caracteres).");
       return;
     }
     setLoading(true);
+
+    // Validação do código da empresa feita no servidor (anti-bypass).
+    try {
+      const res = await validarCodigo({ data: { codigo: form.codigo } });
+      if (!res.ok) {
+        setLoading(false);
+        toast.error("Código da empresa inválido. Solicite ao RH.");
+        return;
+      }
+    } catch {
+      setLoading(false);
+      toast.error("Não foi possível validar o código. Tente novamente.");
+      return;
+    }
+
 
     const { data: existe } = await supabase
       .from('profiles').select('id').eq('matricula', form.matricula.trim()).maybeSingle();
