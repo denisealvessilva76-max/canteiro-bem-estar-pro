@@ -419,48 +419,6 @@ export type Database = {
         }
         Relationships: []
       }
-      elogios: {
-        Row: {
-          anonimo: boolean
-          created_at: string
-          de_user_id: string
-          id: string
-          mensagem: string
-          para_user_id: string
-        }
-        Insert: {
-          anonimo?: boolean
-          created_at?: string
-          de_user_id: string
-          id?: string
-          mensagem: string
-          para_user_id: string
-        }
-        Update: {
-          anonimo?: boolean
-          created_at?: string
-          de_user_id?: string
-          id?: string
-          mensagem?: string
-          para_user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "elogios_de_user_id_fkey"
-            columns: ["de_user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "elogios_para_user_id_fkey"
-            columns: ["para_user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       estresse_logs: {
         Row: {
           created_at: string

@@ -68,6 +68,11 @@ function Home() {
 
   async function enviarCheckin() {
     if (!user || !humorSelecionado) return;
+    if (hojeCheckin) {
+      toast.info('Você já fez seu check-in hoje. Volte amanhã!');
+      setShowCheckin(false); setHumorSelecionado(null); setMotivo('');
+      return;
+    }
     const ruim = humorSelecionado.score <= 2;
     if (ruim && !motivo.trim()) {
       toast.error('Conte rapidinho o que aconteceu');
@@ -78,8 +83,16 @@ function Home() {
       humor_icone: humorSelecionado.icone, humor_score: humorSelecionado.score,
       motivo_texto: ruim ? motivo : null,
     });
-    if (res.online) toast.success('+10 pontos! Check-in registrado.');
-    else toast.success('Salvo offline! Sincroniza quando voltar a internet.');
+    if (res.duplicate) {
+      toast.info('Você já fez seu check-in hoje.');
+    } else if (res.error) {
+      toast.error(`Não consegui registrar: ${res.error}`);
+      return;
+    } else if (res.online) {
+      toast.success('+10 pontos! Check-in registrado.');
+    } else {
+      toast.success('Salvo offline! Sincroniza quando voltar a internet.');
+    }
     setShowCheckin(false); setHumorSelecionado(null); setMotivo('');
     void qc.invalidateQueries({ queryKey: ['checkin-hoje'] });
     setTimeout(() => void refreshProfile(), 800);
@@ -147,7 +160,7 @@ function Home() {
           <ActionCard to="/app/avisos" icon={Bell} title="Avisos" subtitle="Comunicados" tone="info" />
           <ActionCard to="/app/recompensas" icon={Sparkles} title="Recompensas" subtitle="Loja de prêmios" tone="primary" />
           <ActionCard to="/app/quiz" icon={Brain} title="Curiosidades" subtitle="Quiz da obra" tone="accent" />
-          <ActionCard to="/app/elogios" icon={Heart} title="Elogie um colega" subtitle="Mande um nominado" tone="pink" />
+          
           <ActionCard to="/app/hidratacao-qr" icon={Droplets} title="QR Bebedouro" subtitle="Bater ponto na água" tone="water" />
           <ActionCard to="/app/cupons" icon={Ticket} title="Meus cupons" subtitle="Marcos de pontos" tone="accent" />
         </div>

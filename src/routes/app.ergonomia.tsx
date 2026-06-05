@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Activity, Play, Pause, RotateCcw, ExternalLink } from "lucide-react";
+import { ArrowLeft, Activity, Play, Pause, RotateCcw, ExternalLink, MoveHorizontal, MoveVertical, RotateCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
@@ -16,12 +16,15 @@ import imgBracos from "@/assets/ergo-bracos.jpg";
 import imgPernas from "@/assets/ergo-pernas.jpg";
 import imgPunhos from "@/assets/ergo-punhos.jpg";
 
+type Direcao = 'horizontal' | 'vertical' | 'circular';
+
 export const Route = createFileRoute("/app/ergonomia")({
   component: Ergonomia,
 });
 
-type Exercicio = { nome: string; tempo: number; instrucao: string; imagem: string; cacheKey: string };
+type Exercicio = { nome: string; tempo: number; instrucao: string; imagem: string; cacheKey: string; direcao?: Direcao; movimento?: string };
 type Categoria = { id: string; titulo: string; descricao: string; imagem: string; exercicios: Exercicio[] };
+
 
 const CATEGORIAS: Categoria[] = [
   {
@@ -30,17 +33,17 @@ const CATEGORIAS: Categoria[] = [
     descricao: 'Sequência de corpo inteiro — 4 a 6 minutos.',
     imagem: imgCompleta,
     exercicios: [
-      { nome: 'Pescoço', tempo: 30, imagem: imgPescoco, cacheKey: 'pescoco-incl',
+      { nome: 'Pescoço', tempo: 30, imagem: imgPescoco, cacheKey: 'pescoco-incl', direcao: 'horizontal', movimento: 'Incline a cabeça para a direita ↔ esquerda',
         instrucao: 'Incline a cabeça suavemente para o lado direito e segure. Depois, para o lado esquerdo. Respire fundo.' },
-      { nome: 'Ombros', tempo: 30, imagem: imgOmbros, cacheKey: 'ombros-rot',
+      { nome: 'Ombros', tempo: 30, imagem: imgOmbros, cacheKey: 'ombros-rot', direcao: 'circular', movimento: 'Gire os ombros em círculos amplos ⟳',
         instrucao: 'Gire os ombros lentamente para trás, fazendo círculos amplos. Mantenha os braços relaxados.' },
-      { nome: 'Coluna', tempo: 45, imagem: imgLombar, cacheKey: 'coluna-rot',
+      { nome: 'Coluna', tempo: 45, imagem: imgLombar, cacheKey: 'coluna-rot', direcao: 'horizontal', movimento: 'Gire o tronco devagar para os lados ↔',
         instrucao: 'Em pé, gire o tronco devagar para os lados. Mantenha o quadril fixo e os pés firmes no chão.' },
-      { nome: 'Braços', tempo: 30, imagem: imgBracos, cacheKey: 'bracos-peito',
+      { nome: 'Braços', tempo: 30, imagem: imgBracos, cacheKey: 'bracos-peito', direcao: 'horizontal', movimento: 'Puxe um braço contra o peito ↔',
         instrucao: 'Estenda um braço sobre o peito e segure com a outra mão. Sinta o alongamento. Troque o lado.' },
-      { nome: 'Pernas', tempo: 45, imagem: imgPernas, cacheKey: 'pernas-post',
+      { nome: 'Pernas', tempo: 45, imagem: imgPernas, cacheKey: 'pernas-post', direcao: 'vertical', movimento: 'Incline o tronco para frente ↓',
         instrucao: 'Apoie a perna esticada em uma plataforma baixa. Incline o tronco lentamente para frente.' },
-      { nome: 'Punhos', tempo: 20, imagem: imgPunhos, cacheKey: 'punhos-rot',
+      { nome: 'Punhos', tempo: 20, imagem: imgPunhos, cacheKey: 'punhos-rot', direcao: 'circular', movimento: 'Gire os punhos para os dois lados ⟳',
         instrucao: 'Gire os punhos lentamente para um lado e depois para o outro. Solte as mãos.' },
     ],
   },
@@ -50,13 +53,13 @@ const CATEGORIAS: Categoria[] = [
     descricao: 'Alívio para a região lombar após carregar peso ou ficar muito tempo curvado.',
     imagem: imgLombar,
     exercicios: [
-      { nome: 'Inclinação para trás', tempo: 30, imagem: imgLombar, cacheKey: 'lombar-incl-tras',
+      { nome: 'Inclinação para trás', tempo: 30, imagem: imgLombar, cacheKey: 'lombar-incl-tras', direcao: 'vertical', movimento: 'Incline o tronco para trás ↑',
         instrucao: 'Em pé, com as mãos na cintura, incline o tronco para trás devagar, sem forçar.' },
-      { nome: 'Joelho ao peito', tempo: 40, imagem: imgPernas, cacheKey: 'lombar-joelho',
+      { nome: 'Joelho ao peito', tempo: 40, imagem: imgPernas, cacheKey: 'lombar-joelho', direcao: 'vertical', movimento: 'Puxe o joelho até o peito ↑',
         instrucao: 'Sentado ou em pé, traga um joelho ao peito e segure por vinte segundos. Troque a perna.' },
-      { nome: 'Rotação de tronco', tempo: 40, imagem: imgLombar, cacheKey: 'lombar-rot-tronco',
+      { nome: 'Rotação de tronco', tempo: 40, imagem: imgLombar, cacheKey: 'lombar-rot-tronco', direcao: 'horizontal', movimento: 'Gire o tronco para o lado ↔',
         instrucao: 'Sentado, cruze um pé sobre o joelho oposto e gire o tronco lentamente para o lado.' },
-      { nome: 'Alongamento lateral', tempo: 30, imagem: imgBracos, cacheKey: 'lombar-lateral',
+      { nome: 'Alongamento lateral', tempo: 30, imagem: imgBracos, cacheKey: 'lombar-lateral', direcao: 'horizontal', movimento: 'Incline o tronco para o lado oposto ↔',
         instrucao: 'Em pé, eleve um braço e incline o tronco para o lado oposto. Respire profundamente.' },
     ],
   },
@@ -66,15 +69,15 @@ const CATEGORIAS: Categoria[] = [
     descricao: 'Para tensão cervical e dor nos trapézios.',
     imagem: imgPescoco,
     exercicios: [
-      { nome: 'Inclinação lateral', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-incl-lat',
+      { nome: 'Inclinação lateral', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-incl-lat', direcao: 'horizontal', movimento: 'Orelha em direção ao ombro ↔',
         instrucao: 'Incline a cabeça para o ombro direito e segure. Depois para o lado esquerdo.' },
-      { nome: 'Rotação cervical', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-rot-cerv',
+      { nome: 'Rotação cervical', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-rot-cerv', direcao: 'horizontal', movimento: 'Olhe para o ombro direito ↔ esquerdo',
         instrucao: 'Olhe lentamente para o ombro direito, volte ao centro e olhe para o esquerdo.' },
-      { nome: 'Flexão suave', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-flex',
+      { nome: 'Flexão suave', tempo: 30, imagem: imgPescoco, cacheKey: 'pesc-flex', direcao: 'vertical', movimento: 'Queixo ao peito ↓, olhar ao teto ↑',
         instrucao: 'Leve o queixo ao peito devagar. Em seguida, eleve o olhar para o teto.' },
-      { nome: 'Elevação de ombros', tempo: 30, imagem: imgOmbros, cacheKey: 'omb-elev',
+      { nome: 'Elevação de ombros', tempo: 30, imagem: imgOmbros, cacheKey: 'omb-elev', direcao: 'vertical', movimento: 'Suba os ombros até as orelhas ↑',
         instrucao: 'Leve os ombros até as orelhas, segure por cinco segundos e relaxe completamente.' },
-      { nome: 'Círculos de ombro', tempo: 40, imagem: imgOmbros, cacheKey: 'omb-circ',
+      { nome: 'Círculos de ombro', tempo: 40, imagem: imgOmbros, cacheKey: 'omb-circ', direcao: 'circular', movimento: 'Círculos amplos com os ombros ⟳',
         instrucao: 'Faça círculos amplos com os ombros para trás. Em seguida, para frente.' },
     ],
   },
@@ -84,13 +87,13 @@ const CATEGORIAS: Categoria[] = [
     descricao: 'Para quem fica muito tempo em pé ou agachado.',
     imagem: imgPernas,
     exercicios: [
-      { nome: 'Panturrilha', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-pantu',
+      { nome: 'Panturrilha', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-pantu', direcao: 'horizontal', movimento: 'Empurre o calcanhar para trás ←',
         instrucao: 'Apoie as mãos na parede. Estique uma perna atrás com o calcanhar firme no chão.' },
-      { nome: 'Quadríceps', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-quad',
+      { nome: 'Quadríceps', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-quad', direcao: 'vertical', movimento: 'Calcanhar em direção ao glúteo ↑',
         instrucao: 'Em pé, segure o pé atrás aproximando o calcanhar do glúteo. Mantenha o equilíbrio.' },
-      { nome: 'Posterior de coxa', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-poster',
+      { nome: 'Posterior de coxa', tempo: 40, imagem: imgPernas, cacheKey: 'pernas-poster', direcao: 'vertical', movimento: 'Incline o tronco à frente ↓',
         instrucao: 'Apoie um pé em altura baixa e incline o tronco para frente, mantendo a coluna reta.' },
-      { nome: 'Agachamento leve', tempo: 30, imagem: imgPernas, cacheKey: 'pernas-agach',
+      { nome: 'Agachamento leve', tempo: 30, imagem: imgPernas, cacheKey: 'pernas-agach', direcao: 'vertical', movimento: 'Desça e suba devagar ↓ ↑',
         instrucao: 'Faça cinco agachamentos parciais. Mantenha as costas retas e os joelhos alinhados aos pés.' },
     ],
   },
@@ -100,13 +103,13 @@ const CATEGORIAS: Categoria[] = [
     descricao: 'Para quem usa ferramentas, faz movimentos repetitivos.',
     imagem: imgPunhos,
     exercicios: [
-      { nome: 'Punho para cima', tempo: 30, imagem: imgPunhos, cacheKey: 'punho-cima',
+      { nome: 'Punho para cima', tempo: 30, imagem: imgPunhos, cacheKey: 'punho-cima', direcao: 'vertical', movimento: 'Puxe os dedos para cima ↑',
         instrucao: 'Braço esticado com os dedos apontando para cima. Puxe os dedos suavemente com a outra mão.' },
-      { nome: 'Punho para baixo', tempo: 30, imagem: imgPunhos, cacheKey: 'punho-baixo',
+      { nome: 'Punho para baixo', tempo: 30, imagem: imgPunhos, cacheKey: 'punho-baixo', direcao: 'vertical', movimento: 'Puxe a mão para baixo ↓',
         instrucao: 'Braço esticado com os dedos apontando para baixo. Puxe a mão delicadamente na sua direção.' },
-      { nome: 'Abrir e fechar', tempo: 20, imagem: imgPunhos, cacheKey: 'punho-abrir',
+      { nome: 'Abrir e fechar', tempo: 20, imagem: imgPunhos, cacheKey: 'punho-abrir', direcao: 'horizontal', movimento: 'Abra ↔ feche os dedos',
         instrucao: 'Abra bem os dedos e feche em punho. Repita dez vezes, com calma.' },
-      { nome: 'Tríceps', tempo: 30, imagem: imgBracos, cacheKey: 'bracos-triceps',
+      { nome: 'Tríceps', tempo: 30, imagem: imgBracos, cacheKey: 'bracos-triceps', direcao: 'vertical', movimento: 'Empurre o cotovelo para baixo ↓',
         instrucao: 'Coloque a mão sobre o ombro com o cotovelo apontando para cima. Empurre o cotovelo levemente.' },
     ],
   },
@@ -260,12 +263,19 @@ function Ergonomia() {
           <div className="absolute left-3 top-3 rounded-full bg-primary/90 px-3 py-1 text-xs font-bold text-primary-foreground">
             {step + 1} / {categoria.exercicios.length}
           </div>
+          {atual.direcao && <MovimentoOverlay direcao={atual.direcao} ativo={running} />}
         </div>
 
         <div className="p-5 text-center">
           <h2 className="text-xl font-bold">{atual.nome}</h2>
           <div className="mt-1 text-5xl font-extrabold tabular-nums">{seconds}s</div>
+          {atual.movimento && (
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
+              <span>Movimento:</span> <span>{atual.movimento}</span>
+            </div>
+          )}
           <p className="mt-2 text-sm opacity-95">{atual.instrucao}</p>
+
 
           <div className="mt-4">
             <AudioNarracao
@@ -305,5 +315,40 @@ function Ergonomia() {
         ⚠️ Sentiu dor durante o exercício? Pare e procure a Medicina do Trabalho.
       </p>
     </div>
+  );
+}
+
+function MovimentoOverlay({ direcao, ativo }: { direcao: Direcao; ativo: boolean }) {
+  if (direcao === 'horizontal') {
+    return (
+      <motion.div
+        className="pointer-events-none absolute inset-x-6 top-1/2 flex items-center justify-between text-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]"
+        animate={ativo ? { x: [-8, 8, -8] } : { x: 0 }}
+        transition={{ duration: 1.6, repeat: ativo ? Infinity : 0, ease: 'easeInOut' }}
+      >
+        <MoveHorizontal className="h-10 w-10" strokeWidth={3} />
+        <MoveHorizontal className="h-10 w-10" strokeWidth={3} />
+      </motion.div>
+    );
+  }
+  if (direcao === 'vertical') {
+    return (
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 text-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]"
+        animate={ativo ? { y: [0, 12, 0] } : { y: 0 }}
+        transition={{ duration: 1.6, repeat: ativo ? Infinity : 0, ease: 'easeInOut' }}
+      >
+        <MoveVertical className="h-12 w-12" strokeWidth={3} />
+      </motion.div>
+    );
+  }
+  return (
+    <motion.div
+      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]"
+      animate={ativo ? { rotate: 360 } : { rotate: 0 }}
+      transition={{ duration: 2.4, repeat: ativo ? Infinity : 0, ease: 'linear' }}
+    >
+      <RotateCw className="h-12 w-12" strokeWidth={3} />
+    </motion.div>
   );
 }

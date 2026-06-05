@@ -28,6 +28,14 @@ function AppLayout() {
         void ativarLembretes(cfg);
       }
     });
+    // Re-agenda lembretes quando o app volta ao foco (SW pode ter perdido timers)
+    const onVis = () => {
+      if (document.visibilityState === 'visible' && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        void ativarLembretes(lerCfg(), { force: true });
+      }
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
   }, [user]);
 
   if (loading || !user) {
