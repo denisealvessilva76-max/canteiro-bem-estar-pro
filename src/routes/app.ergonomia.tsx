@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Activity, Play, Pause, RotateCcw, ExternalLink } from "lucide-react";
+import { ArrowLeft, Activity, Play, Pause, RotateCcw, ExternalLink, MoveHorizontal, MoveVertical, RotateCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
@@ -16,12 +16,15 @@ import imgBracos from "@/assets/ergo-bracos.jpg";
 import imgPernas from "@/assets/ergo-pernas.jpg";
 import imgPunhos from "@/assets/ergo-punhos.jpg";
 
+type Direcao = 'horizontal' | 'vertical' | 'circular';
+
 export const Route = createFileRoute("/app/ergonomia")({
   component: Ergonomia,
 });
 
-type Exercicio = { nome: string; tempo: number; instrucao: string; imagem: string; cacheKey: string };
+type Exercicio = { nome: string; tempo: number; instrucao: string; imagem: string; cacheKey: string; direcao: Direcao; movimento: string };
 type Categoria = { id: string; titulo: string; descricao: string; imagem: string; exercicios: Exercicio[] };
+
 
 const CATEGORIAS: Categoria[] = [
   {
