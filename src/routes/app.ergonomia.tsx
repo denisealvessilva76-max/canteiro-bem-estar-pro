@@ -263,12 +263,19 @@ function Ergonomia() {
           <div className="absolute left-3 top-3 rounded-full bg-primary/90 px-3 py-1 text-xs font-bold text-primary-foreground">
             {step + 1} / {categoria.exercicios.length}
           </div>
+          {atual.direcao && <MovimentoOverlay direcao={atual.direcao} ativo={running} />}
         </div>
 
         <div className="p-5 text-center">
           <h2 className="text-xl font-bold">{atual.nome}</h2>
           <div className="mt-1 text-5xl font-extrabold tabular-nums">{seconds}s</div>
+          {atual.movimento && (
+            <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">
+              <span>Movimento:</span> <span>{atual.movimento}</span>
+            </div>
+          )}
           <p className="mt-2 text-sm opacity-95">{atual.instrucao}</p>
+
 
           <div className="mt-4">
             <AudioNarracao
