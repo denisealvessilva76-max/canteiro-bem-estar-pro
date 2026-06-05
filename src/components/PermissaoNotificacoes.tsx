@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Bell, X } from 'lucide-react';
-import { pedirPermissao, ativarLembretes, lerCfg, salvarCfg, registrarSW } from '@/lib/notificacoes';
+import { pedirPermissao, ativarLembretes, lerCfg, salvarCfg, registrarSW, inscreverPush } from '@/lib/notificacoes';
+import { VAPID_PUBLIC_KEY } from '@/lib/vapid';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function PermissaoNotificacoes() {
+  const { user } = useAuth();
   const [estado, setEstado] = useState<NotificationPermission | 'unsupported'>('default');
   const [oculto, setOculto] = useState(false);
 
@@ -27,6 +30,10 @@ export function PermissaoNotificacoes() {
       const cfg = { ...lerCfg() };
       salvarCfg(cfg);
       await ativarLembretes(cfg, { force: true });
+      // Inscreve para Web Push (cross-device, funciona com app fechado)
+      if (user) {
+        try { await inscreverPush(user.id, VAPID_PUBLIC_KEY); } catch { /* noop */ }
+      }
       // Disparar um "ping" agora para o usuário ver que funcionou
       try {
         new Notification('Lembretes ativados ✅', {

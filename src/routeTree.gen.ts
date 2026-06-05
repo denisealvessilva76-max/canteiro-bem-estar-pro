@@ -33,6 +33,7 @@ import { Route as AppCuponsRouteImport } from './routes/app.cupons'
 import { Route as AppAvisosRouteImport } from './routes/app.avisos'
 import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
 import { Route as AdminRecompensasRouteImport } from './routes/admin.recompensas'
+import { Route as AdminNotificacoesRouteImport } from './routes/admin.notificacoes'
 import { Route as AdminFuncionariosRouteImport } from './routes/admin.funcionarios'
 import { Route as AdminEngajamentoRouteImport } from './routes/admin.engajamento'
 import { Route as AdminDesafiosRouteImport } from './routes/admin.desafios'
@@ -164,6 +165,11 @@ const AdminRecompensasRoute = AdminRecompensasRouteImport.update({
   path: '/recompensas',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminNotificacoesRoute = AdminNotificacoesRouteImport.update({
+  id: '/notificacoes',
+  path: '/notificacoes',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFuncionariosRoute = AdminFuncionariosRouteImport.update({
   id: '/funcionarios',
   path: '/funcionarios',
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/app/avisos': typeof AppAvisosRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/app/avisos': typeof AppAvisosRoute
@@ -305,6 +313,7 @@ export interface FileRoutesById {
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
   '/app/avisos': typeof AppAvisosRoute
@@ -343,6 +352,7 @@ export interface FileRouteTypes {
     | '/admin/desafios'
     | '/admin/engajamento'
     | '/admin/funcionarios'
+    | '/admin/notificacoes'
     | '/admin/recompensas'
     | '/admin/relatorios'
     | '/app/avisos'
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/admin/desafios'
     | '/admin/engajamento'
     | '/admin/funcionarios'
+    | '/admin/notificacoes'
     | '/admin/recompensas'
     | '/admin/relatorios'
     | '/app/avisos'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/admin/desafios'
     | '/admin/engajamento'
     | '/admin/funcionarios'
+    | '/admin/notificacoes'
     | '/admin/recompensas'
     | '/admin/relatorios'
     | '/app/avisos'
@@ -614,6 +626,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRecompensasRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/notificacoes': {
+      id: '/admin/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/admin/notificacoes'
+      preLoaderRoute: typeof AdminNotificacoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/funcionarios': {
       id: '/admin/funcionarios'
       path: '/funcionarios'
@@ -698,6 +717,7 @@ interface AdminRouteChildren {
   AdminDesafiosRoute: typeof AdminDesafiosRoute
   AdminEngajamentoRoute: typeof AdminEngajamentoRoute
   AdminFuncionariosRoute: typeof AdminFuncionariosRoute
+  AdminNotificacoesRoute: typeof AdminNotificacoesRoute
   AdminRecompensasRoute: typeof AdminRecompensasRoute
   AdminRelatoriosRoute: typeof AdminRelatoriosRoute
 }
@@ -713,6 +733,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDesafiosRoute: AdminDesafiosRoute,
   AdminEngajamentoRoute: AdminEngajamentoRoute,
   AdminFuncionariosRoute: AdminFuncionariosRoute,
+  AdminNotificacoesRoute: AdminNotificacoesRoute,
   AdminRecompensasRoute: AdminRecompensasRoute,
   AdminRelatoriosRoute: AdminRelatoriosRoute,
 }
