@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createHash } from "crypto";
+
 
 // Voz feminina pt-BR calma — Sarah (EXAVITQu4vr4xnSDxMaL) é multilingual e soa natural em pt.
 // Alternativas: "FGY2WhTYpPnrIDTdsKH5" (Laura), "XrExE9yKIg1WjnnlVkGX" (Matilda).
@@ -42,7 +44,9 @@ function bucketPath(text: string, voiceId: string, cacheKey?: string) {
 }
 
 export const obterNarracao = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) => Input.parse(input))
+
   .handler(async ({ data }) => {
     const voiceId = data.voiceId ?? VOZ_PADRAO;
     const path = bucketPath(data.texto, voiceId, data.cacheKey);
