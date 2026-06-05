@@ -317,3 +317,38 @@ function Ergonomia() {
     </div>
   );
 }
+
+function MovimentoOverlay({ direcao, ativo }: { direcao: Direcao; ativo: boolean }) {
+  if (direcao === 'horizontal') {
+    return (
+      <motion.div
+        className="pointer-events-none absolute inset-x-6 top-1/2 flex items-center justify-between text-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]"
+        animate={ativo ? { x: [-8, 8, -8] } : { x: 0 }}
+        transition={{ duration: 1.6, repeat: ativo ? Infinity : 0, ease: 'easeInOut' }}
+      >
+        <MoveHorizontal className="h-10 w-10" strokeWidth={3} />
+        <MoveHorizontal className="h-10 w-10" strokeWidth={3} />
+      </motion.div>
+    );
+  }
+  if (direcao === 'vertical') {
+    return (
+      <motion.div
+        className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 text-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]"
+        animate={ativo ? { y: [0, 12, 0] } : { y: 0 }}
+        transition={{ duration: 1.6, repeat: ativo ? Infinity : 0, ease: 'easeInOut' }}
+      >
+        <MoveVertical className="h-12 w-12" strokeWidth={3} />
+      </motion.div>
+    );
+  }
+  return (
+    <motion.div
+      className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.25)]"
+      animate={ativo ? { rotate: 360 } : { rotate: 0 }}
+      transition={{ duration: 2.4, repeat: ativo ? Infinity : 0, ease: 'linear' }}
+    >
+      <RotateCw className="h-12 w-12" strokeWidth={3} />
+    </motion.div>
+  );
+}
