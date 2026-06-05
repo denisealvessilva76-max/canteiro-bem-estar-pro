@@ -13,6 +13,7 @@ const NAV = [
   { to: '/admin/alertas', icon: AlertTriangle, label: 'Alertas' },
   { to: '/admin/desafios', icon: Trophy, label: 'Desafios' },
   { to: '/admin/avisos', icon: Bell, label: 'Avisos' },
+  { to: '/admin/notificacoes', icon: Bell, label: 'Push (teste)' },
   { to: '/admin/engajamento', icon: Zap, label: 'Engajamento' },
   { to: '/admin/conteudo', icon: BookOpen, label: 'Conteúdo' },
   { to: '/admin/recompensas', icon: Gift, label: 'Recompensas' },

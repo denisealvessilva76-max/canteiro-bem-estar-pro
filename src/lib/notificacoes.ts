@@ -102,13 +102,14 @@ export async function inscreverPush(userId: string, vapidPublicKey?: string) {
     applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
   });
   const j = sub.toJSON();
-  await supabase.from('push_subscriptions').upsert({
+  const { error } = await supabase.from('push_subscriptions').upsert({
     user_id: userId,
     endpoint: sub.endpoint,
     p256dh: j.keys?.p256dh ?? '',
     auth: j.keys?.auth ?? '',
     user_agent: navigator.userAgent,
-  });
+  }, { onConflict: 'endpoint' });
+  if (error) return { ok: false as const, reason: error.message };
   return { ok: true as const };
 }
 
