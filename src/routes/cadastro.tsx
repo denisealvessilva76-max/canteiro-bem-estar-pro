@@ -1,13 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { matriculaToEmail } from "@/lib/canteiro";
+import { validarCodigoEmpresa } from "@/lib/registration.functions";
 
 export const Route = createFileRoute("/cadastro")({
   component: Cadastro,
 });
+
 
 function Cadastro() {
   const navigate = useNavigate();
