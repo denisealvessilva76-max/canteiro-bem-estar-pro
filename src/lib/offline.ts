@@ -7,7 +7,11 @@ type PendingOp = {
   table: string;
   payload: Record<string, unknown>;
   created_at: number;
+  attempts?: number;
+  last_error?: string;
 };
+
+const MAX_ATTEMPTS = 3;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 function getDB() {
@@ -27,7 +31,7 @@ function getDB() {
 export async function enqueue(table: string, payload: Record<string, unknown>) {
   const db = await getDB();
   if (!db) return;
-  await db.add('queue', { table, payload, created_at: Date.now() } as PendingOp);
+  await db.add('queue', { table, payload, created_at: Date.now(), attempts: 0 } as PendingOp);
 }
 
 export async function pendingCount(): Promise<number> {
@@ -36,24 +40,39 @@ export async function pendingCount(): Promise<number> {
   return db.count('queue');
 }
 
-export async function flushQueue(): Promise<{ ok: number; failed: number }> {
+export async function clearQueue(): Promise<number> {
   const db = await getDB();
-  if (!db || typeof navigator === 'undefined' || !navigator.onLine) return { ok: 0, failed: 0 };
-  const tx = db.transaction('queue', 'readwrite');
-  const all = (await tx.store.getAll()) as PendingOp[];
-  let ok = 0, failed = 0;
+  if (!db) return 0;
+  const n = await db.count('queue');
+  await db.clear('queue');
+  return n;
+}
+
+export async function flushQueue(): Promise<{ ok: number; failed: number; discarded: number }> {
+  const db = await getDB();
+  if (!db || typeof navigator === 'undefined' || !navigator.onLine) return { ok: 0, failed: 0, discarded: 0 };
+  const all = (await db.getAll('queue')) as PendingOp[];
+  let ok = 0, failed = 0, discarded = 0;
   for (const op of all) {
+    if (op.id == null) continue;
     try {
       const { error } = await supabase.from(op.table as never).insert(op.payload as never);
       if (error) throw error;
-      if (op.id != null) await tx.store.delete(op.id);
+      await db.delete('queue', op.id);
       ok++;
-    } catch {
-      failed++;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      const attempts = (op.attempts ?? 0) + 1;
+      if (attempts >= MAX_ATTEMPTS) {
+        await db.delete('queue', op.id);
+        discarded++;
+      } else {
+        await db.put('queue', { ...op, attempts, last_error: msg });
+        failed++;
+      }
     }
   }
-  await tx.done;
-  return { ok, failed };
+  return { ok, failed, discarded };
 }
 
 /** Tenta inserir online; se falhar, enfileira offline. Retorna { online: bool }. */
@@ -64,7 +83,6 @@ export async function insertOrQueue(table: string, payload: Record<string, unkno
     if ((error as { code?: string } | null)?.code === '23505') {
       return { online: true as const, duplicate: true as const, error: null };
     }
-    // erro real (RLS, validação, etc): NÃO enfileira — devolve o erro pro chamador.
     return { online: true as const, duplicate: false as const, error: error.message ?? 'erro' };
   }
   await enqueue(table, payload);
@@ -75,7 +93,6 @@ export function setupOnlineSync() {
   if (typeof window === 'undefined') return;
   const flush = () => { void flushQueue(); };
   window.addEventListener('online', flush);
-  // tenta a cada 30s
   setInterval(flush, 30000);
   flush();
 }
