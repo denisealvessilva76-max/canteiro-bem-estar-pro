@@ -22,7 +22,7 @@ export const Route = createFileRoute("/app/ergonomia")({
   component: Ergonomia,
 });
 
-type Exercicio = { nome: string; tempo: number; instrucao: string; imagem: string; cacheKey: string; direcao: Direcao; movimento: string };
+type Exercicio = { nome: string; tempo: number; instrucao: string; imagem: string; cacheKey: string; direcao?: Direcao; movimento?: string };
 type Categoria = { id: string; titulo: string; descricao: string; imagem: string; exercicios: Exercicio[] };
 
 
