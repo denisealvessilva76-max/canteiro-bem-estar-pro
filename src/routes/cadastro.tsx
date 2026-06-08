@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { matriculaToEmail } from "@/lib/canteiro";
 import { validarCodigoEmpresa } from "@/lib/registration.functions";
@@ -15,6 +15,8 @@ export const Route = createFileRoute("/cadastro")({
 function Cadastro() {
   const navigate = useNavigate();
   const validarCodigo = useServerFn(validarCodigoEmpresa);
+  const [showCodigo, setShowCodigo] = useState(false);
+  const [showSenha, setShowSenha] = useState(false);
   const [form, setForm] = useState({
     codigo: "",
     matricula: "", nome: "", senha: "", turno: "diurno" as 'diurno' | 'noturno',
@@ -75,7 +77,10 @@ function Cadastro() {
     if (error) {
       setLoading(false);
       const msg = (error.message || "").toLowerCase();
-      if (msg.includes("matricula") || msg.includes("unique") || msg.includes("duplicate")) {
+      const code = (error as { code?: string }).code;
+      if (code === 'weak_password' || msg.includes('weak') || msg.includes('easy to guess') || msg.includes('pwned')) {
+        toast.error('A senha é fraca ou já foi exposta. Use uma combinação menos óbvia.');
+      } else if (msg.includes("matricula") || msg.includes("unique") || msg.includes("duplicate")) {
         toast.error("Essa matrícula já está cadastrada");
       } else {
         toast.error(error.message || "Erro ao cadastrar");
@@ -101,11 +106,33 @@ function Cadastro() {
         <p className="mt-2 text-sm text-muted-foreground">Cadastre seus dados para começar.</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <Field label="Código da empresa *" value={form.codigo} onChange={(v) => set('codigo', v)} placeholder="Fornecido pelo RH" type="password" />
+          <Field
+            label="Código da empresa *"
+            value={form.codigo}
+            onChange={(v) => set('codigo', v)}
+            placeholder="Fornecido pelo RH"
+            type={showCodigo ? 'text' : 'password'}
+            toggleVisibility={{
+              visible: showCodigo,
+              onToggle: () => setShowCodigo((v) => !v),
+              labels: { show: 'Mostrar código', hide: 'Ocultar código' },
+            }}
+          />
           <Field label="Matrícula *" value={form.matricula} onChange={(v) => set('matricula', v)} placeholder="Ex: 123456" inputMode="numeric" />
           <Field label="Nome completo *" value={form.nome} onChange={(v) => set('nome', v)} placeholder="Seu nome" />
           <Field label="WhatsApp" value={form.telefone} onChange={(v) => set('telefone', v)} placeholder="(31) 9XXXX-XXXX" inputMode="numeric" />
-          <Field label="Senha (mín. 6) *" type="password" value={form.senha} onChange={(v) => set('senha', v)} placeholder="••••••" />
+          <Field
+            label="Senha (mín. 6) *"
+            type={showSenha ? 'text' : 'password'}
+            value={form.senha}
+            onChange={(v) => set('senha', v)}
+            placeholder="••••••"
+            toggleVisibility={{
+              visible: showSenha,
+              onToggle: () => setShowSenha((v) => !v),
+              labels: { show: 'Mostrar senha', hide: 'Ocultar senha' },
+            }}
+          />
           <div>
             <span className="mb-1.5 block text-sm font-semibold text-foreground">Turno</span>
             <div className="grid grid-cols-2 gap-2">
@@ -147,22 +174,42 @@ function Cadastro() {
 }
 
 function Field({
-  label, value, onChange, placeholder, type = 'text', inputMode,
+  label, value, onChange, placeholder, type = 'text', inputMode, toggleVisibility,
 }: {
   label: string; value: string; onChange: (v: string) => void;
   placeholder?: string; type?: string; inputMode?: 'text' | 'numeric' | 'decimal';
+  toggleVisibility?: {
+    visible: boolean;
+    onToggle: () => void;
+    labels: { show: string; hide: string };
+  };
 }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-sm font-semibold text-foreground">{label}</span>
-      <input
-        type={type}
-        inputMode={inputMode}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="h-14 w-full rounded-2xl border-2 border-input bg-card px-4 text-base font-medium outline-none focus:border-primary"
-      />
+      <div className="relative">
+        <input
+          type={type}
+          inputMode={inputMode}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
+          className="h-14 w-full rounded-2xl border-2 border-input bg-card px-4 pr-14 text-base font-medium outline-none focus:border-primary"
+        />
+        {toggleVisibility && (
+          <button
+            type="button"
+            onClick={toggleVisibility.onToggle}
+            aria-label={toggleVisibility.visible ? toggleVisibility.labels.hide : toggleVisibility.labels.show}
+            className="absolute inset-y-0 right-0 flex w-14 items-center justify-center text-muted-foreground transition hover:text-foreground"
+          >
+            {toggleVisibility.visible ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        )}
+      </div>
     </label>
   );
 }

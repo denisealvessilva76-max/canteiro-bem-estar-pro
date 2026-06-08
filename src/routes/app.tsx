@@ -5,7 +5,8 @@ import { BottomNav } from "@/components/BottomNav";
 import { BugReportButton } from "@/components/BugReportButton";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { Loader2 } from "lucide-react";
-import { registrarSW, ativarLembretes, lerCfg } from "@/lib/notificacoes";
+import { registrarSW, ativarLembretes, lerCfg, inscreverPush, registrarSincronizacaoPeriodica } from "@/lib/notificacoes";
+import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
 
 export const Route = createFileRoute("/app")({
   component: AppLayout,
@@ -26,12 +27,15 @@ function AppLayout() {
       const cfg = lerCfg();
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         void ativarLembretes(cfg);
+        void registrarSincronizacaoPeriodica();
+        void inscreverPush(user.id, VAPID_PUBLIC_KEY).catch(() => undefined);
       }
     });
     // Re-agenda lembretes quando o app volta ao foco (SW pode ter perdido timers)
     const onVis = () => {
       if (document.visibilityState === 'visible' && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         void ativarLembretes(lerCfg(), { force: true });
+        void registrarSincronizacaoPeriodica();
       }
     };
     document.addEventListener('visibilitychange', onVis);
