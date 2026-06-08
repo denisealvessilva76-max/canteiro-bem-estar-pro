@@ -7,6 +7,7 @@ import { ArrowLeft, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { calcMetaHidratacao, todayISO, URINA_NIVEIS } from "@/lib/canteiro";
+import { useClimaObra, boostHidratacaoMl, nivelCalor } from "@/lib/clima";
 import { insertOrQueue } from "@/lib/offline";
 import { podeRegistrar, marcarRegistro, formatFaltam } from "@/lib/rateLimit";
 
@@ -21,8 +22,11 @@ const VOLUMES = [150, 250, 300, 1000];
 function Hidratacao() {
   const { user, profile, refreshProfile } = useAuth();
   const qc = useQueryClient();
+  const { data: clima } = useClimaObra();
 
-  const meta = calcMetaHidratacao(profile?.peso, profile?.exposicao_sol, true);
+  const boost = boostHidratacaoMl(clima?.temperatura);
+  const meta = calcMetaHidratacao(profile?.peso, profile?.exposicao_sol, true, boost);
+  const calor = nivelCalor(clima?.temperatura);
 
   const { data: logs } = useQuery({
     queryKey: ['hidratacao-hoje', user?.id],
@@ -76,6 +80,11 @@ function Hidratacao() {
       </Link>
       <h1 className="mt-3 text-2xl font-extrabold">💧 Hidratação</h1>
       <p className="text-sm text-muted-foreground">Meta diária: <strong className="text-foreground">{(meta / 1000).toFixed(1)} L</strong></p>
+      {calor !== "ameno" && boost > 0 && (
+        <div className={`mt-2 rounded-xl border px-3 py-2 text-xs font-semibold ${calor === "extremo" ? "border-orange-500 bg-orange-500/10 text-orange-700" : "border-amber-500 bg-amber-500/10 text-amber-700"}`}>
+          🌡️ {calor === "extremo" ? "Calor extremo" : "Calor elevado"} em campo agora — meta aumentada em <strong>+{boost} ml</strong>.
+        </div>
+      )}
 
       {/* Garrafa visual */}
       <div className="mt-6 flex items-end justify-center">

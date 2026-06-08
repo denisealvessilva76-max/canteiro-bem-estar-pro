@@ -10,6 +10,7 @@ import { GameBoundary } from "@/components/GameBoundary";
 import { EscovaDragDrop } from "@/components/jogos/EscovaDragDrop";
 import { QuizOdonto } from "@/components/jogos/QuizOdonto";
 import { PlacarPessoal } from "@/components/PlacarPessoal";
+import { DenteVirtual } from "@/components/DenteVirtual";
 
 export const Route = createFileRoute("/app/odonto")({
   component: Odontologia,
@@ -89,6 +90,28 @@ function Odontologia() {
 
       {aba === 'info' && (
         <>
+          <div className="mt-5 rounded-3xl border border-cyan-200 bg-cyan-50/60 p-4 dark:border-cyan-900 dark:bg-cyan-950/30">
+            <DenteVirtual done={done} total={3} />
+            {(() => {
+              const dow = new Date().getDay(); // 5 = sexta
+              if (dow === 5 && done >= 3) {
+                return (
+                  <p className="mt-3 rounded-xl bg-accent/15 p-2 text-center text-xs font-bold text-accent">
+                    🏆 Sorriso de Sexta conquistado! +20 pts de bônus pela semana perfeita.
+                  </p>
+                );
+              }
+              if (dow === 5) {
+                return (
+                  <p className="mt-3 rounded-xl bg-muted p-2 text-center text-xs font-semibold text-muted-foreground">
+                    💡 Sexta-feira: complete as 3 escovações para ganhar o bônus &quot;Sorriso de Sexta&quot;.
+                  </p>
+                );
+              }
+              return null;
+            })()}
+          </div>
+
           <h2 className="mt-5 text-sm font-bold">Registrar escovação</h2>
           <div className="mt-2 grid grid-cols-3 gap-2">
             {PERIODOS.map((p) => {
