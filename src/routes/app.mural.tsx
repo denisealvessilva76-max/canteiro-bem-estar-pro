@@ -14,11 +14,12 @@ type Item = {
   foto_url: string | null;
   desafio_id: string;
   user_id: string;
-  desafio?: { titulo: string } | null;
-  profiles?: { nome: string; avatar_url: string | null } | null;
+  titulo: string;
+  nome: string;
+  avatar_url: string | null;
   aplausos: number;
   aplaudido: boolean;
-  url_pub?: string | null;
+  url_pub: string | null;
 };
 
 function Mural() {
@@ -31,34 +32,46 @@ function Mural() {
     queryFn: async (): Promise<Item[]> => {
       const { data: checks } = await supabase
         .from("desafio_checkins")
-        .select("id, data, foto_url, desafio_id, user_id, desafios(titulo), profiles!desafio_checkins_user_id_fkey(nome, avatar_url)")
+        .select("id, data, foto_url, desafio_id, user_id, created_at")
         .eq("validado", true)
         .not("foto_url", "is", null)
         .order("created_at", { ascending: false })
         .limit(60);
-      const ids = (checks ?? []).map((c) => c.id);
-      const [{ data: aps }, urls] = await Promise.all([
+      const lista = checks ?? [];
+      const userIds = [...new Set(lista.map((c) => c.user_id))];
+      const desIds = [...new Set(lista.map((c) => c.desafio_id))];
+      const ids = lista.map((c) => c.id);
+      const [{ data: profs }, { data: deses }, { data: aps }, urls] = await Promise.all([
+        userIds.length > 0
+          ? supabase.from("profiles").select("id, nome, avatar_url").in("id", userIds)
+          : Promise.resolve({ data: [] as { id: string; nome: string; avatar_url: string | null }[] }),
+        desIds.length > 0
+          ? supabase.from("desafios").select("id, titulo").in("id", desIds)
+          : Promise.resolve({ data: [] as { id: string; titulo: string }[] }),
         ids.length > 0
           ? supabase.from("mural_aplausos").select("desafio_checkin_id, user_id").in("desafio_checkin_id", ids)
           : Promise.resolve({ data: [] as { desafio_checkin_id: string; user_id: string }[] }),
-        Promise.all((checks ?? []).map(async (c) => {
+        Promise.all(lista.map(async (c) => {
           if (!c.foto_url) return null;
           const { data } = await supabase.storage.from("desafios-fotos").createSignedUrl(c.foto_url, 60 * 60);
           return data?.signedUrl ?? null;
         })),
       ]);
+      const pMap = new Map((profs ?? []).map((p) => [p.id, p]));
+      const dMap = new Map((deses ?? []).map((d) => [d.id, d]));
       const apsList = aps ?? [];
-      return (checks ?? []).map((c, i) => {
+      return lista.map((c, i) => {
         const meus = apsList.filter((a) => a.desafio_checkin_id === c.id);
+        const prof = pMap.get(c.user_id);
         return {
-          ...c,
-          // Supabase pode retornar relação como array; normaliza para objeto
-          desafio: Array.isArray(c.desafios) ? c.desafios[0] : c.desafios,
-          profiles: Array.isArray(c.profiles) ? c.profiles[0] : c.profiles,
+          id: c.id, data: c.data, foto_url: c.foto_url, desafio_id: c.desafio_id, user_id: c.user_id,
+          titulo: dMap.get(c.desafio_id)?.titulo ?? "Desafio",
+          nome: prof?.nome ?? "Colega",
+          avatar_url: prof?.avatar_url ?? null,
           aplausos: meus.length,
           aplaudido: meus.some((a) => a.user_id === user?.id),
           url_pub: urls[i],
-        } as Item;
+        };
       });
     },
   });
@@ -82,17 +95,17 @@ function Mural() {
         <ArrowLeft className="h-4 w-4" /> Início
       </Link>
       <h1 className="mt-3 text-2xl font-extrabold">👏 Mural dos Campeões</h1>
-      <p className="text-sm text-muted-foreground">Fotos validadas pelos colegas. Aplauda quem está mandando bem!</p>
+      <p className="text-sm text-muted-foreground">Fotos validadas. Aplauda quem está mandando bem!</p>
 
       <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {(itens ?? []).map((it) => (
           <article key={it.id} className="overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
             {it.url_pub ? (
-              <img src={it.url_pub} alt={it.desafio?.titulo ?? "Desafio"} className="aspect-square w-full object-cover" loading="lazy" />
+              <img src={it.url_pub} alt={it.titulo} className="aspect-square w-full object-cover" loading="lazy" />
             ) : <div className="aspect-square w-full bg-muted" />}
             <div className="p-2">
-              <p className="truncate text-xs font-bold">{it.profiles?.nome?.split(" ")[0] ?? "Colega"}</p>
-              <p className="truncate text-[10px] text-muted-foreground">{it.desafio?.titulo}</p>
+              <p className="truncate text-xs font-bold">{it.nome.split(" ")[0]}</p>
+              <p className="truncate text-[10px] text-muted-foreground">{it.titulo}</p>
               <button onClick={() => aplaudir(it)}
                 className={`mt-2 flex w-full items-center justify-center gap-1 rounded-xl py-1.5 text-xs font-bold transition ${
                   it.aplaudido ? "bg-accent text-accent-foreground" : "bg-muted text-foreground hover:bg-accent/30"
