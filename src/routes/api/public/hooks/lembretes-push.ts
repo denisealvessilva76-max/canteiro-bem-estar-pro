@@ -124,7 +124,7 @@ export const Route = createFileRoute("/api/public/hooks/lembretes-push")({
           await supabaseAdmin.from("push_subscriptions").delete().in("id", expirados);
         }
 
-        return Response.json({ ok: true, tipo, enviados, falhas, expirados: expirados.length, total: subs.length });
+        return Response.json({ ok: true, tipo, turno, enviados, falhas, expirados: expirados.length, total: subs.length });
       },
     },
   },
