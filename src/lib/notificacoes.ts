@@ -33,7 +33,7 @@ export async function registrarSW() {
   if (typeof window === 'undefined') return null;
   if (!('serviceWorker' in navigator)) return null;
   try {
-    const reg = await navigator.serviceWorker.register('/sw.js');
+    const reg = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
     return reg;
   } catch (e) {
     console.warn('SW register falhou', e);
@@ -68,9 +68,27 @@ async function agendarLocal(delayMs: number, title: string, body: string, url = 
   }, delayMs);
 }
 
+export async function registrarSincronizacaoPeriodica() {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return false;
+  const reg = await navigator.serviceWorker.ready.catch(() => null);
+  if (!reg || !('periodicSync' in reg)) return false;
+  try {
+    const periodicSync = (reg as ServiceWorkerRegistration & {
+      periodicSync: { register: (tag: string, options: { minInterval: number }) => Promise<void> };
+    }).periodicSync;
+    await periodicSync.register('canteiro-workday-reminder', {
+      minInterval: 3 * 60 * 60 * 1000,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function ativarLembretes(cfg: LembreteCfg, opts?: { force?: boolean }) {
   if (typeof window === 'undefined') return;
   if (Notification?.permission !== 'granted') return;
+  await registrarSincronizacaoPeriodica();
   // Reagenda no máximo 1x por dia (cada agendamento é via setTimeout no SW)
   const hoje = new Date().toDateString();
   if (!opts?.force && localStorage.getItem(ULTIMO_AGENDAMENTO_KEY) === hoje) return;
