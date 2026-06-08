@@ -105,6 +105,41 @@ function AdminRelatorios() {
     URL.revokeObjectURL(url);
   }
 
+  async function exportarPDF() {
+    const { default: jsPDF } = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    doc.setFontSize(16); doc.text('Canteiro Saudável — Relatório Mensal', 40, 40);
+    doc.setFontSize(10); doc.setTextColor(100);
+    doc.text(`Mês de referência: ${mesRef}   |   Trabalhadores: ${linhas.length}   |   Pontos de atenção: ${totalAlertas}`, 40, 58);
+
+    const mediaInd = linhas.length ? Math.round(linhas.reduce((s, l) => s + l.indiceGeral, 0) / linhas.length) : 0;
+    doc.text(`Índice médio de adesão: ${mediaInd}%`, 40, 72);
+
+    autoTable(doc, {
+      startY: 90,
+      head: [['Cargo', 'Pessoas', '% Índice', '% Hidratação', '% Check-in', '% Alongamento']],
+      body: porFuncao.map((f) => [f.cargo, f.qtd, `${f.indice}%`, `${f.hid}%`, `${f.ck}%`, `${f.al}%`]),
+      styles: { fontSize: 9 }, headStyles: { fillColor: [33, 150, 83] },
+    });
+
+    autoTable(doc, {
+      head: [['Matrícula', 'Nome', 'Cargo', '% Índice', '% Hidr', '% Check', '% Along', 'Desaf.', 'Pontos de atenção']],
+      body: linhas.map((l) => [l.matricula, l.nome, l.cargo, `${l.indiceGeral}%`, `${l.aderenciaHidratacao}%`,
+        `${l.aderenciaCheckin}%`, `${l.aderenciaAlongamento}%`, `${l.desafiosOk}/${l.desafiosIni}`, l.alertas.join('; ') || '—']),
+      styles: { fontSize: 8 }, headStyles: { fillColor: [33, 150, 83] },
+    });
+
+    const pages = doc.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i); doc.setFontSize(8); doc.setTextColor(120);
+      doc.text(`Página ${i}/${pages} — gerado em ${new Date().toLocaleString('pt-BR')}`,
+        doc.internal.pageSize.getWidth() - 40, doc.internal.pageSize.getHeight() - 20, { align: 'right' });
+    }
+    doc.save(`canteiro-relatorio-${mesRef}.pdf`);
+  }
+
+
   const totalAlertas = linhas.reduce((s, l) => s + l.alertas.length, 0);
   const focoFuncao = porFuncao[0];
 
@@ -120,6 +155,9 @@ function AdminRelatorios() {
         </label>
         <button onClick={exportarCSV} disabled={!linhas.length} className="flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50">
           <Download className="h-4 w-4" /> Exportar CSV
+        </button>
+        <button onClick={exportarPDF} disabled={!linhas.length} className="flex h-10 items-center gap-2 rounded-xl border-2 border-primary px-4 text-sm font-bold text-primary disabled:opacity-50">
+          <FileText className="h-4 w-4" /> Exportar PDF
         </button>
       </div>
 
