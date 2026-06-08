@@ -43,26 +43,51 @@ export const Route = createFileRoute("/api/public/hooks/lembretes-push")({
           });
         }
 
-        let body: { tipo?: string } = {};
-        try { body = (await request.json()) as { tipo?: string }; } catch { /* noop */ }
+        let body: { tipo?: string; turno?: string } = {};
+        try { body = (await request.json()) as { tipo?: string; turno?: string }; } catch { /* noop */ }
         const tipo = body.tipo as TipoLembrete;
+        const turno = (body.turno ?? "todos") as "diurno" | "noturno" | "todos";
         if (!tipo || !MENSAGENS[tipo]) {
           return new Response(JSON.stringify({ error: "tipo inválido" }), {
             status: 400, headers: { "Content-Type": "application/json" },
           });
         }
+        if (!["diurno", "noturno", "todos"].includes(turno)) {
+          return new Response(JSON.stringify({ error: "turno inválido" }), {
+            status: 400, headers: { "Content-Type": "application/json" },
+          });
+        }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: subs, error } = await supabaseAdmin
+
+        // Se turno específico, filtra user_ids pelo profiles.turno antes
+        let userIdsFiltro: string[] | null = null;
+        if (turno !== "todos") {
+          const { data: profs, error: e2 } = await supabaseAdmin
+            .from("profiles").select("id").eq("turno", turno);
+          if (e2) {
+            return new Response(JSON.stringify({ error: e2.message }), {
+              status: 500, headers: { "Content-Type": "application/json" },
+            });
+          }
+          userIdsFiltro = (profs ?? []).map((p) => p.id);
+          if (userIdsFiltro.length === 0) {
+            return Response.json({ ok: true, enviados: 0, falhas: 0, tipo, turno, mensagem: "sem usuários nesse turno" });
+          }
+        }
+
+        let query = supabaseAdmin
           .from("push_subscriptions")
           .select("id, endpoint, p256dh, auth");
+        if (userIdsFiltro) query = query.in("user_id", userIdsFiltro);
+        const { data: subs, error } = await query;
         if (error) {
           return new Response(JSON.stringify({ error: error.message }), {
             status: 500, headers: { "Content-Type": "application/json" },
           });
         }
         if (!subs || subs.length === 0) {
-          return Response.json({ ok: true, enviados: 0, falhas: 0, tipo, mensagem: "sem inscrições" });
+          return Response.json({ ok: true, enviados: 0, falhas: 0, tipo, turno, mensagem: "sem inscrições" });
         }
 
         const webpush = (await import("web-push")).default;
