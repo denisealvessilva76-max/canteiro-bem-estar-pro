@@ -6,6 +6,7 @@ import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { matriculaToEmail } from "@/lib/canteiro";
 import { validarCodigoEmpresa } from "@/lib/registration.functions";
+import { salvarCredencial } from "@/lib/biometria";
 
 export const Route = createFileRoute("/cadastro")({
   component: Cadastro,
@@ -101,6 +102,7 @@ function Cadastro() {
     if (signup.user && form.telefone) {
       await supabase.from('profiles').update({ telefone: form.telefone.trim() }).eq('id', signup.user.id);
     }
+    void salvarCredencial(form.matricula.trim(), form.senha);
     setLoading(false);
     toast.success("Cadastro realizado! Bem-vindo!");
     void navigate({ to: "/app/home" });
