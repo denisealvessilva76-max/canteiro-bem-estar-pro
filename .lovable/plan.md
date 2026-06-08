@@ -22,7 +22,12 @@ Tabelas `squads`, `mural_aplausos`, `matriculas_autorizadas`, ranking per capita
 - `LevelUpToast` celebra mudança bronze→prata→ouro→diamante com animação framer
 - Exportação PDF do relatório mensal (jspdf + autotable) com KPIs, agregação por função e lista pessoal
 
-## ⏳ Pendências adiadas (precisam de assets/decisão do produto)
-- **Biometria WebAuthn**: precisa de challenge server-side dedicado + UX de fallback — escopo de onda própria.
-- **Áudio-guias narrados**: aguardando arquivos MP3 do RH.
-- **GIFs de alongamento**: ainda imagens estáticas.
+## ✅ Onda 9 — Biometria / login rápido (CONCLUÍDA)
+- `src/lib/biometria.ts` via Credential Management API (PasswordCredential)
+- Login mostra botão "Entrar com digital / Face ID" em celulares compatíveis
+- Cadastro salva credencial automaticamente para próximo acesso por biometria
+- Inputs marcados com `autocomplete="username|current-password webauthn"`
+
+## ⏳ Pendências adiadas (dependem de assets externos)
+- **Áudio-guias narrados**: aguardando MP3s do RH.
+- **GIFs de alongamento**: aguardando arte animada.
