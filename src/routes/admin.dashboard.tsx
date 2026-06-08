@@ -121,10 +121,46 @@ function Dashboard() {
     boxShadow: '0 8px 24px -12px rgba(0,0,0,0.2)',
   } as const;
 
+  const criticos = (stats?.alertas ?? []).filter((a) => a.nivel_urgencia === "critico");
+  const atencaoAbertos = (stats?.alertas ?? []).filter((a) => a.nivel_urgencia === "atencao");
+
   return (
     <div>
       <h1 className="text-3xl font-extrabold">Visão geral</h1>
       <p className="text-sm text-muted-foreground">Indicadores em tempo real do canteiro · {new Date().toLocaleDateString('pt-BR')}</p>
+
+      {/* CAIXA DE TRIAGEM — primeira coisa que o admin vê */}
+      {(criticos.length > 0 || atencaoAbertos.length > 0 || (stats?.progDes.length ?? 0) > 0) && (
+        <div className="mt-5 rounded-3xl border-2 border-destructive/40 bg-destructive/5 p-5">
+          <h2 className="flex items-center gap-2 text-base font-extrabold text-destructive">
+            <AlertTriangle className="h-5 w-5" /> Fila de prioridades
+          </h2>
+          <p className="text-xs text-muted-foreground">Itens que precisam de atenção agora.</p>
+          <div className="mt-3 grid gap-2 md:grid-cols-3">
+            {criticos.length > 0 && (
+              <Link to="/admin/alertas" className="rounded-2xl border-2 border-destructive bg-destructive/10 p-3 transition hover:bg-destructive/15">
+                <p className="text-xs font-bold uppercase text-destructive">Alertas vermelhos</p>
+                <p className="text-2xl font-extrabold text-destructive">{criticos.length}</p>
+                <p className="text-[11px] text-destructive/80">Abrir caixa de triagem →</p>
+              </Link>
+            )}
+            {atencaoAbertos.length > 0 && (
+              <Link to="/admin/alertas" className="rounded-2xl border-2 border-warning bg-warning/10 p-3 transition hover:bg-warning/15">
+                <p className="text-xs font-bold uppercase text-warning">Atenção</p>
+                <p className="text-2xl font-extrabold text-warning">{atencaoAbertos.length}</p>
+                <p className="text-[11px] text-warning/80">Sintomas / dores reportadas</p>
+              </Link>
+            )}
+            {(stats?.progDes.length ?? 0) > 0 && (
+              <Link to="/admin/desafios" className="rounded-2xl border-2 border-accent bg-accent/10 p-3 transition hover:bg-accent/15">
+                <p className="text-xs font-bold uppercase text-accent">Fotos de desafio</p>
+                <p className="text-2xl font-extrabold text-accent">{stats!.progDes.length}</p>
+                <p className="text-[11px] text-accent/80">Validar para liberar pontos</p>
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KCard onClick={() => setDrill('ativos')} icon={Users} label="Trabalhadores ativos" value={stats?.profs.length ?? '—'} tone="primary" />
