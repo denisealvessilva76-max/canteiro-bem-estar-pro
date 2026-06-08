@@ -8,12 +8,13 @@ export function calcMetaHidratacao(
   peso: number | null | undefined,
   exposicaoSol: boolean | null | undefined,
   calorIntenso = true,
+  climaBoostMl = 0,
 ): number {
   const p = peso && peso > 0 ? peso : 70;
   const base = Math.round(p * 35);
   const sol = exposicaoSol ? 500 : 0;
   const calor = calorIntenso ? 500 : 0;
-  return base + sol + calor;
+  return base + sol + calor + Math.max(0, climaBoostMl);
 }
 
 export function classificaPressao(sistolica: number, diastolica: number) {
