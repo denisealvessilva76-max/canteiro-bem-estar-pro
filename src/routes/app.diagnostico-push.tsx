@@ -114,6 +114,56 @@ function DiagnosticoPush() {
     return () => navigator.serviceWorker.removeEventListener("message", onMsg);
   }, []);
 
+  // ---- Persistência do diagnóstico no backend ----
+  const salvar = useServerFn(salvarDiagnosticoPush);
+  const listar = useServerFn(listarDiagnosticosUsuario);
+  const [historico, setHistorico] = useState<Array<{
+    id: string; created_at: string; suporte: string; permissao: string; service_worker: string;
+    inscricao_local: string; backend_gravado: string; entrega: string; user_agent: string | null;
+  }>>([]);
+  const [ultimoSalvo, setUltimoSalvo] = useState<string | null>(null);
+  const [salvando, setSalvando] = useState(false);
+
+  const carregarHistorico = useCallback(async () => {
+    try {
+      const r = await listar({ data: { limit: 10 } });
+      setHistorico(r.registros);
+    } catch (e) { console.warn("histórico falhou", e); }
+  }, [listar]);
+
+  useEffect(() => { void carregarHistorico(); }, [carregarHistorico]);
+
+  const persistir = useCallback(async (motivo: string) => {
+    if (!user) return;
+    setSalvando(true);
+    try {
+      await salvar({ data: {
+        suporte, permissao, service_worker: sw, inscricao_local: subscription,
+        backend_gravado: backend, entrega,
+        endpoint, user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+        detalhes: { motivo, permTexto, swTexto, backendInfo, recebida },
+      }});
+      setUltimoSalvo(new Date().toISOString());
+      await carregarHistorico();
+    } catch (e) {
+      console.warn("salvar diag falhou", e);
+    } finally { setSalvando(false); }
+  }, [user, salvar, suporte, permissao, sw, subscription, backend, entrega, endpoint, permTexto, swTexto, backendInfo, recebida, carregarHistorico]);
+
+  // Snapshot inicial assim que todas as checagens automáticas rodam (estados saem de "idle"/"loading")
+  useEffect(() => {
+    const prontos = [suporte, permissao, sw, subscription, backend].every((s) => s !== "idle" && s !== "loading");
+    if (prontos && !ultimoSalvo) void persistir("snapshot-inicial");
+  }, [suporte, permissao, sw, subscription, backend, ultimoSalvo, persistir]);
+
+  // Salva também quando entrega muda para estado final
+  useEffect(() => {
+    if (entrega === "ok" || entrega === "fail" || entrega === "warn") void persistir(`entrega:${entrega}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entrega]);
+
+
+
   async function acaoPermissao() {
     setLoadingAcao("perm");
     try {
