@@ -79,6 +79,14 @@ function Desafios() {
           <div className="text-2xl">🏆</div>
           <p className="mt-1 text-sm font-bold">Ranking</p>
         </Link>
+        <Link to="/app/squads" className="rounded-2xl border border-border bg-card p-4 text-center">
+          <div className="text-2xl">🛡️</div>
+          <p className="mt-1 text-sm font-bold">Squads</p>
+        </Link>
+        <Link to="/app/mural" className="rounded-2xl border border-border bg-card p-4 text-center">
+          <div className="text-2xl">👏</div>
+          <p className="mt-1 text-sm font-bold">Mural</p>
+        </Link>
         <Link to="/app/recompensas" className="rounded-2xl border border-border bg-card p-4 text-center">
           <div className="text-2xl">🎁</div>
           <p className="mt-1 text-sm font-bold">Recompensas</p>

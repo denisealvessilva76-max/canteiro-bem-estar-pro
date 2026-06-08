@@ -549,6 +549,65 @@ export type Database = {
         }
         Relationships: []
       }
+      matriculas_autorizadas: {
+        Row: {
+          cargo: string | null
+          criado_em: string
+          criado_por: string | null
+          matricula: string
+          nome: string | null
+          telefone: string | null
+          turno: Database["public"]["Enums"]["turno"] | null
+        }
+        Insert: {
+          cargo?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          matricula: string
+          nome?: string | null
+          telefone?: string | null
+          turno?: Database["public"]["Enums"]["turno"] | null
+        }
+        Update: {
+          cargo?: string | null
+          criado_em?: string
+          criado_por?: string | null
+          matricula?: string
+          nome?: string | null
+          telefone?: string | null
+          turno?: Database["public"]["Enums"]["turno"] | null
+        }
+        Relationships: []
+      }
+      mural_aplausos: {
+        Row: {
+          created_at: string
+          desafio_checkin_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          desafio_checkin_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          desafio_checkin_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mural_aplausos_desafio_checkin_id_fkey"
+            columns: ["desafio_checkin_id"]
+            isOneToOne: false
+            referencedRelation: "desafio_checkins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       odonto_dicas: {
         Row: {
           ativo: boolean
@@ -712,6 +771,7 @@ export type Database = {
           peso: number | null
           pontos_acumulados: number
           primeiro_acesso: boolean
+          squad_id: string | null
           telefone: string | null
           turno: Database["public"]["Enums"]["turno"]
           ultimo_checkin: string | null
@@ -735,6 +795,7 @@ export type Database = {
           peso?: number | null
           pontos_acumulados?: number
           primeiro_acesso?: boolean
+          squad_id?: string | null
           telefone?: string | null
           turno?: Database["public"]["Enums"]["turno"]
           ultimo_checkin?: string | null
@@ -758,12 +819,21 @@ export type Database = {
           peso?: number | null
           pontos_acumulados?: number
           primeiro_acesso?: boolean
+          squad_id?: string | null
           telefone?: string | null
           turno?: Database["public"]["Enums"]["turno"]
           ultimo_checkin?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_squad_id_fkey"
+            columns: ["squad_id"]
+            isOneToOne: false
+            referencedRelation: "squads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       progresso_desafios: {
         Row: {
@@ -1175,6 +1245,30 @@ export type Database = {
         }
         Relationships: []
       }
+      squads: {
+        Row: {
+          cor: string
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       ubs_clinicas: {
         Row: {
           ativo: boolean
@@ -1283,6 +1377,17 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      ranking_squads_por_capita: {
+        Args: never
+        Returns: {
+          cor: string
+          integrantes: number
+          media_pontos: number
+          nome: string
+          squad_id: string
+          total_pontos: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "worker"

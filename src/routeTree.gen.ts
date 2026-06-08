@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppSquadsRouteImport } from './routes/app.squads'
 import { Route as AppSeconRouteImport } from './routes/app.secon'
 import { Route as AppSaudeRouteImport } from './routes/app.saude'
 import { Route as AppRecompensasRouteImport } from './routes/app.recompensas'
@@ -22,6 +23,7 @@ import { Route as AppRankingRouteImport } from './routes/app.ranking'
 import { Route as AppQuizRouteImport } from './routes/app.quiz'
 import { Route as AppPerfilRouteImport } from './routes/app.perfil'
 import { Route as AppOdontoRouteImport } from './routes/app.odonto'
+import { Route as AppMuralRouteImport } from './routes/app.mural'
 import { Route as AppMulherRouteImport } from './routes/app.mulher'
 import { Route as AppMentalRouteImport } from './routes/app.mental'
 import { Route as AppHomeRouteImport } from './routes/app.home'
@@ -32,9 +34,11 @@ import { Route as AppDiagnosticoPushRouteImport } from './routes/app.diagnostico
 import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
 import { Route as AppCuponsRouteImport } from './routes/app.cupons'
 import { Route as AppAvisosRouteImport } from './routes/app.avisos'
+import { Route as AdminSquadsRouteImport } from './routes/admin.squads'
 import { Route as AdminRelatoriosRouteImport } from './routes/admin.relatorios'
 import { Route as AdminRecompensasRouteImport } from './routes/admin.recompensas'
 import { Route as AdminNotificacoesRouteImport } from './routes/admin.notificacoes'
+import { Route as AdminMatriculasRouteImport } from './routes/admin.matriculas'
 import { Route as AdminFuncionariosRouteImport } from './routes/admin.funcionarios'
 import { Route as AdminEngajamentoRouteImport } from './routes/admin.engajamento'
 import { Route as AdminDesafiosRouteImport } from './routes/admin.desafios'
@@ -77,6 +81,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSquadsRoute = AppSquadsRouteImport.update({
+  id: '/squads',
+  path: '/squads',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSeconRoute = AppSeconRouteImport.update({
   id: '/secon',
   path: '/secon',
@@ -110,6 +119,11 @@ const AppPerfilRoute = AppPerfilRouteImport.update({
 const AppOdontoRoute = AppOdontoRouteImport.update({
   id: '/odonto',
   path: '/odonto',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMuralRoute = AppMuralRouteImport.update({
+  id: '/mural',
+  path: '/mural',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMulherRoute = AppMulherRouteImport.update({
@@ -162,6 +176,11 @@ const AppAvisosRoute = AppAvisosRouteImport.update({
   path: '/avisos',
   getParentRoute: () => AppRoute,
 } as any)
+const AdminSquadsRoute = AdminSquadsRouteImport.update({
+  id: '/squads',
+  path: '/squads',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminRelatoriosRoute = AdminRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -175,6 +194,11 @@ const AdminRecompensasRoute = AdminRecompensasRouteImport.update({
 const AdminNotificacoesRoute = AdminNotificacoesRouteImport.update({
   id: '/notificacoes',
   path: '/notificacoes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMatriculasRoute = AdminMatriculasRouteImport.update({
+  id: '/matriculas',
+  path: '/matriculas',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminFuncionariosRoute = AdminFuncionariosRouteImport.update({
@@ -251,9 +275,11 @@ export interface FileRoutesByFullPath {
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/matriculas': typeof AdminMatriculasRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/squads': typeof AdminSquadsRoute
   '/app/avisos': typeof AppAvisosRoute
   '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
@@ -264,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/app/home': typeof AppHomeRoute
   '/app/mental': typeof AppMentalRoute
   '/app/mulher': typeof AppMulherRoute
+  '/app/mural': typeof AppMuralRoute
   '/app/odonto': typeof AppOdontoRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/quiz': typeof AppQuizRoute
@@ -271,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
   '/app/secon': typeof AppSeconRoute
+  '/app/squads': typeof AppSquadsRoute
   '/api/public/hooks/lembretes-push': typeof ApiPublicHooksLembretesPushRoute
 }
 export interface FileRoutesByTo {
@@ -290,9 +318,11 @@ export interface FileRoutesByTo {
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/matriculas': typeof AdminMatriculasRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/squads': typeof AdminSquadsRoute
   '/app/avisos': typeof AppAvisosRoute
   '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
@@ -303,6 +333,7 @@ export interface FileRoutesByTo {
   '/app/home': typeof AppHomeRoute
   '/app/mental': typeof AppMentalRoute
   '/app/mulher': typeof AppMulherRoute
+  '/app/mural': typeof AppMuralRoute
   '/app/odonto': typeof AppOdontoRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/quiz': typeof AppQuizRoute
@@ -310,6 +341,7 @@ export interface FileRoutesByTo {
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
   '/app/secon': typeof AppSeconRoute
+  '/app/squads': typeof AppSquadsRoute
   '/api/public/hooks/lembretes-push': typeof ApiPublicHooksLembretesPushRoute
 }
 export interface FileRoutesById {
@@ -330,9 +362,11 @@ export interface FileRoutesById {
   '/admin/desafios': typeof AdminDesafiosRoute
   '/admin/engajamento': typeof AdminEngajamentoRoute
   '/admin/funcionarios': typeof AdminFuncionariosRoute
+  '/admin/matriculas': typeof AdminMatriculasRoute
   '/admin/notificacoes': typeof AdminNotificacoesRoute
   '/admin/recompensas': typeof AdminRecompensasRoute
   '/admin/relatorios': typeof AdminRelatoriosRoute
+  '/admin/squads': typeof AdminSquadsRoute
   '/app/avisos': typeof AppAvisosRoute
   '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
@@ -343,6 +377,7 @@ export interface FileRoutesById {
   '/app/home': typeof AppHomeRoute
   '/app/mental': typeof AppMentalRoute
   '/app/mulher': typeof AppMulherRoute
+  '/app/mural': typeof AppMuralRoute
   '/app/odonto': typeof AppOdontoRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/quiz': typeof AppQuizRoute
@@ -350,6 +385,7 @@ export interface FileRoutesById {
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
   '/app/secon': typeof AppSeconRoute
+  '/app/squads': typeof AppSquadsRoute
   '/api/public/hooks/lembretes-push': typeof ApiPublicHooksLembretesPushRoute
 }
 export interface FileRouteTypes {
@@ -371,9 +407,11 @@ export interface FileRouteTypes {
     | '/admin/desafios'
     | '/admin/engajamento'
     | '/admin/funcionarios'
+    | '/admin/matriculas'
     | '/admin/notificacoes'
     | '/admin/recompensas'
     | '/admin/relatorios'
+    | '/admin/squads'
     | '/app/avisos'
     | '/app/cupons'
     | '/app/desafios'
@@ -384,6 +422,7 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/mental'
     | '/app/mulher'
+    | '/app/mural'
     | '/app/odonto'
     | '/app/perfil'
     | '/app/quiz'
@@ -391,6 +430,7 @@ export interface FileRouteTypes {
     | '/app/recompensas'
     | '/app/saude'
     | '/app/secon'
+    | '/app/squads'
     | '/api/public/hooks/lembretes-push'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -410,9 +450,11 @@ export interface FileRouteTypes {
     | '/admin/desafios'
     | '/admin/engajamento'
     | '/admin/funcionarios'
+    | '/admin/matriculas'
     | '/admin/notificacoes'
     | '/admin/recompensas'
     | '/admin/relatorios'
+    | '/admin/squads'
     | '/app/avisos'
     | '/app/cupons'
     | '/app/desafios'
@@ -423,6 +465,7 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/mental'
     | '/app/mulher'
+    | '/app/mural'
     | '/app/odonto'
     | '/app/perfil'
     | '/app/quiz'
@@ -430,6 +473,7 @@ export interface FileRouteTypes {
     | '/app/recompensas'
     | '/app/saude'
     | '/app/secon'
+    | '/app/squads'
     | '/api/public/hooks/lembretes-push'
   id:
     | '__root__'
@@ -449,9 +493,11 @@ export interface FileRouteTypes {
     | '/admin/desafios'
     | '/admin/engajamento'
     | '/admin/funcionarios'
+    | '/admin/matriculas'
     | '/admin/notificacoes'
     | '/admin/recompensas'
     | '/admin/relatorios'
+    | '/admin/squads'
     | '/app/avisos'
     | '/app/cupons'
     | '/app/desafios'
@@ -462,6 +508,7 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/mental'
     | '/app/mulher'
+    | '/app/mural'
     | '/app/odonto'
     | '/app/perfil'
     | '/app/quiz'
@@ -469,6 +516,7 @@ export interface FileRouteTypes {
     | '/app/recompensas'
     | '/app/saude'
     | '/app/secon'
+    | '/app/squads'
     | '/api/public/hooks/lembretes-push'
   fileRoutesById: FileRoutesById
 }
@@ -526,6 +574,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/squads': {
+      id: '/app/squads'
+      path: '/squads'
+      fullPath: '/app/squads'
+      preLoaderRoute: typeof AppSquadsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/secon': {
       id: '/app/secon'
       path: '/secon'
@@ -573,6 +628,13 @@ declare module '@tanstack/react-router' {
       path: '/odonto'
       fullPath: '/app/odonto'
       preLoaderRoute: typeof AppOdontoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/mural': {
+      id: '/app/mural'
+      path: '/mural'
+      fullPath: '/app/mural'
+      preLoaderRoute: typeof AppMuralRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/mulher': {
@@ -645,6 +707,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAvisosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/admin/squads': {
+      id: '/admin/squads'
+      path: '/squads'
+      fullPath: '/admin/squads'
+      preLoaderRoute: typeof AdminSquadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/relatorios': {
       id: '/admin/relatorios'
       path: '/relatorios'
@@ -664,6 +733,13 @@ declare module '@tanstack/react-router' {
       path: '/notificacoes'
       fullPath: '/admin/notificacoes'
       preLoaderRoute: typeof AdminNotificacoesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/matriculas': {
+      id: '/admin/matriculas'
+      path: '/matriculas'
+      fullPath: '/admin/matriculas'
+      preLoaderRoute: typeof AdminMatriculasRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/funcionarios': {
@@ -757,9 +833,11 @@ interface AdminRouteChildren {
   AdminDesafiosRoute: typeof AdminDesafiosRoute
   AdminEngajamentoRoute: typeof AdminEngajamentoRoute
   AdminFuncionariosRoute: typeof AdminFuncionariosRoute
+  AdminMatriculasRoute: typeof AdminMatriculasRoute
   AdminNotificacoesRoute: typeof AdminNotificacoesRoute
   AdminRecompensasRoute: typeof AdminRecompensasRoute
   AdminRelatoriosRoute: typeof AdminRelatoriosRoute
+  AdminSquadsRoute: typeof AdminSquadsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -773,9 +851,11 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDesafiosRoute: AdminDesafiosRoute,
   AdminEngajamentoRoute: AdminEngajamentoRoute,
   AdminFuncionariosRoute: AdminFuncionariosRoute,
+  AdminMatriculasRoute: AdminMatriculasRoute,
   AdminNotificacoesRoute: AdminNotificacoesRoute,
   AdminRecompensasRoute: AdminRecompensasRoute,
   AdminRelatoriosRoute: AdminRelatoriosRoute,
+  AdminSquadsRoute: AdminSquadsRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -791,6 +871,7 @@ interface AppRouteChildren {
   AppHomeRoute: typeof AppHomeRoute
   AppMentalRoute: typeof AppMentalRoute
   AppMulherRoute: typeof AppMulherRoute
+  AppMuralRoute: typeof AppMuralRoute
   AppOdontoRoute: typeof AppOdontoRoute
   AppPerfilRoute: typeof AppPerfilRoute
   AppQuizRoute: typeof AppQuizRoute
@@ -798,6 +879,7 @@ interface AppRouteChildren {
   AppRecompensasRoute: typeof AppRecompensasRoute
   AppSaudeRoute: typeof AppSaudeRoute
   AppSeconRoute: typeof AppSeconRoute
+  AppSquadsRoute: typeof AppSquadsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -811,6 +893,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppHomeRoute: AppHomeRoute,
   AppMentalRoute: AppMentalRoute,
   AppMulherRoute: AppMulherRoute,
+  AppMuralRoute: AppMuralRoute,
   AppOdontoRoute: AppOdontoRoute,
   AppPerfilRoute: AppPerfilRoute,
   AppQuizRoute: AppQuizRoute,
@@ -818,6 +901,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppRecompensasRoute: AppRecompensasRoute,
   AppSaudeRoute: AppSaudeRoute,
   AppSeconRoute: AppSeconRoute,
+  AppSquadsRoute: AppSquadsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
