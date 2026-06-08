@@ -28,6 +28,7 @@ import { Route as AppHomeRouteImport } from './routes/app.home'
 import { Route as AppHidratacaoQrRouteImport } from './routes/app.hidratacao-qr'
 import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppErgonomiaRouteImport } from './routes/app.ergonomia'
+import { Route as AppDiagnosticoPushRouteImport } from './routes/app.diagnostico-push'
 import { Route as AppDesafiosRouteImport } from './routes/app.desafios'
 import { Route as AppCuponsRouteImport } from './routes/app.cupons'
 import { Route as AppAvisosRouteImport } from './routes/app.avisos'
@@ -140,6 +141,11 @@ const AppErgonomiaRoute = AppErgonomiaRouteImport.update({
   path: '/ergonomia',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDiagnosticoPushRoute = AppDiagnosticoPushRouteImport.update({
+  id: '/diagnostico-push',
+  path: '/diagnostico-push',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDesafiosRoute = AppDesafiosRouteImport.update({
   id: '/desafios',
   path: '/desafios',
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/app/avisos': typeof AppAvisosRoute
   '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
+  '/app/diagnostico-push': typeof AppDiagnosticoPushRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/hidratacao-qr': typeof AppHidratacaoQrRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/app/avisos': typeof AppAvisosRoute
   '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
+  '/app/diagnostico-push': typeof AppDiagnosticoPushRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/hidratacao-qr': typeof AppHidratacaoQrRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/app/avisos': typeof AppAvisosRoute
   '/app/cupons': typeof AppCuponsRoute
   '/app/desafios': typeof AppDesafiosRoute
+  '/app/diagnostico-push': typeof AppDiagnosticoPushRoute
   '/app/ergonomia': typeof AppErgonomiaRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/hidratacao-qr': typeof AppHidratacaoQrRoute
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/app/avisos'
     | '/app/cupons'
     | '/app/desafios'
+    | '/app/diagnostico-push'
     | '/app/ergonomia'
     | '/app/hidratacao'
     | '/app/hidratacao-qr'
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/app/avisos'
     | '/app/cupons'
     | '/app/desafios'
+    | '/app/diagnostico-push'
     | '/app/ergonomia'
     | '/app/hidratacao'
     | '/app/hidratacao-qr'
@@ -432,6 +443,7 @@ export interface FileRouteTypes {
     | '/app/avisos'
     | '/app/cupons'
     | '/app/desafios'
+    | '/app/diagnostico-push'
     | '/app/ergonomia'
     | '/app/hidratacao'
     | '/app/hidratacao-qr'
@@ -591,6 +603,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppErgonomiaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/diagnostico-push': {
+      id: '/app/diagnostico-push'
+      path: '/diagnostico-push'
+      fullPath: '/app/diagnostico-push'
+      preLoaderRoute: typeof AppDiagnosticoPushRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/desafios': {
       id: '/app/desafios'
       path: '/desafios'
@@ -744,6 +763,7 @@ interface AppRouteChildren {
   AppAvisosRoute: typeof AppAvisosRoute
   AppCuponsRoute: typeof AppCuponsRoute
   AppDesafiosRoute: typeof AppDesafiosRoute
+  AppDiagnosticoPushRoute: typeof AppDiagnosticoPushRoute
   AppErgonomiaRoute: typeof AppErgonomiaRoute
   AppHidratacaoRoute: typeof AppHidratacaoRoute
   AppHidratacaoQrRoute: typeof AppHidratacaoQrRoute
@@ -763,6 +783,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAvisosRoute: AppAvisosRoute,
   AppCuponsRoute: AppCuponsRoute,
   AppDesafiosRoute: AppDesafiosRoute,
+  AppDiagnosticoPushRoute: AppDiagnosticoPushRoute,
   AppErgonomiaRoute: AppErgonomiaRoute,
   AppHidratacaoRoute: AppHidratacaoRoute,
   AppHidratacaoQrRoute: AppHidratacaoQrRoute,
@@ -791,13 +812,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

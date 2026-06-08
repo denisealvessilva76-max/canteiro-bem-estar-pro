@@ -6,13 +6,20 @@ self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); })
 self.addEventListener('push', (event) => {
   let data = { title: 'Canteiro Saudável', body: 'Lembrete', url: '/app/home' };
   try { if (event.data) data = { ...data, ...event.data.json() }; } catch (_) { /* noop */ }
-  event.waitUntil(self.registration.showNotification(data.title, {
-    body: data.body,
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
-    data: { url: data.url },
-    vibrate: [120, 60, 120],
-  }));
+  event.waitUntil((async () => {
+    await self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      data: { url: data.url },
+      vibrate: [120, 60, 120],
+    });
+    // Avisa abas abertas (usado pela página de diagnóstico)
+    try {
+      const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      for (const c of clients) c.postMessage({ type: 'push-recebido-diagnostico', data });
+    } catch (_) { /* noop */ }
+  })());
 });
 
 self.addEventListener('notificationclick', (event) => {
