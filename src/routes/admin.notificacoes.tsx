@@ -36,7 +36,7 @@ function AdminNotificacoes() {
         setInscrito(true);
         toast.success("Dispositivo inscrito para receber push!");
       } else {
-        toast.error("Falha ao inscrever dispositivo.");
+        toast.error(typeof r.reason === 'string' ? `Falha ao inscrever dispositivo: ${r.reason}` : "Falha ao inscrever dispositivo.");
       }
     } catch (e) {
       toast.error((e as Error).message);

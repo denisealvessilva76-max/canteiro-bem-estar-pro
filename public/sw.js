@@ -26,6 +26,26 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag !== 'canteiro-workday-reminder') return;
+
+  event.waitUntil((async () => {
+    const now = new Date();
+    const hour = now.getHours();
+    if (hour < 6 || hour > 20) return;
+
+    await self.registration.showNotification('Canteiro Saudável', {
+      body: 'Passe no app para fazer seu check-in e registrar seus cuidados de hoje.',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      data: { url: '/app/home' },
+      vibrate: [120, 60, 120],
+      tag: 'canteiro-workday-reminder',
+      renotify: false,
+    });
+  })());
+});
+
 // Mensagens do app principal — agenda notificação local via setTimeout
 self.addEventListener('message', (event) => {
   const msg = event.data || {};
