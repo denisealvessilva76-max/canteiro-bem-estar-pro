@@ -45,6 +45,7 @@ import { Route as AdminClinicasRouteImport } from './routes/admin.clinicas'
 import { Route as AdminBugsRouteImport } from './routes/admin.bugs'
 import { Route as AdminAvisosRouteImport } from './routes/admin.avisos'
 import { Route as AdminAlertasRouteImport } from './routes/admin.alertas'
+import { Route as ApiPublicHooksLembretesPushRouteImport } from './routes/api/public/hooks/lembretes-push'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -226,6 +227,12 @@ const AdminAlertasRoute = AdminAlertasRouteImport.update({
   path: '/alertas',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicHooksLembretesPushRoute =
+  ApiPublicHooksLembretesPushRouteImport.update({
+    id: '/api/public/hooks/lembretes-push',
+    path: '/api/public/hooks/lembretes-push',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -264,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
   '/app/secon': typeof AppSeconRoute
+  '/api/public/hooks/lembretes-push': typeof ApiPublicHooksLembretesPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -302,6 +310,7 @@ export interface FileRoutesByTo {
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
   '/app/secon': typeof AppSeconRoute
+  '/api/public/hooks/lembretes-push': typeof ApiPublicHooksLembretesPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -341,6 +350,7 @@ export interface FileRoutesById {
   '/app/recompensas': typeof AppRecompensasRoute
   '/app/saude': typeof AppSaudeRoute
   '/app/secon': typeof AppSeconRoute
+  '/api/public/hooks/lembretes-push': typeof ApiPublicHooksLembretesPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/app/recompensas'
     | '/app/saude'
     | '/app/secon'
+    | '/api/public/hooks/lembretes-push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -419,6 +430,7 @@ export interface FileRouteTypes {
     | '/app/recompensas'
     | '/app/saude'
     | '/app/secon'
+    | '/api/public/hooks/lembretes-push'
   id:
     | '__root__'
     | '/'
@@ -457,6 +469,7 @@ export interface FileRouteTypes {
     | '/app/recompensas'
     | '/app/saude'
     | '/app/secon'
+    | '/api/public/hooks/lembretes-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -466,6 +479,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   CadastroRoute: typeof CadastroRoute
   LoginRoute: typeof LoginRoute
+  ApiPublicHooksLembretesPushRoute: typeof ApiPublicHooksLembretesPushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -722,6 +736,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAlertasRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/hooks/lembretes-push': {
+      id: '/api/public/hooks/lembretes-push'
+      path: '/api/public/hooks/lembretes-push'
+      fullPath: '/api/public/hooks/lembretes-push'
+      preLoaderRoute: typeof ApiPublicHooksLembretesPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -808,6 +829,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   CadastroRoute: CadastroRoute,
   LoginRoute: LoginRoute,
+  ApiPublicHooksLembretesPushRoute: ApiPublicHooksLembretesPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

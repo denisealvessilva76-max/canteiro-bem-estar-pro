@@ -4,7 +4,7 @@ self.addEventListener('install', (e) => { self.skipWaiting(); });
 self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
 
 self.addEventListener('push', (event) => {
-  let data = { title: 'Canteiro Saudável', body: 'Lembrete', url: '/app/home' };
+  let data = { title: 'Canteiro Saudável', body: 'Lembrete', url: '/app/home', tag: undefined };
   try { if (event.data) data = { ...data, ...event.data.json() }; } catch (_) { /* noop */ }
   event.waitUntil((async () => {
     await self.registration.showNotification(data.title, {
@@ -13,8 +13,9 @@ self.addEventListener('push', (event) => {
       badge: '/icon-192.png',
       data: { url: data.url },
       vibrate: [120, 60, 120],
+      tag: data.tag,         // mesmo tag substitui notificação anterior do mesmo tipo
+      renotify: !!data.tag,
     });
-    // Avisa abas abertas (usado pela página de diagnóstico)
     try {
       const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
       for (const c of clients) c.postMessage({ type: 'push-recebido-diagnostico', data });
