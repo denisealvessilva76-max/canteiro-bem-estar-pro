@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { BottomNav } from "@/components/BottomNav";
 import { BugReportButton } from "@/components/BugReportButton";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { LevelUpToast } from "@/components/LevelUpToast";
 import { Loader2 } from "lucide-react";
 import { registrarSW, ativarLembretes, lerCfg, inscreverPush, registrarSincronizacaoPeriodica } from "@/lib/notificacoes";
 import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
@@ -53,6 +54,7 @@ function AppLayout() {
   return (
     <div className="min-h-screen bg-background pb-20">
       <OfflineIndicator />
+      <LevelUpToast />
       <div className="mx-auto max-w-md">
         <Outlet />
       </div>
