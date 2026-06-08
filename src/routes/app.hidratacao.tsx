@@ -80,6 +80,11 @@ function Hidratacao() {
       </Link>
       <h1 className="mt-3 text-2xl font-extrabold">💧 Hidratação</h1>
       <p className="text-sm text-muted-foreground">Meta diária: <strong className="text-foreground">{(meta / 1000).toFixed(1)} L</strong></p>
+      {calor !== "ameno" && boost > 0 && (
+        <div className={`mt-2 rounded-xl border px-3 py-2 text-xs font-semibold ${calor === "extremo" ? "border-orange-500 bg-orange-500/10 text-orange-700" : "border-amber-500 bg-amber-500/10 text-amber-700"}`}>
+          🌡️ {calor === "extremo" ? "Calor extremo" : "Calor elevado"} em campo agora — meta aumentada em <strong>+{boost} ml</strong>.
+        </div>
+      )}
 
       {/* Garrafa visual */}
       <div className="mt-6 flex items-end justify-center">
