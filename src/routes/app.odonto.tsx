@@ -10,6 +10,7 @@ import { GameBoundary } from "@/components/GameBoundary";
 import { EscovaDragDrop } from "@/components/jogos/EscovaDragDrop";
 import { QuizOdonto } from "@/components/jogos/QuizOdonto";
 import { PlacarPessoal } from "@/components/PlacarPessoal";
+import { DenteVirtual } from "@/components/DenteVirtual";
 
 export const Route = createFileRoute("/app/odonto")({
   component: Odontologia,
