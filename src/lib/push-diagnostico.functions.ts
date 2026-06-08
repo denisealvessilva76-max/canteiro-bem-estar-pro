@@ -35,3 +35,68 @@ export const verificarInscricoesUsuario = createServerFn({ method: "POST" })
       })),
     };
   });
+
+const STATUS_VALIDOS = new Set(["idle", "ok", "warn", "fail", "loading"]);
+function normalizarStatus(v: unknown): string {
+  return typeof v === "string" && STATUS_VALIDOS.has(v) ? v : "idle";
+}
+
+export type DiagnosticoStatus = "idle" | "ok" | "warn" | "fail" | "loading";
+
+/**
+ * Persiste uma execução do diagnóstico de push para o usuário autenticado.
+ */
+export const salvarDiagnosticoPush = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: {
+    suporte: string;
+    permissao: string;
+    service_worker: string;
+    inscricao_local: string;
+    backend_gravado: string;
+    entrega: string;
+    endpoint?: string | null;
+    user_agent?: string | null;
+    detalhes?: Record<string, unknown>;
+  }) => ({
+    suporte: normalizarStatus(data?.suporte),
+    permissao: normalizarStatus(data?.permissao),
+    service_worker: normalizarStatus(data?.service_worker),
+    inscricao_local: normalizarStatus(data?.inscricao_local),
+    backend_gravado: normalizarStatus(data?.backend_gravado),
+    entrega: normalizarStatus(data?.entrega),
+    endpoint: typeof data?.endpoint === "string" ? data.endpoint.slice(0, 1024) : null,
+    user_agent: typeof data?.user_agent === "string" ? data.user_agent.slice(0, 512) : null,
+    detalhes: data?.detalhes && typeof data.detalhes === "object" ? data.detalhes : {},
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row, error } = await supabase
+      .from("push_diagnosticos")
+      .insert({ ...data, user_id: userId })
+      .select("id, created_at")
+      .single();
+    if (error) throw new Error(error.message);
+    return { ok: true, id: row.id, created_at: row.created_at };
+  });
+
+/**
+ * Lê o histórico recente do diagnóstico do usuário autenticado.
+ */
+export const listarDiagnosticosUsuario = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { limit?: number }) => ({
+    limit: Math.min(Math.max(Number(data?.limit) || 20, 1), 100),
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: rows, error } = await supabase
+      .from("push_diagnosticos")
+      .select("id, created_at, suporte, permissao, service_worker, inscricao_local, backend_gravado, entrega, endpoint, user_agent")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (error) throw new Error(error.message);
+    return { ok: true, registros: rows ?? [] };
+  });
+
