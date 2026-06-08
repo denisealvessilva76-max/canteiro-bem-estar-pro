@@ -51,8 +51,18 @@ function Cadastro() {
     }
 
 
+    // Verifica se a matrícula está pré-autorizada pelo RH
+    const mat = form.matricula.trim();
+    const { data: autorizada } = await supabase
+      .from('matriculas_autorizadas').select('matricula').eq('matricula', mat).maybeSingle();
+    if (!autorizada) {
+      setLoading(false);
+      toast.error("Matrícula não autorizada. Procure o RH para liberar seu acesso.");
+      return;
+    }
+
     const { data: existe } = await supabase
-      .from('profiles').select('id').eq('matricula', form.matricula.trim()).maybeSingle();
+      .from('profiles').select('id').eq('matricula', mat).maybeSingle();
     if (existe) {
       setLoading(false);
       toast.error("Essa matrícula já está cadastrada");
