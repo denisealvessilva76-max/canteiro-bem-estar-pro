@@ -295,11 +295,51 @@ function DiagnosticoPush() {
         )}
       />
 
+      <section className="space-y-2 rounded-2xl border border-border bg-card p-3">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-bold">Histórico</h3>
+          <div className="flex items-center gap-2">
+            {ultimoSalvo && <span className="text-[10px] text-muted-foreground">Salvo: {new Date(ultimoSalvo).toLocaleTimeString()}</span>}
+            <button onClick={() => void persistir("manual")} disabled={salvando}
+              className="rounded-xl border border-border bg-background px-2 py-1 text-[11px] font-bold disabled:opacity-50">
+              {salvando ? "Salvando…" : "Salvar agora"}
+            </button>
+          </div>
+        </div>
+        {historico.length === 0 ? (
+          <p className="text-xs text-muted-foreground">Sem registros ainda.</p>
+        ) : (
+          <ul className="divide-y divide-border text-[11px]">
+            {historico.map((h) => (
+              <li key={h.id} className="grid grid-cols-[auto_1fr] gap-2 py-1.5">
+                <span className="font-mono text-muted-foreground">{new Date(h.created_at).toLocaleString()}</span>
+                <span className="flex flex-wrap gap-1">
+                  <Badge label="sup" v={h.suporte} />
+                  <Badge label="perm" v={h.permissao} />
+                  <Badge label="sw" v={h.service_worker} />
+                  <Badge label="sub" v={h.inscricao_local} />
+                  <Badge label="bk" v={h.backend_gravado} />
+                  <Badge label="ent" v={h.entrega} />
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       <div className="rounded-2xl border border-dashed border-border bg-muted/30 p-3 text-[11px] text-muted-foreground">
         Dica: em iOS, o push só funciona se o app estiver instalado na tela inicial (PWA). Em desktop/Android funciona com a aba aberta ou app instalado.
       </div>
     </div>
   );
+}
+
+function Badge({ label, v }: { label: string; v: string }) {
+  const cor = v === "ok" ? "bg-success/15 text-success" :
+              v === "fail" ? "bg-destructive/15 text-destructive" :
+              v === "warn" ? "bg-warning/15 text-warning" :
+              "bg-muted text-muted-foreground";
+  return <span className={`rounded px-1.5 py-0.5 font-mono ${cor}`}>{label}:{v}</span>;
 }
 
 function Step({ icon, status, title, desc, action }: {
