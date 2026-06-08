@@ -8,7 +8,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { registrarSW, pedirPermissao, inscreverPush } from "@/lib/notificacoes";
 import { VAPID_PUBLIC_KEY } from "@/lib/vapid";
-import { verificarInscricoesUsuario } from "@/lib/push-diagnostico.functions";
+import { verificarInscricoesUsuario, salvarDiagnosticoPush, listarDiagnosticosUsuario } from "@/lib/push-diagnostico.functions";
 import { enviarPushTeste } from "@/lib/push.functions";
 
 export const Route = createFileRoute("/app/diagnostico-push")({
