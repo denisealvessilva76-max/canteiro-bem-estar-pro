@@ -71,9 +71,10 @@ export const salvarDiagnosticoPush = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const payload = { ...data, detalhes: data.detalhes as unknown as Record<string, never>, user_id: userId };
     const { data: row, error } = await supabase
       .from("push_diagnosticos")
-      .insert({ ...data, user_id: userId })
+      .insert(payload)
       .select("id, created_at")
       .single();
     if (error) throw new Error(error.message);
