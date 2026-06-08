@@ -816,6 +816,51 @@ export type Database = {
           },
         ]
       }
+      push_diagnosticos: {
+        Row: {
+          backend_gravado: string
+          created_at: string
+          detalhes: Json
+          endpoint: string | null
+          entrega: string
+          id: string
+          inscricao_local: string
+          permissao: string
+          service_worker: string
+          suporte: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          backend_gravado: string
+          created_at?: string
+          detalhes?: Json
+          endpoint?: string | null
+          entrega: string
+          id?: string
+          inscricao_local: string
+          permissao: string
+          service_worker: string
+          suporte: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          backend_gravado?: string
+          created_at?: string
+          detalhes?: Json
+          endpoint?: string | null
+          entrega?: string
+          id?: string
+          inscricao_local?: string
+          permissao?: string
+          service_worker?: string
+          suporte?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           auth: string
