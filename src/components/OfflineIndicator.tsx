@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { CloudOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { flushQueue } from '@/lib/offline';
 
@@ -19,12 +18,13 @@ export function OfflineIndicator() {
       });
     };
 
-    window.addEventListener('online', () => { void syncWhenOnline(); });
+    const onOnline = () => { void syncWhenOnline(); };
     window.addEventListener('offline', avisarOffline);
+    window.addEventListener('online', onOnline);
 
     return () => {
       window.removeEventListener('offline', avisarOffline);
-      window.removeEventListener('online', () => { void syncWhenOnline(); });
+      window.removeEventListener('online', onOnline);
     };
   }, []);
 
