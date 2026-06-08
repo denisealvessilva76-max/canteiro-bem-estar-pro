@@ -15,6 +15,8 @@ type Profile = {
   ofensiva_dias: number;
   ultimo_checkin: string | null;
   avatar_id: number | null;
+  avatar_url?: string | null;
+  squad_id?: string | null;
   primeiro_acesso: boolean;
 };
 
