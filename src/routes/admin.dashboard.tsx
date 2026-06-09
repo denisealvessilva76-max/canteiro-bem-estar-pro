@@ -26,7 +26,7 @@ function Dashboard() {
         supabase.from('checkin_diario').select('user_id, humor_score, humor_icone, motivo_texto, created_at').eq('data', today),
         supabase.from('hidratacao_logs').select('user_id, ml_consumidos').eq('data', today),
         supabase.from('alertas').select('id, user_id, tipo, mensagem, nivel_urgencia, created_at, resolvido').eq('resolvido', false).order('created_at', { ascending: false }),
-        supabase.from('alongamento_logs').select('user_id').eq('data', today),
+        supabase.from('alongamento_logs').select('user_id, categoria, duracao_segundos, created_at, sincronizado_em').eq('data', today),
         supabase.from('progresso_desafios').select('user_id, status, foto_url, foto_validada').not('foto_url', 'is', null).is('foto_validada', null),
       ]);
       const profMap = new Map((profs ?? []).map((p) => [p.id, p]));
