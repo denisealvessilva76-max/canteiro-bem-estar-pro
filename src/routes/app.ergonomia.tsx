@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
 import { VIDEO_GINASTICA_LABORAL } from "@/lib/contatos";
 import { AudioNarracao, pararTodosAudios } from "@/components/AudioNarracao";
+import { insertOrQueue } from "@/lib/offline";
 import imgCompleta from "@/assets/ergo-completa.jpg";
 import imgPescoco from "@/assets/ergo-pescoco.jpg";
 import imgOmbros from "@/assets/ergo-ombros.jpg";
@@ -173,13 +174,18 @@ function Ergonomia() {
   async function finalizar() {
     if (!user || !categoria) return;
     const total = categoria.exercicios.reduce((s, a) => s + a.tempo, 0);
-    await supabase.from('alongamento_logs').insert({
-      user_id: user.id, data: todayISO(), duracao_segundos: total,
+    const res = await insertOrQueue('alongamento_logs', {
+      user_id: user.id, data: todayISO(), duracao_segundos: total, categoria: categoria.id,
+      created_at: new Date().toISOString(),
     });
-    const { data: prof } = await supabase.from('profiles').select('pontos_acumulados').eq('id', user.id).maybeSingle();
-    if (prof) await supabase.from('profiles').update({ pontos_acumulados: prof.pontos_acumulados + 15 }).eq('id', user.id);
-    toast.success('Alongamento concluído! +15 pontos');
-    setTimeout(() => void refreshProfile(), 500);
+    if (res.online) {
+      const { data: prof } = await supabase.from('profiles').select('pontos_acumulados').eq('id', user.id).maybeSingle();
+      if (prof) await supabase.from('profiles').update({ pontos_acumulados: prof.pontos_acumulados + 15 }).eq('id', user.id);
+      toast.success('Alongamento concluído! +15 pontos');
+      setTimeout(() => void refreshProfile(), 500);
+    } else {
+      toast.success('Sessão salva offline. Será enviada quando houver internet.');
+    }
   }
 
   function iniciar() {

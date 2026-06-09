@@ -90,24 +90,30 @@ export type Database = {
       }
       alongamento_logs: {
         Row: {
+          categoria: string | null
           created_at: string
           data: string
           duracao_segundos: number | null
           id: string
+          sincronizado_em: string | null
           user_id: string
         }
         Insert: {
+          categoria?: string | null
           created_at?: string
           data?: string
           duracao_segundos?: number | null
           id?: string
+          sincronizado_em?: string | null
           user_id: string
         }
         Update: {
+          categoria?: string | null
           created_at?: string
           data?: string
           duracao_segundos?: number | null
           id?: string
+          sincronizado_em?: string | null
           user_id?: string
         }
         Relationships: [

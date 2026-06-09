@@ -26,7 +26,7 @@ function Dashboard() {
         supabase.from('checkin_diario').select('user_id, humor_score, humor_icone, motivo_texto, created_at').eq('data', today),
         supabase.from('hidratacao_logs').select('user_id, ml_consumidos').eq('data', today),
         supabase.from('alertas').select('id, user_id, tipo, mensagem, nivel_urgencia, created_at, resolvido').eq('resolvido', false).order('created_at', { ascending: false }),
-        supabase.from('alongamento_logs').select('user_id').eq('data', today),
+        supabase.from('alongamento_logs').select('user_id, categoria, duracao_segundos, created_at, sincronizado_em').eq('data', today),
         supabase.from('progresso_desafios').select('user_id, status, foto_url, foto_validada').not('foto_url', 'is', null).is('foto_validada', null),
       ]);
       const profMap = new Map((profs ?? []).map((p) => [p.id, p]));
@@ -98,8 +98,11 @@ function Dashboard() {
         setFeed((f) => [{ icone: '💧', tipo: 'Hidratação', texto: `+${h.ml_consumidos}ml registrados`, ts: h.created_at }, ...f].slice(0, 30));
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'alongamento_logs' }, (p) => {
-        const c = p.new as { created_at: string };
-        setFeed((f) => [{ icone: '🤸', tipo: 'Alongamento', texto: 'Trabalhador concluiu ginástica', ts: c.created_at }, ...f].slice(0, 30));
+        const c = p.new as { created_at: string; categoria: string | null; duracao_segundos: number | null; sincronizado_em: string | null };
+        const cat = c.categoria ? ` (${c.categoria})` : '';
+        const dur = c.duracao_segundos ? ` · ${Math.round(c.duracao_segundos / 60)}min` : '';
+        const offline = c.sincronizado_em && c.created_at && (new Date(c.sincronizado_em).getTime() - new Date(c.created_at).getTime() > 60000) ? ' · 📶 sync offline' : '';
+        setFeed((f) => [{ icone: '🤸', tipo: 'Alongamento', texto: `Sessão concluída${cat}${dur}${offline}`, ts: c.created_at }, ...f].slice(0, 30));
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'saude_logs' }, (p) => {
         const s = p.new as { pressao_sistolica: number | null; pressao_diastolica: number | null; created_at: string };
