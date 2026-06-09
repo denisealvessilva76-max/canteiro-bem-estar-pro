@@ -47,21 +47,35 @@ function ensureVoices(): Promise<void> {
   });
 }
 
-// Ritmo padrão: calmo e claro. Não muda durante a sessão.
-const RATE_PADRAO = 0.78;   // mais devagar (era 0.95)
-const PITCH_PADRAO = 1.0;   // tom natural feminino (era 1.05, soava mais agudo)
+// Ritmo padrão: bem calmo, claro, feminino e acolhedor.
+const RATE_PADRAO = 0.72;   // mais devagar — voz tranquila
+const PITCH_PADRAO = 0.96;  // ligeiramente mais grave = mais humano/quente
 
-export async function speak(texto: string, opts?: { rate?: number; pitch?: number; calmo?: boolean }) {
+// Quebra o texto em frases curtas com pausas naturais para soar mais humano.
+function humanizar(texto: string): string {
+  return texto
+    .replace(/\s*\.\s*/g, '. ')
+    .replace(/,\s*/g, ', ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+export async function speak(texto: string, opts?: { rate?: number; pitch?: number; calmo?: boolean; fila?: boolean }) {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   await ensureVoices();
-  const u = new SpeechSynthesisUtterance(texto);
+  const u = new SpeechSynthesisUtterance(humanizar(texto));
   u.lang = 'pt-BR';
-  u.rate = opts?.rate ?? (opts?.calmo ? 0.7 : RATE_PADRAO);
+  u.rate = opts?.rate ?? (opts?.calmo ? 0.66 : RATE_PADRAO);
   u.pitch = opts?.pitch ?? PITCH_PADRAO;
   u.volume = 1;
   if (cachedVoice) u.voice = cachedVoice;
-  window.speechSynthesis.cancel();
+  if (!opts?.fila) window.speechSynthesis.cancel();
   window.speechSynthesis.speak(u);
+}
+
+// Pequena dica calma (ex.: "Inspire... e solte"). Não interrompe a narração principal.
+export async function speakCue(texto: string) {
+  return speak(texto, { rate: 0.62, pitch: 0.92, fila: true });
 }
 
 export function stopSpeaking() {
