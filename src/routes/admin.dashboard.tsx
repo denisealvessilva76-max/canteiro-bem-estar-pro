@@ -98,8 +98,11 @@ function Dashboard() {
         setFeed((f) => [{ icone: '💧', tipo: 'Hidratação', texto: `+${h.ml_consumidos}ml registrados`, ts: h.created_at }, ...f].slice(0, 30));
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'alongamento_logs' }, (p) => {
-        const c = p.new as { created_at: string };
-        setFeed((f) => [{ icone: '🤸', tipo: 'Alongamento', texto: 'Trabalhador concluiu ginástica', ts: c.created_at }, ...f].slice(0, 30));
+        const c = p.new as { created_at: string; categoria: string | null; duracao_segundos: number | null; sincronizado_em: string | null };
+        const cat = c.categoria ? ` (${c.categoria})` : '';
+        const dur = c.duracao_segundos ? ` · ${Math.round(c.duracao_segundos / 60)}min` : '';
+        const offline = c.sincronizado_em && c.created_at && (new Date(c.sincronizado_em).getTime() - new Date(c.created_at).getTime() > 60000) ? ' · 📶 sync offline' : '';
+        setFeed((f) => [{ icone: '🤸', tipo: 'Alongamento', texto: `Sessão concluída${cat}${dur}${offline}`, ts: c.created_at }, ...f].slice(0, 30));
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'saude_logs' }, (p) => {
         const s = p.new as { pressao_sistolica: number | null; pressao_diastolica: number | null; created_at: string };
