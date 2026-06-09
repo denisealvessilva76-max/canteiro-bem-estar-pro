@@ -176,6 +176,7 @@ function Ergonomia() {
     const total = categoria.exercicios.reduce((s, a) => s + a.tempo, 0);
     const res = await insertOrQueue('alongamento_logs', {
       user_id: user.id, data: todayISO(), duracao_segundos: total, categoria: categoria.id,
+      created_at: new Date().toISOString(),
     });
     if (res.online) {
       const { data: prof } = await supabase.from('profiles').select('pontos_acumulados').eq('id', user.id).maybeSingle();
