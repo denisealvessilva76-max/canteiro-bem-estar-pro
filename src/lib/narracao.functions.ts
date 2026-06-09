@@ -11,7 +11,7 @@ const VOZ_PADRAO = "EXAVITQu4vr4xnSDxMaL";
 
 const Input = z.object({
   texto: z.string().min(1).max(2000),
-  voiceId: z.string().min(1).max(64).optional(),
+  voiceId: z.string().regex(/^[a-zA-Z0-9_-]{1,64}$/).optional(),
   // chave de cache opcional — quando ausente, usa hash(texto+voz)
   cacheKey: z.string().min(1).max(128).optional(),
 });
