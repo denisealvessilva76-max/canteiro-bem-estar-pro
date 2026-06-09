@@ -37,28 +37,22 @@ function Cadastro() {
     }
     setLoading(true);
 
-    // Validação do código da empresa feita no servidor (anti-bypass).
+    // Validação do código da empresa + matrícula autorizada (ambos no servidor)
+    const mat = form.matricula.trim();
     try {
-      const res = await validarCodigo({ data: { codigo: form.codigo } });
+      const res = await validarCodigo({ data: { codigo: form.codigo, matricula: mat } });
       if (!res.ok) {
         setLoading(false);
-        toast.error("Código da empresa inválido. Solicite ao RH.");
+        if (res.motivo === "matricula") {
+          toast.error("Matrícula não autorizada. Procure o RH para liberar seu acesso.");
+        } else {
+          toast.error("Código da empresa inválido. Solicite ao RH.");
+        }
         return;
       }
-    } catch {
+    } catch (e) {
       setLoading(false);
-      toast.error("Não foi possível validar o código. Tente novamente.");
-      return;
-    }
-
-
-    // Verifica se a matrícula está pré-autorizada pelo RH
-    const mat = form.matricula.trim();
-    const { data: autorizada } = await supabase
-      .from('matriculas_autorizadas').select('matricula').eq('matricula', mat).maybeSingle();
-    if (!autorizada) {
-      setLoading(false);
-      toast.error("Matrícula não autorizada. Procure o RH para liberar seu acesso.");
+      toast.error((e as Error)?.message || "Não foi possível validar o cadastro. Tente novamente.");
       return;
     }
 
