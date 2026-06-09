@@ -34,11 +34,22 @@ export const Route = createFileRoute("/api/public/hooks/lembretes-push")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Validação leve do apikey (defesa em profundidade — rota é pública por padrão)
-        const apikey = request.headers.get("apikey") ?? "";
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? "";
-        if (expected && apikey !== expected) {
-          return new Response(JSON.stringify({ error: "apikey inválida" }), {
+        // Autenticação dedicada: exige header `x-webhook-secret` com valor
+        // de WEBHOOK_LEMBRETES_SECRET. A anon key pública NÃO serve mais
+        // como credencial — era apenas defesa em profundidade e está embutida
+        // no bundle do cliente.
+        const expected = process.env.WEBHOOK_LEMBRETES_SECRET ?? "";
+        if (!expected) {
+          return new Response(JSON.stringify({ error: "webhook não configurado" }), {
+            status: 503, headers: { "Content-Type": "application/json" },
+          });
+        }
+        const provided = request.headers.get("x-webhook-secret") ?? "";
+        const a = Buffer.from(provided);
+        const b = Buffer.from(expected);
+        const ok = a.length === b.length && (await import("crypto")).timingSafeEqual(a, b);
+        if (!ok) {
+          return new Response(JSON.stringify({ error: "não autorizado" }), {
             status: 401, headers: { "Content-Type": "application/json" },
           });
         }
