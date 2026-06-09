@@ -131,6 +131,22 @@ function Ergonomia() {
 
   const categoria = useMemo(() => CATEGORIAS.find((c) => c.id === catId) ?? null, [catId]);
 
+  // Pré-carrega imagens de todas as categorias para garantir uso offline (cache do SW)
+  useEffect(() => {
+    CATEGORIAS.forEach((c) => {
+      [c.imagem, ...c.exercicios.map((e) => e.imagem)].forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
+    });
+  }, []);
+
+  function iniciarCategoria(id: string) {
+    setCatId(id); setStep(0);
+    const cat = CATEGORIAS.find((c) => c.id === id);
+    if (cat) { setSeconds(cat.exercicios[0].tempo); setRunning(true); }
+  }
+
   useEffect(() => {
     if (categoria) setSeconds(categoria.exercicios[0].tempo);
   }, [categoria]);
