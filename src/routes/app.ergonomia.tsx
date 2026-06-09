@@ -216,21 +216,39 @@ function Ergonomia() {
 
         <h2 className="mt-7 text-base font-bold">Escolha um foco</h2>
         <div className="mt-3 space-y-3">
-          {CATEGORIAS.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => { setCatId(c.id); setRunning(false); setStep(0); }}
-              className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-3 text-left transition hover:border-primary"
-            >
-              <img src={c.imagem} alt={c.titulo} loading="lazy" width={64} height={64}
-                className="h-16 w-16 shrink-0 rounded-xl object-cover" />
-              <div className="flex-1">
-                <p className="text-sm font-bold">{c.titulo}</p>
-                <p className="text-xs text-muted-foreground">{c.descricao}</p>
+          {CATEGORIAS.map((c) => {
+            const totalSeg = c.exercicios.reduce((s, e) => s + e.tempo, 0);
+            const mm = Math.floor(totalSeg / 60);
+            const ss = totalSeg % 60;
+            const tempoLabel = mm > 0 ? `${mm}min${ss ? ` ${ss}s` : ''}` : `${ss}s`;
+            return (
+              <div
+                key={c.id}
+                className="rounded-2xl border border-border bg-card p-3 transition hover:border-primary"
+              >
+                <button
+                  onClick={() => { setCatId(c.id); setRunning(false); setStep(0); }}
+                  className="flex w-full items-center gap-3 text-left"
+                >
+                  <img src={c.imagem} alt={c.titulo} loading="lazy" width={64} height={64}
+                    className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold">{c.titulo}</p>
+                    <p className="text-xs text-muted-foreground">{c.descricao}</p>
+                    <p className="mt-1 text-[11px] font-semibold text-muted-foreground">
+                      ⏱ {tempoLabel} · {c.exercicios.length} exerc. · 📶 offline
+                    </p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => iniciarCategoria(c.id)}
+                  className="mt-3 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-primary text-sm font-bold text-primary-foreground shadow-warm active:scale-[.99]"
+                >
+                  <Play className="h-4 w-4" /> Iniciar agora
+                </button>
               </div>
-              <span className="text-xs font-bold text-primary">{c.exercicios.length} exerc.</span>
-            </button>
-          ))}
+            );
+          })}
         </div>
 
         <h2 className="mt-7 text-base font-bold">Posturas corretas</h2>
