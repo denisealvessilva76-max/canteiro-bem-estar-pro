@@ -1,7 +1,38 @@
 // Canteiro Saudável — Service Worker
 // Recebe Web Push (quando configurado) e exibe notificações locais agendadas.
+const ASSET_CACHE = 'canteiro-assets-v1';
+
 self.addEventListener('install', (e) => { self.skipWaiting(); });
-self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
+self.addEventListener('activate', (e) => {
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter((k) => k.startsWith('canteiro-assets-') && k !== ASSET_CACHE).map((k) => caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+// Cache-first para imagens/fontes/assets buildados (offline para ergonomia, ícones etc.)
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  const isAsset = url.pathname.startsWith('/assets/') ||
+    /\.(png|jpg|jpeg|webp|svg|gif|woff2?|ttf|mp3|ogg)$/i.test(url.pathname);
+  if (!isAsset) return;
+  event.respondWith((async () => {
+    const cache = await caches.open(ASSET_CACHE);
+    const cached = await cache.match(req);
+    if (cached) return cached;
+    try {
+      const fresh = await fetch(req);
+      if (fresh.ok) cache.put(req, fresh.clone());
+      return fresh;
+    } catch (err) {
+      return cached || Response.error();
+    }
+  })());
+});
 
 self.addEventListener('push', (event) => {
   let data = { title: 'Canteiro Saudável', body: 'Lembrete', url: '/app/home', tag: undefined };
