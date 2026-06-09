@@ -155,8 +155,18 @@ function Ergonomia() {
 
   useEffect(() => {
     if (!running || !categoria) return;
+    const exTempo = categoria.exercicios[step].tempo;
     const id = setInterval(() => {
       setSeconds((s) => {
+        // Dicas suaves sincronizadas com o cronômetro (respiração + contagem final)
+        const decorrido = exTempo - s + 1;
+        if (decorrido > 1 && decorrido < exTempo - 2 && decorrido % 6 === 0) {
+          void speakCue('Inspire... e solte devagar.');
+        }
+        if (s === 3) void speakCue('Três.');
+        else if (s === 2) void speakCue('Dois.');
+        else if (s === 1) void speakCue('Um. Troque ou descanse.');
+
         if (s > 1) return s - 1;
         if (step < categoria.exercicios.length - 1) {
           setStep(step + 1);
