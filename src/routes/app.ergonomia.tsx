@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
 import { VIDEO_GINASTICA_LABORAL } from "@/lib/contatos";
 import { AudioNarracao, pararTodosAudios } from "@/components/AudioNarracao";
+import { speakCue } from "@/lib/tts";
 import { insertOrQueue } from "@/lib/offline";
 import imgCompleta from "@/assets/ergo-completa.jpg";
 import imgPescoco from "@/assets/ergo-pescoco.jpg";
