@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { todayISO } from "@/lib/canteiro";
 import { VIDEO_GINASTICA_LABORAL } from "@/lib/contatos";
 import { AudioNarracao, pararTodosAudios } from "@/components/AudioNarracao";
+import { speakCue } from "@/lib/tts";
 import { insertOrQueue } from "@/lib/offline";
 import imgCompleta from "@/assets/ergo-completa.jpg";
 import imgPescoco from "@/assets/ergo-pescoco.jpg";
@@ -154,8 +155,18 @@ function Ergonomia() {
 
   useEffect(() => {
     if (!running || !categoria) return;
+    const exTempo = categoria.exercicios[step].tempo;
     const id = setInterval(() => {
       setSeconds((s) => {
+        // Dicas suaves sincronizadas com o cronômetro (respiração + contagem final)
+        const decorrido = exTempo - s + 1;
+        if (decorrido > 1 && decorrido < exTempo - 2 && decorrido % 6 === 0) {
+          void speakCue('Inspire... e solte devagar.');
+        }
+        if (s === 3) void speakCue('Três.');
+        else if (s === 2) void speakCue('Dois.');
+        else if (s === 1) void speakCue('Um. Troque ou descanse.');
+
         if (s > 1) return s - 1;
         if (step < categoria.exercicios.length - 1) {
           setStep(step + 1);
