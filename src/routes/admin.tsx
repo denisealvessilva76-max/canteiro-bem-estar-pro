@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Link, useNavigate, useLocation } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutDashboard, Users, AlertTriangle, Trophy, Bell, Gift, LogOut, HardHat, Loader2, ShieldCheck, Menu, X, ChevronLeft, MapPin, Bug, FileText, Zap, BookOpen, FileSpreadsheet, UsersRound } from "lucide-react";
+import { LayoutDashboard, Users, AlertTriangle, Trophy, Bell, Gift, LogOut, HardHat, Loader2, ShieldCheck, Menu, X, ChevronLeft, MapPin, Bug, FileText, Zap, BookOpen, FileSpreadsheet, UsersRound, Calculator } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const Route = createFileRoute("/admin")({
@@ -9,6 +9,7 @@ export const Route = createFileRoute("/admin")({
 
 const NAV = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/simulador', icon: Calculator, label: 'Simulador Financeiro' },
   { to: '/admin/funcionarios', icon: Users, label: 'Funcionários' },
   { to: '/admin/matriculas', icon: FileSpreadsheet, label: 'Pré-cadastro CSV' },
   { to: '/admin/squads', icon: UsersRound, label: 'Squads' },
