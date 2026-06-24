@@ -1,0 +1,50 @@
+PROPRIETARY SOFTWARE LICENSE
+Copyright (c) 2026 Canteiro Saudável™ — Idealizador e Autor Original do Programa
+de Desenvolvimento Individual (PDI) "Canteiro Saudável" / MIP Engenharia.
+Todos os direitos reservados. All rights reserved.
+
+OBRA INTELECTUAL PROTEGIDA
+==========================
+Este software, sua arquitetura, identidade visual, fluxos de gamificação,
+modelo financeiro (Iceberg de Custos Ocultos, fórmula de Custo Carregado
+CCT-PA × 1,83 × 1,5), personas operacionais, mecânicas de hidratação por
+QR Code geocercado, sistema de recompensas com saturação 95–120 pts/dia
+e demais elementos originais são obra intelectual protegida pela
+Lei nº 9.609/1998 (Lei do Software) e Lei nº 9.610/1998 (Direitos Autorais)
+da República Federativa do Brasil, bem como pelos tratados internacionais
+de propriedade intelectual dos quais o Brasil é signatário (Convenção de
+Berna, TRIPS).
+
+TERMOS
+======
+1. É VEDADO, sem autorização prévia, expressa e por escrito do titular:
+   (a) reproduzir, no todo ou em parte, o código-fonte, a documentação
+       técnica, o dossiê financeiro ou a apresentação executiva;
+   (b) criar obra derivada, adaptação, "remix" ou versão funcionalmente
+       equivalente que reproduza a estrutura conceitual aqui descrita;
+   (c) explorar comercialmente, sublicenciar, ceder ou transferir;
+   (d) remover, alterar ou ocultar este aviso de copyright.
+
+2. A consulta ao código para fins de avaliação interna por colaboradores
+   diretos do titular é permitida, sem que isso implique cessão de direitos.
+
+3. A propositura, por terceiros, de produto ou programa que reproduza a
+   combinação original aqui registrada — ainda que com alterações
+   cosméticas — configura violação de direitos autorais e concorrência
+   desleal (Lei nº 9.279/1996, art. 195).
+
+PROVA DE ANTERIORIDADE
+======================
+A autoria e a data de criação são comprovadas por:
+- histórico de commits assinados em repositório Git público;
+- hash SHA-256 dos artefatos (ver scripts/gerar-hash.sh);
+- Dossiê Financeiro v7 e Apresentação Executiva PDI v20 datados.
+
+CONTATO PARA LICENCIAMENTO
+==========================
+Solicitações de licenciamento, parceria ou cessão devem ser formalizadas
+por escrito ao titular dos direitos.
+
+ESTE SOFTWARE É FORNECIDO "NO ESTADO EM QUE SE ENCONTRA", SEM GARANTIAS DE
+QUALQUER NATUREZA. O TITULAR NÃO SE RESPONSABILIZA POR DANOS DECORRENTES
+DO USO NÃO AUTORIZADO.
